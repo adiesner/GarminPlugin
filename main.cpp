@@ -1,14 +1,14 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
- * npGarminReplacement
- * Copyright (C) Andreas Diesner 2010 <andreas.diesner@gmx.de>
+ * GarminPlugin
+ * Copyright (C) Andreas Diesner 2010 <andreas.diesner [AT] gmx [DOT] de>
  *
- * npGarminReplacement is free software: you can redistribute it and/or modify it
+ * GarminPlugin is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * npGarminReplacement is distributed in the hope that it will be useful, but
+ * GarminPlugin is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU General Public License for more details.
@@ -318,6 +318,23 @@ bool methodFinishWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argC
     return false;
 }
 
+
+/**
+ * Stops writing to the device
+ * @param obj
+ * @param args[] contains all passed parameters
+ * @param argCount number of passed parameters
+ * @param result store return value here
+ * @return boolean. Return true if successful
+ */
+bool methodCancelWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
+{
+    if (currentWorkingDevice != NULL) {
+        currentWorkingDevice->cancelWriteToGps();
+        return true;
+    }
+    return false;
+}
 /**
  * Fetches a detailed device description
  * The return value is a string(xml) with lots of details about the device functionality
@@ -442,6 +459,8 @@ void initializePropertyList() {
     methodList["StartWriteToGps"] = fooPointer;
     fooPointer = &methodFinishWriteToGps;
     methodList["FinishWriteToGps"] = fooPointer;
+    fooPointer = &methodCancelWriteToGps;
+    methodList["CancelWriteToGps"] = fooPointer;
 
     fooPointer = &methodRespondToMessageBox;
     methodList["RespondToMessageBox"] = fooPointer;

@@ -1,0 +1,47 @@
+Short description:
+GarminPlugin is a browser plugin to support Garmin Devices on Linux. 
+Currently (31.01.2010) there is no official browser plugin support for Linux from Garmin.
+
+This plugin has nothing to do with the company Garmin (http://www.garmin.com)
+
+Long description:
+This browser plugin has the same methods and properties as the official 
+Garmin Communicator Plugin (http://www8.garmin.com/products/communicator/).
+It can be used to transfer GPX files (Geocache Descriptions) to your garmin
+device using the official Garmin Javascript API. Its functionality is
+currently limited to transfering files to the device, other functionality
+like reading data from the device might follow soon. 
+ 
+
+Motivation:
+Garmin introduced paperless geocaching a while ago on their devices. This
+works great using Windows and geocaching.com because a windows plugin is 
+available that gives you the possibility to transfer geocaches with one click
+to the device. Having to boot Windows every time I wanted to go geocaching
+felt like a waste of time. I had many different ideas on how to best transfer
+geocaches to my garmin device, but they were all based on parsing the 
+geocaching.com website because they do not offer an official API to access 
+the geocaches. The idea of having to update my application every time they 
+change their layout did stop me from going that approach. Writing a browser
+plugin that simulates the garmin plugin seemed to be the best idea. Using a
+javascript debugger soon revealed that the effort of writing such a plugin
+wasn't that huge - so I got started...
+
+Features:
+  - Write a GPX file to disk
+  - Call a script after the GPX file was written to disk
+
+
+GarminPlugin is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+GarminPlugin is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+This software was written by Andreas Diesner [ andreas.diesner [AT] gmx [DOT] de ]
+The project is hosted on http://www.andreas-diesner.de/garminplugin/
+The source code is hosted on GitHub http://github.com/adiesner/GarminPlugin

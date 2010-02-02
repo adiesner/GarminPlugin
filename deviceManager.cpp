@@ -1,3 +1,22 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
+/*
+ * GarminPlugin
+ * Copyright (C) Andreas Diesner 2010 <andreas.diesner [AT] gmx [DOT] de>
+ *
+ * GarminPlugin is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * GarminPlugin is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 
 #include "deviceManager.h"
 #include "log.h"
@@ -25,11 +44,11 @@ const std::string DeviceManager::getDevicesXML()
 	TiXmlElement * devices = new TiXmlElement( "Devices" );
     devices->SetAttribute("xmlns", "http://www.garmin.com/xmlschemas/PluginAPI/v1");
 
-    for(unsigned int ii=0; ii < gpsDeviceList.size(); ii++)
+    for(unsigned int ii=0; ii < gpsActiveDeviceList.size(); ii++)
     {
-        if (gpsDeviceList[ii]->isDeviceAvailable()) {
+        if (gpsActiveDeviceList[ii]->isDeviceAvailable()) {
             TiXmlElement *device = new TiXmlElement ( "Device" );
-            device->SetAttribute("DisplayName", gpsDeviceList[ii]->getDisplayName());
+            device->SetAttribute("DisplayName", gpsActiveDeviceList[ii]->getDisplayName());
             device->SetAttribute("Number", ii);
             devices->LinkEndChild( device );
         }
@@ -47,7 +66,13 @@ const std::string DeviceManager::getDevicesXML()
 }
 
 void DeviceManager::startFindDevices() {
-
+    gpsActiveDeviceList.clear();
+    for(unsigned int ii=0; ii < gpsDeviceList.size(); ii++)
+    {
+        if (gpsDeviceList[ii]->isDeviceAvailable()) {
+            gpsActiveDeviceList.push_back(gpsDeviceList[ii]);
+        }
+    }
 }
 
 void DeviceManager::createDeviceList(TiXmlDocument * doc) {
@@ -106,5 +131,5 @@ int DeviceManager::finishedFindDevices() {
 
 GpsDevice * DeviceManager::getGpsDevice(int number)
 {
-    return gpsDeviceList[number];
+    return gpsActiveDeviceList[number];
 }
