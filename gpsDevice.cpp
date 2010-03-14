@@ -44,7 +44,7 @@ GpsDevice::GpsDevice() : threadStatus(0)
 string GpsDevice::getDeviceDescription()
 {
 
-    if (Log::enabledDbg) Log::dbg("GpsDevice::getDeviceDescription() "+this->displayName);
+    if (Log::enabledDbg()) Log::dbg("GpsDevice::getDeviceDescription() "+this->displayName);
 /*
 
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
@@ -209,7 +209,7 @@ xsi:schemaLocation="http://www.garmin.com/xmlschemas/GarminDevice/v2 http://www.
 	doc.Accept( &printer );
     string str = printer.Str();
 
-    if (Log::enabledDbg) Log::dbg("GpsDevice::getDeviceDescription() Done: "+this->displayName );
+    if (Log::enabledDbg()) Log::dbg("GpsDevice::getDeviceDescription() Done: "+this->displayName );
     return str;
 }
 
