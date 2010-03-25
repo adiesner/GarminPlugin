@@ -26,9 +26,6 @@
 #include <string>
 #include "messageBox.h"
 
-#include <pthread.h>
-
-
 using namespace std;
 
 class MessageBox;
@@ -36,21 +33,12 @@ class MessageBox;
 class GpsDevice
 {
 public:
-  /**
-   * Creates a new GpsDevice - which simulates an SD Card
-   */
-    GpsDevice();
-
-  /**
-   * Destructor - currently useless
-   */
-    ~GpsDevice();
 
   /**
    * Returns the device description in XML format to be passed to the Garmin Javascript Libs
    * @return xml string with device description
    */
-    string getDeviceDescription();
+    virtual string getDeviceDescription() const = 0;
 
   /**
    * Starts a thread that writes the passed xml string to the given filename
@@ -58,100 +46,87 @@ public:
    * @param xml - content for the file on disk
    * @return int returns 1 if successful otherwise 0
    */
-    int startWriteToGps(string filename, string xml);
+    virtual int startWriteToGps(string filename, string xml) = 0;
+
+  /**
+   * Starts a thread that tries to read the fitness data from a garmin device
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFitnessData() = 0;
 
   /**
    * Returns the status if writing to device is finished
    * @return int     0 = idle    1 = working    2 = waiting    3 = finished
    */
-    int finishWriteToGps();
+    virtual int finishWriteToGps() = 0;
+
+  /**
+   * Returns the status of reading fitness data from the device
+   * @return int     0 = idle    1 = working    2 = waiting    3 = finished
+   */
+    virtual int finishReadFitnessData() = 0;
 
   /**
    * Cancels the write thread
    */
-    void cancelWriteToGps();
+    virtual void cancelWriteToGps() = 0;
 
   /**
    * Returns if the transfer to the device was successful
    * @return int     0 = failed    1 = success
    */
-    int getTransferSucceeded();
+    virtual int getTransferSucceeded() = 0;
 
   /**
    * Returns the name of the device
    * @return string with name of device
    */
-    string getDisplayName();
+    virtual string getDisplayName() { return this->displayName; };
 
   /**
    * Set the name of the device
    * @param name set the name of the devices
    */
-    void setDisplayName(string name);
-
-  /**
-   * Sets the path on disk where to store the files
-   * @param directory full path to a directory on disk
-   */
-    void setStorageDirectory(string directory);
+    virtual void setDisplayName(string name) { this->displayName = name; };
 
   /**
    * Sets a command that gets executed after the file was stored on disk
    * @param cmd command to execute after the file was stored on disk
    */
-    void setStorageCommand(string cmd);
+    virtual void setStorageCommand(string cmd) = 0;
 
   /**
    * Returns a message for the user. Should be called if finishWriteToGps returns 2 (waiting)
    * The function that fetches the message must delete the message!
    * @return MessageBox for the user to display
    */
-    MessageBox * getMessage();
+    virtual MessageBox * getMessage() = 0;
 
   /**
    * A message can be answered by the user. This function must be called if the message was answered
    * @param answer contains the button the user pressed
    */
-    void userAnswered(const int answer);
+    virtual void userAnswered(const int answer) = 0;
 
   /**
    * Returns true if the device is available - current implementation checks if directory exists
    * @return true if devices should be shown to user
    */
-    bool isDeviceAvailable();
-
-private:
+    virtual bool isDeviceAvailable() = 0;
 
   /**
-   * Thread that gets called when a file should be written to disk
-   * @param instance of the GpsDevice that should be written to disk
+   * Gets the fitness data xml
+   * @return xml containing fitness data read from garmin device
    */
-    static void * writeToDevice(void * pthis);
+    virtual string getFitnessData() = 0;
 
-  /**
-   * Name of the GpsDevice which gets displayed to the user
-   */
-    string displayName;
-
-  /**
-   * Directory where this device stores its data to
-   */
-    string storageDirectory;
-
-  /**
-   * Command that should be executed after file was written. Leave empty if no command should be executed
-   */
-    string storageCmd;
-
-  /**
-   * File content to write to disk
-   */
-    string xmlToWrite;
-
-  /**
-   * File name for file on disk
-   */
-    string filenameToWrite;
+protected:
+    enum WorkType
+    {
+      WRITEGPX,
+      READFITNESS
+    };
+    WorkType workType;
 
   /**
    * Stores the status of the thread
@@ -159,27 +134,40 @@ private:
    * This value is used by finishWriteToGps to signal the current status
    * @see finishWriteToGps
    */
-    int threadStatus;
+    int threadState;
+
+    void waitThread();
+
+  /**
+   * Name of the GpsDevice which gets displayed to the user
+   */
+    string displayName;
 
   /**
    * Stores the thread id
    */
     pthread_t threadId;
 
-  /**
-   * The thread can create a message for the user - this message is stored here
-   */
-    MessageBox *  waitingMessage;
 
-  /**
-   * If an overwrite yes/no message is posted to the user, this variable is set to 1 if the user wishes to overwrite the file. Otherwise set to 0
-   */
-    int overwriteFile;
+    void cancelThread();
 
+    void lockVariables();
+    void unlockVariables();
+
+    void signalThread();
+    bool startThread();
+
+    virtual void doWork() = 0;
+
+
+private:
   /**
-   * The thread stores the success state in this variable
+   * Thread that gets called when the device performs a longer operation
+   * like writing data to the device or reading fitness data
+   * @param instance of the GpsDevice that should be written to disk
    */
-    bool transferSuccessful;
+    static void * workerThread(void * pthis);
+
 };
 
 #endif // GPSDEVICE_H_INCLUDED

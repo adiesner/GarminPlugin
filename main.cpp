@@ -39,7 +39,7 @@ char const * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-char const * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.1";
+char const * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2beta";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -410,6 +410,92 @@ bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t a
     return false;
 }
 
+
+bool methodStartReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
+{
+    if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
+        int deviceId = -1;
+        if (args[0].type == NPVariantType_Int32) {
+            deviceId = args[0].value.intValue;
+        } else if (args[0].type == NPVariantType_String) {
+
+            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            Log::dbg("Device ID String: "+deviceIdStr);
+            std::istringstream ss( deviceIdStr );
+            ss >> deviceId;
+            /* Does not work
+            if (! ss.good())
+            {
+                deviceId = -1;
+                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
+            } */
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessData: Expected INT parameter");
+        }
+
+        if (deviceId != -1) {
+            currentWorkingDevice = devManager->getGpsDevice(deviceId);
+            if (currentWorkingDevice != NULL) {
+                result->type = NPVariantType_Int32;
+                result->value.intValue = currentWorkingDevice->startReadFitnessData();
+                return true;
+            } else {
+                if (Log::enabledInfo()) Log::info("StartReadFitnessData: Device not found");
+            }
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessData: Unable to determine device id");
+        }
+
+    } else {
+        if (Log::enabledErr()) Log::err("StartReadFitnessData: Wrong parameter count");
+    }
+
+    return false;
+}
+
+bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
+{
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishReadFitnessData();
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishReadFitnessData: No working device specified");
+        }
+    }
+    return false;
+}
+
+
 /**
  * Initializes the Property List and Function List that are accessible from the outside
  */
@@ -425,6 +511,12 @@ void initializePropertyList() {
 	value.stringValue = "";
 	propertyList["MessageBoxXml"] = value;
 
+	value.stringValue = "";
+	propertyList["TcdXml"] = value;
+	value.stringValue = "";
+	propertyList["TcdXmlz"] = value; // Compressed
+
+
     // can be written from the outside
     value.writeable = true;
     value.stringValue = "";
@@ -436,8 +528,12 @@ void initializePropertyList() {
 	value.type = NPVariantType_Int32;
 	value.intValue = 0;
 	propertyList["GpsTransferSucceeded"] = value;
+	propertyList["Locked"] = value; // unlock
 	value.intValue = 1;
 	propertyList["ProgressXml"] = value;
+
+	value.intValue = 1;
+	propertyList["FitnessTransferSucceeded"] = value;
 
 
 	// Functions
@@ -465,6 +561,11 @@ void initializePropertyList() {
     fooPointer = &methodRespondToMessageBox;
     methodList["RespondToMessageBox"] = fooPointer;
 
+    fooPointer = &methodStartReadFitnessData;
+    methodList["StartReadFitnessData"] = fooPointer;
+
+    fooPointer = &methodFinishReadFitnessData;
+    methodList["FinishReadFitnessData"] = fooPointer;
 
 }
 
@@ -539,7 +640,9 @@ static bool invoke(NPObject* obj, NPIdentifier methodName, const NPVariant *args
 		pt2Func functionPointer = it->second;
 		return (*functionPointer)(obj, args, argCount, result);
 	} else {
-	    cerr << "Method " << name << " not found";
+        std::stringstream ss;
+        ss << "Method "  << name << " not found";
+        Log::err(ss.str());
 	}
 
 	// aim exception handling

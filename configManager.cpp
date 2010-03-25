@@ -106,6 +106,7 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
           <Name>My Oregon 300</Name>
           <StoragePath>/tmp</StoragePath>
           <StorageCommand></StorageCommand>
+          <FitnessDataPath useDriver="false"></FitnessDataPath>
         </Device>
       </Devices>
     </GarminPlugin> */
@@ -131,6 +132,10 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 	TiXmlElement * storageCmd = new TiXmlElement( "StorageCommand" );
 	storageCmd->LinkEndChild(new TiXmlText(""));
 	device->LinkEndChild( storageCmd );
+
+	TiXmlElement * fitnessPath = new TiXmlElement( "FitnessDataPath" );
+	fitnessPath->LinkEndChild(new TiXmlText(""));
+	device->LinkEndChild( fitnessPath );
 
     try {
         doc->SaveFile(configFile);

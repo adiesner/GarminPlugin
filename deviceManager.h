@@ -76,20 +76,11 @@ public:
 
 private:
   /**
-   * Reads the configuration settings xml and creates the device list
-   * @param XML document with configuration
-   */
-    void createDeviceList(TiXmlDocument * );
-
-  /**
    * Stores all configured devices
    */
     vector<GpsDevice *> gpsDeviceList;
 
-  /**
-   * Stores all active devices
-   */
-    vector<GpsDevice *> gpsActiveDeviceList;
+    TiXmlDocument * configuration;
 };
 
 #endif // DEVICEMANAGER_H_INCLUDED

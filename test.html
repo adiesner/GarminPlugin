@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>Aplix Foo Plugin Test</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+		function VersionXml() {
+			try {
+				alert(document.getElementById("pluginobj").VersionXml());
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+
+		function PropertyVersionXml() {
+			try {
+				document.getElementById("debugandi").value = document.getElementById("pluginobj").VersionXml;
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+
+		function PropertyGpsTransferSucceeded() {
+			try {
+				alert(document.getElementById("pluginobj").GpsTransferSucceeded);
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+
+		function PropertyLocked() {
+			try {
+				alert(document.getElementById("pluginobj").Locked);
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+		function StartFindDevices() {
+			try {
+				document.getElementById("pluginobj").StartFindDevices();
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function DeviceDescription() {
+			var number = document.getElementById("deviceid").value;
+			number = number * 1;
+			try {
+				document.getElementById("debugandi").value= document.getElementById("pluginobj").DeviceDescription(number);
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function Unlock() {
+			var number = document.getElementById("deviceid").value;
+			number = number * 1;
+			try {
+				document.getElementById("debugandi").value= document.getElementById("pluginobj").Unlock("http://wwwdev.garmin.com","3e2bab85cbc4e17d3ce5b55c8f2aa652");
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function StartReadFitnessData() {
+			var number = document.getElementById("deviceid").value;
+			number = number * 1;
+			try {
+				document.getElementById("pluginobj").StartReadFitnessData(number);
+                document.getElementById("debugandi").value= "Done";
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function ReadTcdXml() {
+			try {
+				document.getElementById("debugandi").value = document.getElementById("pluginobj").TcdXml;
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function FinishReadFitnessData() {
+			try {
+				document.getElementById("debugandi2").value = document.getElementById("pluginobj").FinishReadFitnessData();
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function WriteToDevice() {
+			var number = document.getElementById("deviceid").value;
+			number = number * 1;
+			var filename = document.getElementById("filename").value;
+			var content = document.getElementById("filecontent").value;
+
+			try {
+				document.getElementById("pluginobj").GpsXml = content;
+				document.getElementById("pluginobj").FileName = filename;
+				document.getElementById("debugandi2").value = document.getElementById("pluginobj").StartWriteToGps(number);
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function DevicesXmlString() {
+			try {
+				document.getElementById("debugandi2").value = document.getElementById("pluginobj").DevicesXmlString();
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function CancelReadFitnessData() {
+			try {
+				document.getElementById("debugandi2").value = document.getElementById("pluginobj").CancelReadFitnessData();
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+
+	</script>
+	<p>
+<h>Plugin Specific</h>
+        <button onclick='PropertyVersionXml()'>Get Property VersionXml</button>
+        <button onclick='Unlock()'>Unlock</button>
+        <button onclick='PropertyLocked()'>Get Int Property Locked</button>
+<hr>
+<h>Search devices</h>
+        <button onclick='StartFindDevices()'>1. StartFindDevices</button>
+        <button onclick='DevicesXmlString()'>2. DevicesXmlString</button>
+        <button onclick='DeviceDescription()'>3. DeviceDescription</button>
+	Device: <input name="deviceid"  id="deviceid" type="text" size="5" maxlength="5" value="0">
+<hr>
+<h>Read Fitnessdata</h>
+        <button onclick='StartReadFitnessData()'>1. StartReadFitnessData</button>
+        <button onclick='FinishReadFitnessData()'>2. FinishReadFitnessData</button>
+        <button onclick='ReadTcdXml()'>3. ReadTcdXml</button>
+        <button onclick='CancelReadFitnessData()'>X. CancelReadFitnessData</button>
+<hr>
+<h>Write GPX File to device</h>
+	Device: <input name="filename"  id="filename" type="text" size="15" maxlength="30" value="dummy.gpx">
+	Device: <input name="filecontent"  id="filecontent" type="text" size="50" maxlength="600" value="This is dummy data for the file">
+        <br><button onclick='WriteToDevice()'>1. WriteToDevice</button>
+        <button onclick='PropertyGpsTransferSucceeded()'>2. GpsTransferSucceeded</button>
+<hr>
+		<object id="pluginobj" type="application/vnd-garmin.mygarmin">Plugin FAILED to load</object>
+	</p>
+
+    <textarea id="debugandi" style="width:400px;height:400px">Empty</textarea>
+    <textarea id="debugandi2" style="width:400px;height:400px">Empty</textarea>
+	</body>
+</html>

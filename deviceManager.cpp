@@ -20,6 +20,13 @@
 
 #include "deviceManager.h"
 #include "log.h"
+#include <mntent.h>
+#include <dirent.h>
+#include "edge705Device.h"
+#include "oregonDevice.h"
+#include "edge305Device.h"
+#include "sdCardDevice.h"
+
 
 DeviceManager::DeviceManager()
 {
@@ -44,14 +51,29 @@ const std::string DeviceManager::getDevicesXML()
 	TiXmlElement * devices = new TiXmlElement( "Devices" );
     devices->SetAttribute("xmlns", "http://www.garmin.com/xmlschemas/PluginAPI/v1");
 
-    for(unsigned int ii=0; ii < gpsActiveDeviceList.size(); ii++)
-    {
-        if (gpsActiveDeviceList[ii]->isDeviceAvailable()) {
+    int deviceCount = 0;
+
+    vector<GpsDevice*>::iterator it=gpsDeviceList.begin();
+    while(it != gpsDeviceList.end()){
+        // Delete devices that are no longer available
+        if( !(*it)->isDeviceAvailable() ){
+            delete *it;
+            it = gpsDeviceList.erase(it);
+            continue;
+        } else {
             TiXmlElement *device = new TiXmlElement ( "Device" );
-            device->SetAttribute("DisplayName", gpsActiveDeviceList[ii]->getDisplayName());
-            device->SetAttribute("Number", ii);
+            device->SetAttribute("DisplayName", (*it)->getDisplayName());
+            device->SetAttribute("Number", deviceCount);
             devices->LinkEndChild( device );
+            deviceCount++;
         }
+        ++it;
+    }
+
+    if (Log::enabledDbg()) {
+        std::ostringstream dbgOut;
+        dbgOut << "getDeviceXML returns " << deviceCount << " devices";
+        Log::dbg(dbgOut.str());
     }
 
     doc.LinkEndChild( decl );
@@ -66,58 +88,172 @@ const std::string DeviceManager::getDevicesXML()
 }
 
 void DeviceManager::startFindDevices() {
-    gpsActiveDeviceList.clear();
-    for(unsigned int ii=0; ii < gpsDeviceList.size(); ii++)
+    // Think about putting this routine into a thread when devices will be supported that take more time to search for
+
+    // Remove active devices
+    while (gpsDeviceList.size() > 0)
     {
-        if (gpsDeviceList[ii]->isDeviceAvailable()) {
-            gpsActiveDeviceList.push_back(gpsDeviceList[ii]);
+        GpsDevice *dev = gpsDeviceList.back();
+        gpsDeviceList.pop_back();
+        delete(dev);
+    }
+
+    FILE *mounts = NULL;
+    struct mntent *ent = NULL;
+    mounts = setmntent("/etc/mtab", "r");
+
+    Log::dbg("Searching for Edge705/Oregon300/...");
+    while ( (ent = getmntent(mounts)) != NULL ) {
+        string filesystype = ent->mnt_type;
+        if (filesystype.compare("vfat") == 0) {
+            string mountPath = ent->mnt_dir;
+            DIR *dp;
+            struct dirent *dirp;
+            if((dp = opendir(mountPath.c_str())) == NULL) {
+                Log::err("Error opening directory: "+mountPath);
+                break;
+            }
+
+            bool garminDirFound = false;
+            while ((dirp = readdir(dp)) != NULL) {
+                string dir = string(dirp->d_name);
+                if (dir.compare("Garmin") == 0) {
+                    garminDirFound = true;
+                    break;
+                }
+            }
+            closedir(dp);
+
+            if (garminDirFound) {
+                string fullPath = mountPath + "/Garmin/GarminDevice.xml";
+                TiXmlDocument doc(fullPath);
+                if (doc.LoadFile()) {
+                    // Perfect, seems to be a Garmin Device
+                    TiXmlElement * node = doc.FirstChildElement("Device");
+                    if (node!=NULL) { node = node->FirstChildElement("Model"); }
+                    if (node!=NULL) { node = node->FirstChildElement("Description"); }
+                    if (node!=NULL) {
+                        string deviceName = node->GetText();
+
+                        GpsDevice * device = NULL;
+                        string::size_type position = deviceName.find( "Oregon", 0 );
+                        if ((device == NULL) && (position != string::npos)) { // Found Oregon in deviceName
+                            OregonDevice * oregon = new OregonDevice();
+                            oregon->setBaseDirectory(mountPath);
+                            oregon->setDeviceDescription(&doc);
+                            oregon->setDisplayName(deviceName);
+                            device = oregon;
+                        }
+
+                        position = deviceName.find( "EDGE", 0 );
+                        if ((device == NULL) && (position != string::npos)) {
+                            Edge705Device * edge = new Edge705Device();
+                            edge->setBaseDirectory(mountPath);
+                            edge->setDeviceDescription(&doc);
+                            edge->setDisplayName(deviceName);
+                            device = edge;
+                        }
+
+                        if (device != NULL) {
+                            Log::dbg("Found "+deviceName+" at "+mountPath);
+                            gpsDeviceList.push_back(device);
+                        } else {
+                            Log::err("Unknown device "+deviceName+" at "+mountPath);
+                        }
+
+                    } else {
+                        Log::err("GarminDevice.xml has unexpected format!");
+                    }
+                } else {
+                    Log::err("Not yet implemented new SD-Card"); //@TODO
+                }
+            } else {
+                Log::dbg("Garmin directory not found at "+mountPath);
+            }
         }
     }
-}
 
-void DeviceManager::createDeviceList(TiXmlDocument * doc) {
-    if (doc == NULL) { return; }
-/*  <GarminPlugin>
-      <Devices>
-        <Device>
-          <Name>My Oregon 300</Name>
-          <StoragePath>/tmp</StoragePath>
-          <StorageCommand></StorageCommand>
-        </Device>
-      </Devices>
-    </GarminPlugin> */
-    TiXmlElement * pRoot = doc->FirstChildElement( "GarminPlugin" );
-    if (pRoot) {
-        TiXmlElement * devices = pRoot->FirstChildElement("Devices");
-        TiXmlElement * device = devices->FirstChildElement("Device");
-        while ( device )
-        {
-            GpsDevice *dev = new GpsDevice();
-            TiXmlElement * name = device->FirstChildElement("Name");
-            if (name) {
-                if (name->GetText() != NULL)
-                    dev->setDisplayName(name->GetText());
-            }
-            TiXmlElement * dir = device->FirstChildElement("StoragePath");
-            if (dir) {
-                if (dir->GetText() != NULL)
-                    dev->setStorageDirectory(dir->GetText());
-            }
-            TiXmlElement * cmd = device->FirstChildElement("StorageCommand");
-            if (cmd) {
-                if (cmd->GetText() != NULL)
-                    dev->setStorageCommand(cmd->GetText());
-            }
+    // Search for garmin 305
+    string deviceName = Edge305Device::getAttachedDeviceName();
+    if (deviceName.length() > 0) {  // Found a device
+        Log::dbg("Found device via garmintools: "+deviceName);
+        Edge305Device * device = new Edge305Device(deviceName);
+        gpsDeviceList.push_back(device);
+    }
 
-            gpsDeviceList.push_back(dev);
+    // Now create virtual SD Card devices from configuration
 
-            device = device->NextSiblingElement( "Device" );
+    if (this->configuration != NULL) {
+        TiXmlElement * pRoot = this->configuration->FirstChildElement( "GarminPlugin" );
+        if (pRoot != NULL) {
+            TiXmlElement * devices = pRoot->FirstChildElement("Devices");
+            TiXmlElement * device = devices->FirstChildElement("Device");
+            while ( device != NULL )
+            {
+                string storagePath = "";
+                string storageCmd = "";
+                string fitnessPath = "";
+                TiXmlElement * dir = device->FirstChildElement("StoragePath");
+                if ((dir) && (dir->GetText() != NULL)) {
+                    storagePath = dir->GetText();
+                }
+                TiXmlElement * cmd = device->FirstChildElement("StorageCommand");
+                if ((cmd) && (cmd->GetText() != NULL)) {
+                    storageCmd = cmd->GetText();
+                }
+                TiXmlElement * fitness = device->FirstChildElement("FitnessDataPath");
+                if ((fitness) && (fitness->GetText() != NULL)) {
+                    fitnessPath = fitness->GetText();
+                }
+
+                GpsDevice * currentDevice = NULL;
+                TiXmlElement * name = device->FirstChildElement("Name");
+                if (name!=NULL) {
+                    if (name->GetText() != NULL) {
+                        for(unsigned int i=0; i < gpsDeviceList.size(); i++)
+                        {
+                            // Device exists, and is configured in configuration
+                            if (gpsDeviceList[i]->getDisplayName().compare(name->GetText()) == 0) {
+                                currentDevice = gpsDeviceList[i];
+                            }
+                        }
+                        if (currentDevice == NULL) { // no device found
+                            deviceName = name->GetText();
+                            Log::info("Creating new SD Card Device from configuration: "+deviceName);
+                            SDCardDevice * sdcard = new SDCardDevice();
+                            sdcard->setDisplayName(name->GetText());
+                            sdcard->setBaseDirectory("");
+                            sdcard->setDeviceDescription(SDCardDevice::getDefaultConfiguration(deviceName, storagePath, fitnessPath));
+                            if (sdcard->isDeviceAvailable()) {
+                                currentDevice = sdcard;
+                                gpsDeviceList.push_back(currentDevice);
+                            } else {
+                                delete(sdcard);
+                                currentDevice = NULL;
+                                Log::dbg("Device "+deviceName+" is not available.");
+                            }
+                        }
+                    }
+                }
+
+                if ((storageCmd.length() > 0) && (currentDevice!=NULL)) {
+                    Log::dbg("Setting Storage Command for "+currentDevice->getDisplayName()+": "+storageCmd);
+                    currentDevice->setStorageCommand(storageCmd);
+                }
+
+                device = device->NextSiblingElement( "Device" );
+            }
         }
     }
+
+    std::ostringstream infoOut;
+    infoOut << "Number of devices found: " << gpsDeviceList.size();
+    Log::info(infoOut.str());
 }
 
 void DeviceManager::setConfiguration(TiXmlDocument * config) {
-    createDeviceList(config);
+    //@TODO
+    this->configuration = config;
 }
 
 
@@ -131,5 +267,8 @@ int DeviceManager::finishedFindDevices() {
 
 GpsDevice * DeviceManager::getGpsDevice(int number)
 {
-    return gpsActiveDeviceList[number];
+    if (number < (int)gpsDeviceList.size()) {
+        return gpsDeviceList[number];
+    }
+    return NULL;
 }

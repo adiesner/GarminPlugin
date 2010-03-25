@@ -22,7 +22,7 @@ CFLAGS_C = $(filter-out -include "sdk.h",$(CFLAGS))
 
 # MAKE_DEP = -MMD -MT $@ -MF $(@:.o=.d)
 
-CFLAGS = 
+CFLAGS = -Wall 
 INCLUDES = 
 LDFLAGS =  -s
 RCFLAGS = 
@@ -59,17 +59,17 @@ clean :
 # -----------------------------------------
 # Release_target
 
-Release_target.BIN = libGarminPlugin.a
-Release_target.OBJ = configManager.o deviceManager.o gpsDevice.o log.o main.o messageBox.o 
-DEP_FILES += configManager.d deviceManager.d gpsDevice.d log.d main.d messageBox.d 
+Release_target.BIN = bin/Release/npGarminPlugin.so
+Release_target.OBJ = configManager.o deviceManager.o edge305Device.o edge705Device.o garminFilebasedDevice.o gpsDevice.o log.o main.o messageBox.o oregonDevice.o sdCardDevice.o 
+DEP_FILES += configManager.d deviceManager.d edge305Device.d edge705Device.d garminFilebasedDevice.d gpsDevice.d log.d main.d messageBox.d oregonDevice.d sdCardDevice.d 
 clean.OBJ += $(Release_target.BIN) $(Release_target.OBJ)
 
 Release_target : Release_target.before $(Release_target.BIN) Release_target.after_always
-Release_target : CFLAGS += -Wall -O2  -Os
-Release_target : INCLUDES += -I../ticpp -I/usr/lib/xulrunner-devel-1.9.1.8/include 
+Release_target : CFLAGS += -O2 -fPIC  -Os
+Release_target : INCLUDES += -I/usr/lib/xulrunner-devel-1.9.1.7/include -I../ticpp -I/usr/lib/xulrunner-devel-1.9.1.8/include -I../garmintools/src 
 Release_target : RCFLAGS += 
-Release_target : LDFLAGS += -s   $(CREATE_DEF)
-Release_target : T_LDLIBS = ../ticpp/lib/libticppd.a 
+Release_target : LDFLAGS += -s  $(CREATE_LIB) $(CREATE_DEF)
+Release_target : T_LDLIBS = ../ticpp/lib/libticppd.a ../garmintools/src/.libs/libgarmintools.a /usr/lib64/libusb.so 
 ifdef LMAKE
 Release_target : CFLAGS -= -O1 -O2 -g -pipe
 endif
@@ -80,23 +80,23 @@ Release_target.before :
 Release_target.after_always : $(Release_target.BIN)
 	
 $(Release_target.BIN) : $(Release_target.OBJ)
-	$(LINK_lib)
+	$(LINK_dll)
 	
 
 # -----------------------------------------
 # Debug_target
 
-Debug_target.BIN = npGarminPlugin.so
-Debug_target.OBJ = configManager.o deviceManager.o gpsDevice.o log.o main.o messageBox.o 
-DEP_FILES += configManager.d deviceManager.d gpsDevice.d log.d main.d messageBox.d 
+Debug_target.BIN = bin/Debug/npGarminPlugin.so
+Debug_target.OBJ = configManager.o deviceManager.o edge305Device.o edge705Device.o garminFilebasedDevice.o gpsDevice.o log.o main.o messageBox.o oregonDevice.o sdCardDevice.o 
+DEP_FILES += configManager.d deviceManager.d edge305Device.d edge705Device.d garminFilebasedDevice.d gpsDevice.d log.d main.d messageBox.d oregonDevice.d sdCardDevice.d 
 clean.OBJ += $(Debug_target.BIN) $(Debug_target.OBJ)
 
 Debug_target : Debug_target.before $(Debug_target.BIN) Debug_target.after_always
-Debug_target : CFLAGS += -Wall -g  -Os
-Debug_target : INCLUDES += -I../ticpp -I/usr/lib/xulrunner-devel-1.9.1.8/include 
+Debug_target : CFLAGS += -g -fPIC  -Os
+Debug_target : INCLUDES += -I/usr/lib/xulrunner-devel-1.9.1.8/include -I../ticpp -I../garmintools/src 
 Debug_target : RCFLAGS += 
 Debug_target : LDFLAGS +=  $(CREATE_LIB) $(CREATE_DEF)
-Debug_target : T_LDLIBS = ../ticpp/lib/libticppd.a 
+Debug_target : T_LDLIBS = ../ticpp/lib/libticppd.a ../garmintools/src/.libs/libgarmintools.a /usr/lib64/libusb.so 
 ifdef LMAKE
 Debug_target : CFLAGS -= -O1 -O2 -g -pipe
 endif
