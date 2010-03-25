@@ -30,7 +30,7 @@ wasn't that huge - so I got started...
 Features:
   - Write a GPX file to disk
   - Call a script after the GPX file was written to disk
-
+  - Read FitnessData from device
 
 GarminPlugin is free software: you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the
@@ -45,3 +45,9 @@ See the GNU General Public License for more details.
 This software was written by Andreas Diesner [ andreas.diesner [AT] gmx [DOT] de ]
 The project is hosted on http://www.andreas-diesner.de/garminplugin/
 The source code is hosted on GitHub http://github.com/adiesner/GarminPlugin
+
+Dependencies to other projects:
+garmintools - http://code.google.com/p/garmintools/
+libusb      - http://www.libusb.org/
+ticpp       - http://code.google.com/p/ticpp/
+

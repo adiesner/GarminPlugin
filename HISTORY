@@ -1,0 +1,13 @@
+
+
+2010-03-25 - Version 0.2beta
+- Autodetect devices like Oregon 300, Edge 705, Edge 305
+- Added garmintools to communicate with Edge 305 / Forerunner 305
+- Read FitnessData of Edge 705, Edge 305
+- Upload FitnessData to pages like www.cyclogz.com
+
+2010-01-31 - Version 0.1
+- Send GPX to filesystem (tested on www.geocaching.com)
+- Configure several devices using a xml configuration file
+- Execute a command after successfully storing a gpx file (like gpsbabel)
+
