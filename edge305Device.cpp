@@ -125,8 +125,8 @@ string Edge305Device::readFitnessData()
 
     if ( garmin_init(&garmin,0) != 0 ) {
         Log::dbg("Extracting data from Garmin "+this->displayName);
-        //if ((data = garmin_get(&garmin,GET_RUNS)) != NULL ) {
-        if ( (data = garmin_load("/home/andreas/Projekte/GeocacheDownloader/Firefox-Plugin/gpsbabel/2010/02/20100227T152346.gmn")) != NULL ) {
+        if ((data = garmin_get(&garmin,GET_RUNS)) != NULL ) {
+        //if ( (data = garmin_load("/workout/2010/02/20100227T152346.gmn")) != NULL ) {
             Log::dbg("Received data from Garmin, processing data...");
 
             data0 = garmin_list_data(data,0);
