@@ -495,6 +495,28 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
     return false;
 }
 
+bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    Log::err("Please implement me!");
+    return true;
+}
+
+bool methodStartReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    Log::err("Please implement me!");
+    return true;
+}
+
+bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    Log::err("Please implement me!");
+    result->type = NPVariantType_Int32;
+    result->value.intValue = 3; // Finished
+    return true;
+}
+
+bool methodCancelReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    Log::err("Please implement me!");
+    return true;
+}
+
 
 /**
  * Initializes the Property List and Function List that are accessible from the outside
@@ -566,6 +588,18 @@ void initializePropertyList() {
 
     fooPointer = &methodFinishReadFitnessData;
     methodList["FinishReadFitnessData"] = fooPointer;
+
+    fooPointer = &methodStartReadFITDirectory;
+    methodList["StartReadFITDirectory"] = fooPointer;
+
+    fooPointer = &methodStartReadFitnessDirectory;
+    methodList["StartReadFitnessDirectory"] = fooPointer;
+
+    fooPointer = &methodFinishReadFitnessDirectory;
+    methodList["FinishReadFitnessDirectory"] = fooPointer;
+
+    fooPointer = &methodCancelReadFitnessData;
+    methodList["CancelReadFitnessData"] = fooPointer;
 
 }
 

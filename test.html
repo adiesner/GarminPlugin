@@ -16,7 +16,7 @@
 
 		function PropertyVersionXml() {
 			try {
-				document.getElementById("debugandi").value = document.getElementById("pluginobj").VersionXml;
+				document.getElementById("debug1").value = document.getElementById("pluginobj").VersionXml;
 			}
 			catch(e) {
 				alert(e);
@@ -52,7 +52,7 @@
 			var number = document.getElementById("deviceid").value;
 			number = number * 1;
 			try {
-				document.getElementById("debugandi").value= document.getElementById("pluginobj").DeviceDescription(number);
+				document.getElementById("debug1").value= document.getElementById("pluginobj").DeviceDescription(number);
 			}
 			catch(e) {
 				alert(e);
@@ -62,7 +62,7 @@
 			var number = document.getElementById("deviceid").value;
 			number = number * 1;
 			try {
-				document.getElementById("debugandi").value= document.getElementById("pluginobj").Unlock("http://wwwdev.garmin.com","3e2bab85cbc4e17d3ce5b55c8f2aa652");
+				document.getElementById("debug1").value= document.getElementById("pluginobj").Unlock("http://wwwdev.garmin.com","3e2bab85cbc4e17d3ce5b55c8f2aa652");
 			}
 			catch(e) {
 				alert(e);
@@ -73,7 +73,7 @@
 			number = number * 1;
 			try {
 				document.getElementById("pluginobj").StartReadFitnessData(number);
-                document.getElementById("debugandi").value= "Done";
+                document.getElementById("debug1").value= "Done";
 			}
 			catch(e) {
 				alert(e);
@@ -81,7 +81,7 @@
 		}
         function ReadTcdXml() {
 			try {
-				document.getElementById("debugandi").value = document.getElementById("pluginobj").TcdXml;
+				document.getElementById("debug1").value = document.getElementById("pluginobj").TcdXml;
 			}
 			catch(e) {
 				alert(e);
@@ -89,7 +89,7 @@
 		}
         function FinishReadFitnessData() {
 			try {
-				document.getElementById("debugandi2").value = document.getElementById("pluginobj").FinishReadFitnessData();
+				document.getElementById("debug2").value = document.getElementById("pluginobj").FinishReadFitnessData();
 			}
 			catch(e) {
 				alert(e);
@@ -104,7 +104,7 @@
 			try {
 				document.getElementById("pluginobj").GpsXml = content;
 				document.getElementById("pluginobj").FileName = filename;
-				document.getElementById("debugandi2").value = document.getElementById("pluginobj").StartWriteToGps(number);
+				document.getElementById("debug2").value = document.getElementById("pluginobj").StartWriteToGps(number);
 			}
 			catch(e) {
 				alert(e);
@@ -112,7 +112,7 @@
 		}
         function DevicesXmlString() {
 			try {
-				document.getElementById("debugandi2").value = document.getElementById("pluginobj").DevicesXmlString();
+				document.getElementById("debug2").value = document.getElementById("pluginobj").DevicesXmlString();
 			}
 			catch(e) {
 				alert(e);
@@ -120,7 +120,35 @@
 		}
         function CancelReadFitnessData() {
 			try {
-				document.getElementById("debugandi2").value = document.getElementById("pluginobj").CancelReadFitnessData();
+				document.getElementById("debug2").value = document.getElementById("pluginobj").CancelReadFitnessData();
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function StartReadFITDirectory() {
+			try {
+				var number = document.getElementById("deviceid").value;
+				number = number * 1;
+				document.getElementById("debug2").value = document.getElementById("pluginobj").StartReadFITDirectory(number);
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function StartReadFitnessDirectory() {
+			try {
+				var number = document.getElementById("deviceid").value;
+				number = number * 1;
+				document.getElementById("debug2").value = document.getElementById("pluginobj").StartReadFitnessDirectory(number,"FitnessHistory");
+			}
+			catch(e) {
+				alert(e);
+			}
+		}
+        function FinishReadFitnessDirectory() {
+			try {
+				document.getElementById("debug2").value = document.getElementById("pluginobj").FinishReadFitnessDirectory();
 			}
 			catch(e) {
 				alert(e);
@@ -140,10 +168,17 @@
         <button onclick='DeviceDescription()'>3. DeviceDescription</button>
 	Device: <input name="deviceid"  id="deviceid" type="text" size="5" maxlength="5" value="0">
 <hr>
-<h>Read Fitnessdata</h>
+<h>Read Fitnessdata like cyclogz.com</h>
         <button onclick='StartReadFitnessData()'>1. StartReadFitnessData</button>
         <button onclick='FinishReadFitnessData()'>2. FinishReadFitnessData</button>
         <button onclick='ReadTcdXml()'>3. ReadTcdXml</button>
+        <button onclick='CancelReadFitnessData()'>X. CancelReadFitnessData</button>
+<hr>
+<h>Read Fitnessdata like connect.garmin.com</h>
+        <button onclick='StartReadFITDirectory()'>1. StartReadFITDirectory</button>
+        <button onclick='StartReadFitnessDirectory()'>2. StartReadFitnessDirectory</button>
+        <button onclick='FinishReadFitnessDirectory()'>3. FinishReadFitnessDirectory</button>
+        <button onclick='ReadTcdXml()'>4. ReadTcdXml</button>
         <button onclick='CancelReadFitnessData()'>X. CancelReadFitnessData</button>
 <hr>
 <h>Write GPX File to device</h>
@@ -155,7 +190,7 @@
 		<object id="pluginobj" type="application/vnd-garmin.mygarmin">Plugin FAILED to load</object>
 	</p>
 
-    <textarea id="debugandi" style="width:400px;height:400px">Empty</textarea>
-    <textarea id="debugandi2" style="width:400px;height:400px">Empty</textarea>
+    <textarea id="debug1" style="width:400px;height:400px">Empty</textarea>
+    <textarea id="debug2" style="width:400px;height:400px">Empty</textarea>
 	</body>
 </html>
