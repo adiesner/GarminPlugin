@@ -16,7 +16,7 @@ class Edge705Device : public GarminFilebasedDevice
 public:
     Edge705Device();
 
-    ~Edge705Device();
+    virtual ~Edge705Device();
 
 
   /**
@@ -61,11 +61,15 @@ public:
     virtual void cancelReadFitnessData();
 
 
+    virtual int startReadFitnessDetail(string id);
+
+    virtual int finishReadFitnessDetail();
+
+    virtual void cancelReadFitnessDetail();
+
 protected:
     virtual void doWork();
-    void readFitnessDataFromDevice();
-
-    void readFitnessDirectoryFromDevice();
+    void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);
 
   /**
    * Directory where this device stores its fitness data
@@ -83,6 +87,11 @@ private:
    * Stores the fitnessData which was read from the device
    */
     string fitnessDataTcdXml;
+
+    /**
+     * Stores the id of the track that should be read
+     */
+    string readFitnessDetailId;
 
 };
 
