@@ -147,6 +147,22 @@ string compressStringData(const string text) {
     return outstream.str();
 }
 
+void printFinishState(string text, int state) {
+    if (Log::enabledDbg()) {
+        std::stringstream ss;
+        ss << "Finish State of function " << text << ": ";
+        // 0 = idle      1 = working      2 = waiting for user input      3 = finished
+        switch (state) {
+            case 0: ss << "Idle"; break;
+            case 1: ss << "Working"; break;
+            case 2: ss << "Waiting for user input"; break;
+            case 3: ss << "Finished"; break;
+            default: ss << "Unknown ("<<state<<")";
+        }
+        Log::dbg(ss.str());
+    }
+}
+
 /**
  * Method to unlock the plugin.
  * This method gets called from the outside.
@@ -240,7 +256,7 @@ bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
 {
     result->type = NPVariantType_Int32;
     result->value.intValue = devManager->finishedFindDevices();
-
+    printFinishState("FinishFindDevices", result->value.intValue);
     return true;
 }
 
@@ -337,6 +353,7 @@ bool methodFinishWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argC
         if (currentWorkingDevice != NULL) {
             result->type = NPVariantType_Int32;
             result->value.intValue = currentWorkingDevice->finishWriteToGps();
+            printFinishState("FinishWriteToGps", result->value.intValue);
             if (result->value.intValue == 2) { // waiting for user input
                 messageList.push_back(currentWorkingDevice->getMessage());
                 MessageBox * msg = messageList.front();
@@ -513,6 +530,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
         if (currentWorkingDevice != NULL) {
             result->type = NPVariantType_Int32;
             result->value.intValue = currentWorkingDevice->finishReadFitnessData();
+            printFinishState("FinishReadFitnessData", result->value.intValue);
             if (result->value.intValue == 2) { // waiting for user input
                 messageList.push_back(currentWorkingDevice->getMessage());
                 MessageBox * msg = messageList.front();
@@ -652,6 +670,7 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
         if (currentWorkingDevice != NULL) {
             result->type = NPVariantType_Int32;
             result->value.intValue = currentWorkingDevice->finishReadFitnessDetail();
+            printFinishState("FinishReadFitnessDetail", result->value.intValue);
             if (result->value.intValue == 2) { // waiting for user input
                 messageList.push_back(currentWorkingDevice->getMessage());
                 MessageBox * msg = messageList.front();
@@ -702,6 +721,7 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
         if (currentWorkingDevice != NULL) {
             result->type = NPVariantType_Int32;
             result->value.intValue = currentWorkingDevice->finishReadFitnessDirectory();
+            printFinishState("FinishReadFitnessDirectory", result->value.intValue);
             if (result->value.intValue == 2) { // waiting for user input
                 messageList.push_back(currentWorkingDevice->getMessage());
                 MessageBox * msg = messageList.front();
@@ -836,7 +856,7 @@ void initializePropertyList() {
  */
 static bool hasMethod(NPObject* obj, NPIdentifier methodName) {
     string name = npnfuncs->utf8fromidentifier(methodName);
-	if (Log::enabledDbg()) Log::dbg("hasMethod: "+name);
+	//if (Log::enabledDbg()) Log::dbg("hasMethod: "+name);
 
 	map<string,pt2Func>::iterator it;
 
@@ -918,7 +938,7 @@ static bool invoke(NPObject* obj, NPIdentifier methodName, const NPVariant *args
 static bool hasProperty(NPObject *obj, NPIdentifier propertyName) {
 
     string name = npnfuncs->utf8fromidentifier(propertyName);
-    if (Log::enabledDbg()) Log::dbg("hasProperty: "+name);
+    //if (Log::enabledDbg()) Log::dbg("hasProperty: "+name);
 
 	map<string,Property>::iterator it;
 
