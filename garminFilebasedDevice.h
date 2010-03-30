@@ -19,7 +19,7 @@ class GarminFilebasedDevice : public GpsDevice
 public:
     GarminFilebasedDevice();
 
-    ~GarminFilebasedDevice();
+    virtual ~GarminFilebasedDevice();
 
     void setDeviceDescription(TiXmlDocument * device);
 

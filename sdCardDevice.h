@@ -16,7 +16,7 @@ class SDCardDevice : public GarminFilebasedDevice
 public:
     SDCardDevice();
 
-    ~SDCardDevice();
+    virtual ~SDCardDevice();
 
 
   /**

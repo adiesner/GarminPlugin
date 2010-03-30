@@ -29,6 +29,11 @@ pthread_mutex_t     waitThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 GpsDevice::GpsDevice() : threadId (0) {
 }
 
+GpsDevice::~GpsDevice() {
+    Log::dbg("Destructor of GpsDevice "+ this->displayName + " called");
+    cancelThread();
+}
+
 bool GpsDevice::startThread() {
     int code = pthread_create(&(this->threadId), NULL, GpsDevice::workerThread, (void*)this);
 

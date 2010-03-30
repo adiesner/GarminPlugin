@@ -36,7 +36,7 @@ SDCardDevice::SDCardDevice()
 }
 
 SDCardDevice::~SDCardDevice() {
-    delete(deviceDescription);
+    Log::dbg("SDCardDevice destructor");
 }
 
 bool SDCardDevice::isDeviceAvailable() {

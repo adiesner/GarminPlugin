@@ -35,6 +35,8 @@ class GpsDevice
 public:
     GpsDevice();
 
+    virtual ~GpsDevice();
+
   /**
    * Returns the device description in XML format to be passed to the Garmin Javascript Libs
    * @return xml string with device description

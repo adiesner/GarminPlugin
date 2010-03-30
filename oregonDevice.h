@@ -16,7 +16,7 @@ class OregonDevice : public GarminFilebasedDevice
 public:
     OregonDevice();
 
-    ~OregonDevice();
+    virtual ~OregonDevice();
 
 
   /**

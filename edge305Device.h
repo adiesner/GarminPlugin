@@ -19,7 +19,7 @@ public:
 
     Edge305Device(string name);
 
-    ~Edge305Device();
+    virtual ~Edge305Device();
 
 
   /**

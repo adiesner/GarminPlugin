@@ -35,6 +35,7 @@ OregonDevice::OregonDevice()
 }
 
 OregonDevice::~OregonDevice() {
+    Log::dbg("OregonDevice destructor");
 }
 
 void OregonDevice::setPathesFromConfiguration() {
