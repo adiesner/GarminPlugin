@@ -23,11 +23,14 @@
 #include <sys/stat.h>
 #include "log.h"
 
-ConfigManager::ConfigManager() : createdNew(false) {
+ConfigManager::ConfigManager() : configuration(NULL), createdNew(false) {
 }
 
 ConfigManager::~ConfigManager() {
-    delete configuration;
+    Log::dbg("ConfigManager destructor");
+    if (this->configuration != NULL) {
+        delete this->configuration;
+    }
 }
 
 void ConfigManager::readConfiguration() {

@@ -252,7 +252,7 @@ void DeviceManager::startFindDevices() {
 }
 
 void DeviceManager::setConfiguration(TiXmlDocument * config) {
-    //@TODO
+    // Memory will be freed from configManager
     this->configuration = config;
 }
 
