@@ -81,7 +81,10 @@ void OregonDevice::setPathesFromConfiguration() {
         }
     }
 
-    // Oregon officially does not support read fitness data. Therefore add a node to support it as I implemented it
+    // Oregon officially does not support read fitness data.
+    // It is planned in the future to read the current.gpx file
+    // convert that file to fitness data
+    /*
     if (massStorageNode != NULL) {
         TiXmlElement * dataTypes = new TiXmlElement( "DataType" );
         massStorageNode->LinkEndChild(dataTypes);
@@ -113,8 +116,8 @@ void OregonDevice::setPathesFromConfiguration() {
         TiXmlElement * transferDir = new TiXmlElement( "TransferDirection" );
         transferDir->LinkEndChild(new TiXmlText("OutputFromUnit"));
         file->LinkEndChild(transferDir);
-
     }
+    */
 }
 
 
@@ -158,7 +161,8 @@ void OregonDevice::doWork() {
     }
 }
 
-
+// This is currently a hack - the device does not support the read of fitnessdata
+// This function still needs testing!
 void OregonDevice::readFitnessDataFromDevice() {
     Log::dbg("Thread readFitnessData started");
 /*
