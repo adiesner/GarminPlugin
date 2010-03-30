@@ -273,3 +273,35 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
         }
     }
 }
+
+int GarminFilebasedDevice::startReadFITDirectory() {
+    Log::err("Reading fitness directory is not implemented for this device "+this->displayName);
+    return 0;
+}
+
+int GarminFilebasedDevice::startReadFitnessDirectory() {
+    Log::err("Reading fitness directory is not implemented for this device "+this->displayName);
+    return 0;
+}
+
+int GarminFilebasedDevice::finishReadFitnessDirectory() {
+    return 3; // Finished
+}
+
+void GarminFilebasedDevice::cancelReadFitnessData() {
+    cancelThread();
+}
+
+int GarminFilebasedDevice::startReadFitnessDetail(string id) {
+    Log::err("Please implement me GarminFilebasedDevice::startReadFitnessDetail");
+    return 0;
+}
+
+int GarminFilebasedDevice::finishReadFitnessDetail() {
+    Log::err("Please implement me GarminFilebasedDevice::finishReadFitnessDetail");
+    return 0;
+}
+
+void GarminFilebasedDevice::cancelReadFitnessDetail() {
+    Log::err("Please implement me GarminFilebasedDevice::cancelReadFitnessDetail");
+}

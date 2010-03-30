@@ -33,6 +33,7 @@ class MessageBox;
 class GpsDevice
 {
 public:
+    GpsDevice();
 
   /**
    * Returns the device description in XML format to be passed to the Garmin Javascript Libs
@@ -120,11 +121,45 @@ public:
    */
     virtual string getFitnessData() = 0;
 
+  /**
+   * Starts reading the fitness data without points
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFITDirectory() = 0;
+
+  /**
+   * Starts reading the fitness data without points
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFitnessDirectory() = 0;
+
+  /**
+   * Checks if the read of the fitness directory finished
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFitnessDirectory() = 0;
+
+    /**
+     * Cancels the read of the fitness data
+     */
+    virtual void cancelReadFitnessData() = 0;
+
+    /**
+     *
+     */
+    virtual int startReadFitnessDetail(string id) = 0;
+
+    virtual int finishReadFitnessDetail() = 0;
+
+    virtual void cancelReadFitnessDetail() = 0;
+
 protected:
     enum WorkType
     {
       WRITEGPX,
-      READFITNESS
+      READFITNESS,
+      READFITNESSDIR,
+      READFITNESSDETAIL
     };
     WorkType workType;
 

@@ -37,9 +37,35 @@ public:
    */
     string getFitnessData();
 
+  /**
+   * Starts reading the fitness data without points
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFITDirectory();
+
+  /**
+   * Starts reading the fitness data without points
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFitnessDirectory();
+
+  /**
+   * Checks if the read of the fitness directory finished
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFitnessDirectory();
+
+    /**
+     * Cancels the read of the fitness data
+     */
+    virtual void cancelReadFitnessData();
+
+
 protected:
     virtual void doWork();
-    void * readFitnessDataFromDevice();
+    void readFitnessDataFromDevice();
+
+    void readFitnessDirectoryFromDevice();
 
   /**
    * Directory where this device stores its fitness data

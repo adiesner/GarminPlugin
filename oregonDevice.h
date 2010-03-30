@@ -47,6 +47,7 @@ public:
 
     void setStorageDirectory(string path);
 
+
 protected:
     virtual void doWork();
     void readFitnessDataFromDevice();

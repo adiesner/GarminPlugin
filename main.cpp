@@ -28,6 +28,13 @@
 #include "configManager.h"
 #include "log.h"
 #include <sstream>
+#include "zlib.h"
+
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include "boost/archive/iterators/base64_from_binary.hpp"
+#include "boost/archive/iterators/transform_width.hpp"
 
 using namespace std;
 
@@ -111,6 +118,35 @@ std::vector<MessageBox*> messageList;
  */
 GpsDevice * currentWorkingDevice = NULL;
 
+typedef
+   boost::archive::iterators::base64_from_binary<
+        boost::archive::iterators::transform_width<string::const_iterator, 6, 8>
+        > base64_t;
+
+/**
+ * Compresses a string using gzip and encodes it using base64
+ * Use uudecode to unpack and then gunzip
+ */
+string compressStringData(const string text) {
+    std::stringstream decompressed;
+    std::stringstream compressed;
+    std::stringstream outstream;
+    decompressed << text;
+
+    boost::iostreams::filtering_streambuf<boost::iostreams::input> out;
+    out.push(boost::iostreams::gzip_compressor());
+    out.push(decompressed);
+    boost::iostreams::copy(out, compressed);
+
+    string bin = compressed.str();
+    string enc(base64_t(bin.begin()), base64_t(bin.end()));
+
+    outstream << "begin-base64 644 data.xml.gz" << endl;
+    outstream << enc << "==" << endl;  // Don't ask me why I have to add "==" here, but otherwise it does not decompress correctly
+    outstream << "====" << endl;
+    return outstream.str();
+}
+
 /**
  * Method to unlock the plugin.
  * This method gets called from the outside.
@@ -167,6 +203,7 @@ bool methodDevicesXmlString(NPObject *obj, const NPVariant args[], uint32_t argC
  */
 bool methodStartFindDevices(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
+    currentWorkingDevice = NULL;
     devManager->startFindDevices();
     return true;
 }
@@ -485,6 +522,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
+                propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
             }
 
             return true;
@@ -496,8 +534,44 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
 }
 
 bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
-    Log::err("Please implement me!");
-    return true;
+    if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
+        int deviceId = -1;
+        if (args[0].type == NPVariantType_Int32) {
+            deviceId = args[0].value.intValue;
+        } else if (args[0].type == NPVariantType_String) {
+
+            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            Log::dbg("Device ID String: "+deviceIdStr);
+            std::istringstream ss( deviceIdStr );
+            ss >> deviceId;
+            /* Does not work
+            if (! ss.good())
+            {
+                deviceId = -1;
+                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
+            } */
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected INT parameter");
+        }
+
+        if (deviceId != -1) {
+            currentWorkingDevice = devManager->getGpsDevice(deviceId);
+            if (currentWorkingDevice != NULL) {
+                result->type = NPVariantType_Int32;
+                result->value.intValue = currentWorkingDevice->startReadFitnessDirectory();
+                return true;
+            } else {
+                if (Log::enabledInfo()) Log::info("StartReadFitnessDirectory: Device not found");
+            }
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Unable to determine device id");
+        }
+
+    } else {
+        if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Wrong parameter count");
+    }
+
+    return false;
 }
 
 bool methodStartReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
@@ -505,16 +579,157 @@ bool methodStartReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_t
     return true;
 }
 
-bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
-    Log::err("Please implement me!");
-    result->type = NPVariantType_Int32;
-    result->value.intValue = 3; // Finished
+bool methodStartReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    //  StartReadFitnessDetail(0,"FitnessHistory","2010-02-27T14:23:46Z")
+
+    if (argCount >= 2) { // What is the second parameter for ? "FitnessHistory"
+        int deviceId = -1;
+        string id = "";
+        if (args[0].type == NPVariantType_Int32) {
+            deviceId = args[0].value.intValue;
+        } else if (args[0].type == NPVariantType_String) {
+
+            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            Log::dbg("Device ID String: "+deviceIdStr);
+            std::istringstream ss( deviceIdStr );
+            ss >> deviceId;
+            /* Does not work
+            if (! ss.good())
+            {
+                deviceId = -1;
+                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
+            } */
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected INT parameter 1");
+        }
+
+        if (args[2].type == NPVariantType_Int32) {
+            id = args[2].value.intValue;
+        } else if (args[2].type == NPVariantType_String) {
+            id = args[2].value.stringValue.utf8characters;
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected STRING parameter 3");
+        }
+
+        if (deviceId != -1) {
+            currentWorkingDevice = devManager->getGpsDevice(deviceId);
+            if (currentWorkingDevice != NULL) {
+                result->type = NPVariantType_Int32;
+                result->value.intValue = currentWorkingDevice->startReadFitnessDetail(id);
+                return true;
+            } else {
+                if (Log::enabledInfo()) Log::info("StartReadFitnessDirectory: Device not found");
+            }
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Unable to determine device id");
+        }
+    } else {
+        if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Wrong parameter count");
+    }
+
+    return false;
+}
+
+bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishReadFitnessDetail();
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
+                propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishReadFitnessDetail: No working device specified");
+        }
+    }
+    return false;
+}
+
+bool methodCancelReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (currentWorkingDevice != NULL) {
+        currentWorkingDevice -> cancelReadFitnessDetail();
+    }
     return true;
 }
 
+
+bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishReadFitnessDirectory();
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
+                propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishReadFitnessData: No working device specified");
+        }
+    }
+    return false;
+}
+
 bool methodCancelReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
-    Log::err("Please implement me!");
-    return true;
+    if (currentWorkingDevice != NULL) {
+        Log::dbg("Calling cancel read fitness data");
+
+        currentWorkingDevice->cancelReadFitnessData();
+        return true;
+    }
+    return false;
 }
 
 
@@ -600,6 +815,15 @@ void initializePropertyList() {
 
     fooPointer = &methodCancelReadFitnessData;
     methodList["CancelReadFitnessData"] = fooPointer;
+
+    fooPointer = &methodStartReadFitnessDetail;
+    methodList["StartReadFitnessDetail"] = fooPointer;
+
+    fooPointer = &methodFinishReadFitnessDetail;
+    methodList["FinishReadFitnessDetail"] = fooPointer;
+
+    fooPointer = &methodCancelReadFitnessDetail;
+    methodList["CancelReadFitnessDetail"] = fooPointer;
 
 }
 

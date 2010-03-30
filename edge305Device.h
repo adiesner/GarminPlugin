@@ -57,9 +57,39 @@ public:
     void userAnswered(const int answer);
     bool isDeviceAvailable();
 
+  /**
+   * Starts reading the fitness data without points
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFITDirectory();
+
+  /**
+   * Starts reading the fitness data without points
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFitnessDirectory();
+
+  /**
+   * Checks if the read of the fitness directory finished
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFitnessDirectory();
+
+    /**
+     * Cancels the read of the fitness data
+     */
+    virtual void cancelReadFitnessData();
+
+    virtual int startReadFitnessDetail(string id);
+
+    virtual int finishReadFitnessDetail();
+
+    virtual void cancelReadFitnessDetail();
+
+
 protected:
     virtual void doWork();
-    void readFitnessDataFromDevice();
+    void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);
 
   /**
    * Directory where this device stores its fitness data
@@ -72,8 +102,13 @@ protected:
      * Reads fitnessdata xml from a garmin device like Edge 305/Forerunner 305
      * @return xml containing fitness data read from garmin device
      */
-    string readFitnessData();
+    string readFitnessData(bool readTrackData, string fitnessDetailId);
 
+
+    /**
+     * Stores the data read from the device to speed up things
+     */
+    garmin_data * fitnessdata;
 
 private:
 
@@ -85,7 +120,7 @@ private:
      * @param garmin device descriptor
      * @return xml string that describes all activities provided by the given lists
      */
-    string printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin);
+    string printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin, bool readTrackData, string fitnessDetailId);
 
 
     /**
@@ -117,15 +152,17 @@ private:
      * Prints the header of a lap
      * @param D1011 internal lap format of garmintools
      * @param firstLap if set to true an <ID>Time</ID> header is added
+     * @param printTrackData if <Track> should be outputted
      * @return xml string
      */
-    string getLapHeader(D1011 * lapData, bool firstLap);
+    string getLapHeader(D1011 * lapData, bool firstLap, bool printTrackData);
 
     /**
      * Prints the footer of a lap
+     * @param printTrackData set to true if you have track data
      * @return xml string
      */
-    string getLapFooter();
+    string getLapFooter(bool printTrackData);
 
     /**
      * Prints a time in the format 2007-04-20T23:55:01Z
@@ -156,6 +193,8 @@ private:
     bool transferSuccessful;
 
     static string filterDeviceName(string name);
+
+    string readFitnessDetailId;
 };
 
 

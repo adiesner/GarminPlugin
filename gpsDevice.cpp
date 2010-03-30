@@ -26,6 +26,8 @@ pthread_mutex_t shareVariables_mtx= PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t      waitThreadCond  = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t     waitThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 
+GpsDevice::GpsDevice() : threadId (0) {
+}
 
 bool GpsDevice::startThread() {
     int code = pthread_create(&(this->threadId), NULL, GpsDevice::workerThread, (void*)this);
@@ -65,7 +67,10 @@ void GpsDevice::signalThread() {
 }
 
 void GpsDevice::cancelThread() {
-    pthread_cancel(this->threadId);
+    Log::dbg("Cancel Thread in GPSDevice für "+this->displayName);
+    if (this->threadId > 0) {
+        pthread_cancel(this->threadId);
+    }
 }
 
 
@@ -77,5 +82,6 @@ void * GpsDevice::workerThread(void * pthis) {
     obj->doWork();
 
     Log::dbg("Thread finished");
+    obj->threadId = 0;
     return NULL;
 }

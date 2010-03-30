@@ -118,13 +118,15 @@ void Edge705Device::doWork() {
         this->writeGpxFile();
     } else if (this->workType == READFITNESS) {
         this->readFitnessDataFromDevice();
+    } else if (this->workType == READFITNESSDIR) {
+        this->readFitnessDirectoryFromDevice();
     } else {
         Log::err("Work Type not implemented!");
     }
 }
 
 
-void * Edge705Device::readFitnessDataFromDevice() {
+void Edge705Device::readFitnessDataFromDevice() {
     Log::dbg("Thread readFitnessData started");
 /*
 Thread-Status
@@ -152,7 +154,7 @@ Thread-Status
         this->threadState = 3; // Finished
         this->transferSuccessful = false; // Failed;
         unlockVariables();
-        return NULL;
+        return;
     }
 
     while ((dirp = readdir(dp)) != NULL) {
@@ -211,11 +213,141 @@ Thread-Status
     unlockVariables();
 
     if (Log::enabledDbg()) { Log::dbg("Thread readFitnessData finished"); }
-    return NULL;
+    return;
 }
 
 
 string Edge705Device::getFitnessData() {
     return this->fitnessDataTcdXml;
+}
+
+int Edge705Device::startReadFITDirectory() {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device");
+
+    this->workType = READFITNESSDIR;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int Edge705Device::startReadFitnessDirectory() {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device");
+
+    this->workType = READFITNESSDIR;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int Edge705Device::finishReadFitnessDirectory() {
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+void Edge705Device::cancelReadFitnessData() {
+}
+
+void Edge705Device::readFitnessDirectoryFromDevice() {
+    Log::dbg("Thread readFitnessDirectory started");
+/*
+Thread-Status
+    0 = idle
+    1 = working
+    2 = waiting
+    3 = finished
+*/
+    string workDir;
+    lockVariables();
+    this->threadState = 1; // Working
+    workDir = this->fitnessDirectory;
+    unlockVariables();
+
+
+    DIR *dp;
+    struct dirent *dirp;
+    vector<string> files = vector<string>();
+
+    if((dp = opendir(workDir.c_str())) == NULL) {
+        Log::err("Error opening fitness directory! "+ workDir);
+
+        lockVariables();
+        this->fitnessDataTcdXml = "";
+        this->threadState = 3; // Finished
+        this->transferSuccessful = false; // Failed;
+        unlockVariables();
+        return;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+        files.push_back(string(dirp->d_name));
+    }
+    closedir(dp);
+
+    TiXmlDocument * output = new TiXmlDocument();
+    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
+    output->LinkEndChild( decl );
+
+    TiXmlElement * train = new TiXmlElement( "TrainingCenterDatabase" );
+    train->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2");
+    train->SetAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    train->SetAttribute("xsi:schemaLocation","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd");
+
+    output->LinkEndChild( train );
+
+    TiXmlElement * activities = new TiXmlElement( "Activities" );
+    train->LinkEndChild( activities );
+
+    // Loop over all files in Fitnessdirectory:
+    for (unsigned int i = 0;i < files.size();i++) {
+        if (files[i].find("."+this->fitnessFileExtension)!=string::npos) {
+            TiXmlDocument doc(workDir + "/" + files[i]);
+            if (doc.LoadFile()) {
+                TiXmlElement * train = doc.FirstChildElement("TrainingCenterDatabase");
+                TiXmlElement * inputActivities = train->FirstChildElement("Activities");
+                while ( inputActivities != NULL) {
+                    TiXmlElement * inputActivity =inputActivities->FirstChildElement("Activity");
+                    while ( inputActivity != NULL) {
+                        TiXmlNode * newAct = inputActivity->Clone();
+
+                        // Track data must be deleted
+                        TiXmlNode * node = newAct->FirstChildElement("Lap");
+                        if ((node != NULL) && (node->FirstChildElement("Track") != NULL)) { node->RemoveChild( node->FirstChildElement("Track") );}
+
+                        activities->LinkEndChild( newAct );
+
+                        inputActivity = inputActivity->NextSiblingElement( "Activity" );
+                        if (Log::enabledDbg()) { Log::dbg("Adding activity from file "+files[i]); }
+                    }
+                    inputActivities = inputActivities->NextSiblingElement( "Activities" );
+                }
+            } else {
+                Log::err("Unable to load fitness file "+files[i]);
+            }
+        }
+    }
+
+    TiXmlPrinter printer;
+    printer.SetIndent( "  " );
+    output->Accept( &printer );
+    string fitnessXml = printer.Str();
+    delete(output);
+
+    lockVariables();
+    this->fitnessDataTcdXml = fitnessXml;
+    this->threadState = 3; // Finished
+    this->transferSuccessful = true; // Successfull;
+    unlockVariables();
+
+    if (Log::enabledDbg()) { Log::dbg("Thread readFitnessDirectory finished"); }
+    return;
 }
 

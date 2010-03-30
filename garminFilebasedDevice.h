@@ -56,6 +56,33 @@ public:
     virtual bool isDeviceAvailable();
 
 
+  /**
+   * Starts reading the fitness data without points
+   */
+    virtual int startReadFITDirectory();
+
+  /**
+   * Starts reading the fitness data without points
+   */
+    virtual int startReadFitnessDirectory();
+
+  /**
+   * Checks if the read of the fitness directory finished
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFitnessDirectory();
+
+    /**
+     * Cancels the read of the fitness data
+     */
+    virtual void cancelReadFitnessData();
+
+    virtual int startReadFitnessDetail(string id);
+
+    virtual int finishReadFitnessDetail();
+
+    virtual void cancelReadFitnessDetail();
+
 protected:
 
   /**

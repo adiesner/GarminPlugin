@@ -24,17 +24,21 @@
 #include <sstream>
 
 
-Edge305Device::Edge305Device()
+Edge305Device::Edge305Device() : fitnessdata(NULL)
 {
     this->displayName = "Edge305";
+    this->fitnessdata = NULL;
 }
 
-Edge305Device::Edge305Device(string name)
+Edge305Device::Edge305Device(string name) : fitnessdata(NULL)
 {
     this->displayName = name;
 }
 
 Edge305Device::~Edge305Device() {
+    if (fitnessdata != NULL) {
+        garmin_free_data(fitnessdata);
+    }
 }
 
 
@@ -43,6 +47,7 @@ int Edge305Device::startReadFitnessData()
     if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device: "+this->displayName);
 
     this->workType = READFITNESS;
+    this->threadState = 1;
 
     if (startThread()) {
         return 1;
@@ -59,6 +64,7 @@ int Edge305Device::finishReadFitnessData()
     2 = waiting
     3 = finished
 */
+    Log::dbg("Inside Edge305Device::finishReadFitnessData"); //REMOVE
 
     lockVariables();
     int status = this->threadState;
@@ -72,14 +78,18 @@ void Edge305Device::doWork() {
     if (this->workType == WRITEGPX) {
         Log::err("Write GPX to Edge305 not yet implemented!");
     } else if (this->workType == READFITNESS) {
-        this->readFitnessDataFromDevice();
+        this->readFitnessDataFromDevice(true, "");
+    } else if (this->workType == READFITNESSDIR) {
+        this->readFitnessDataFromDevice(false, "");
+    } else if (this->workType == READFITNESSDETAIL) {
+        this->readFitnessDataFromDevice(true, readFitnessDetailId);
     } else {
         Log::err("Work Type not implemented!");
     }
 }
 
 
-void Edge305Device::readFitnessDataFromDevice() {
+void Edge305Device::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
     Log::dbg("Thread readFitnessData started");
 /*
 Thread-Status
@@ -94,11 +104,11 @@ Thread-Status
     unlockVariables();
 
 
-    string fitnessData = readFitnessData();
+    string fitnessDataXml = readFitnessData(readTrackData, fitnessDetailId);
 
     lockVariables();
     this->threadState = 3;
-    fitnessDataTcdXml = fitnessData;
+    fitnessDataTcdXml = fitnessDataXml;
     unlockVariables();
 
     if (Log::enabledDbg()) { Log::dbg("Thread readFitnessData finished"); }
@@ -109,10 +119,9 @@ string Edge305Device::getFitnessData() {
     return fitnessDataTcdXml;
 }
 
-string Edge305Device::readFitnessData()
+string Edge305Device::readFitnessData(bool readTrackData, string fitnessDetailId)
 {
     garmin_unit garmin;
-    garmin_data *       data;
     garmin_data *       data0;
     garmin_data *       data1;
     garmin_data *       data2;
@@ -125,13 +134,19 @@ string Edge305Device::readFitnessData()
 
     if ( garmin_init(&garmin,0) != 0 ) {
         Log::dbg("Extracting data from Garmin "+this->displayName);
-        if ((data = garmin_get(&garmin,GET_RUNS)) != NULL ) {
-        //if ( (data = garmin_load("/workout/2010/02/20100227T152346.gmn")) != NULL ) {
+        if (fitnessdata == NULL) {
+            //fitnessdata = garmin_get(&garmin,GET_RUNS);
+            //fitnessdata = garmin_load("/workout/2010/02/20100227T152346.gmn");
+            fitnessdata = garmin_load("/home/andreas/Projekte/GeocacheDownloader/Firefox-Plugin/gpsbabel/2010/02/20100227T152346.gmn");
+        } else {
+            Log::dbg("Re-using fitnessdata from last read");
+        }
+        if (fitnessdata != NULL ) {
             Log::dbg("Received data from Garmin, processing data...");
 
-            data0 = garmin_list_data(data,0);
-            data1 = garmin_list_data(data,1);
-            data2 = garmin_list_data(data,2);
+            data0 = garmin_list_data(fitnessdata,0);
+            data1 = garmin_list_data(fitnessdata,1);
+            data2 = garmin_list_data(fitnessdata,2);
 
             if ( data0 != NULL && (data0->data != NULL) &&
                  data1 != NULL && (laps   = (garmin_list*)data1->data) != NULL &&
@@ -141,12 +156,11 @@ string Edge305Device::readFitnessData()
                 } else {
                    runs = garmin_list_append(NULL,data0);
                 }
-                xmlData << printActivities(runs, laps, tracks, garmin);
+                xmlData << printActivities(runs, laps, tracks, garmin, readTrackData, fitnessDetailId);
 
                 if (data0->type != data_Dlist) {
                     garmin_free_list_only(runs);
                 }
-                garmin_free_data(data);
                 Log::dbg("Done processing data...");
                 transferSuccessful = true;
 
@@ -165,8 +179,9 @@ string Edge305Device::readFitnessData()
     return xmlData.str();
 }
 
-string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin) {
+string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin, bool readTrackData, string fitnessDetailId) {
     std::ostringstream xmlData;
+
     xmlData << "<Activities>\n";
 
     garmin_list_node * runNode = run->head;
@@ -175,7 +190,9 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
         garmin_data *run = runNode->data;
         if ((run != NULL) && (run->type == data_D1009) && (run->data != NULL)) {
             D1009 * runData = (D1009*)run->data;
-            xmlData << getRunHeader(runData);
+            std::ostringstream activityData;
+            activityData << getRunHeader(runData);
+            string currentLapId = "";
             bool firstLap = true;
             for ( garmin_list_node * n = lap->head; n != NULL; n = n->next ) {
                 if (n->data->type == data_D1011) {
@@ -183,22 +200,27 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
 
                     if ((lapData->index >= runData->first_lap_index) && (lapData->index <= runData->last_lap_index)) {
 
-                        xmlData << getLapHeader(lapData,firstLap);
-                        firstLap = false;
+                        activityData << getLapHeader(lapData,firstLap, readTrackData);
+                        if (firstLap) {
+                            currentLapId = print_dtime(lapData->start_time);
+                            firstLap = false;
+                        }
 
-                        uint32 endTime = lapData->start_time + (lapData->total_time/100);
+                        if (readTrackData) {
+                            uint32 endTime = lapData->start_time + (lapData->total_time/100);
 
-                        for ( garmin_list_node * t = track->head; t != NULL; t = t->next ) {
-                            if (t->data->type == data_D304) {
-                                D304 * trackData = (D304 *)t->data->data;
+                            for ( garmin_list_node * t = track->head; t != NULL; t = t->next ) {
+                                if (t->data->type == data_D304) {
+                                    D304 * trackData = (D304 *)t->data->data;
 
-                                if ((trackData->time >= lapData->start_time) && (trackData->time <= endTime)) {
-                                    xmlData << getTrackPoint(trackData);
+                                    if ((trackData->time >= lapData->start_time) && (trackData->time <= endTime)) {
+                                        activityData << getTrackPoint(trackData);
+                                    }
                                 }
                             }
                         }
 
-                        xmlData << getLapFooter();
+                        activityData << getLapFooter(readTrackData);
                     }
 
                 } else {
@@ -206,8 +228,12 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
                 }
             }
 
-            xmlData << getCreator(garmin);
-            xmlData << getRunFooter();
+            activityData << getCreator(garmin);
+            activityData << getRunFooter();
+
+            if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
+                xmlData << activityData.str();
+            }
         } else {
             Log::dbg("Not a run :-(");
         }
@@ -269,7 +295,7 @@ string Edge305Device::getRunFooter() {
     return "</Activity>\n";
 }
 
-string Edge305Device::getLapHeader(D1011 * lapData, bool firstLap) {
+string Edge305Device::getLapHeader(D1011 * lapData, bool firstLap, bool printTrackData) {
     std::ostringstream xmlData;
 
     if (firstLap) {
@@ -324,14 +350,19 @@ string Edge305Device::getLapHeader(D1011 * lapData, bool firstLap) {
     }
     xmlData << "</TriggerMethod>\n";
 
-    xmlData << "<Track>\n";
+    if (printTrackData) {
+        xmlData << "<Track>\n";
+    }
 
     return xmlData.str();
 }
 
 
-string Edge305Device::getLapFooter() {
-    return "</Track>\n</Lap>\n";
+string Edge305Device::getLapFooter(bool printTrackData) {
+    if (printTrackData) {
+        return "</Track>\n</Lap>\n";
+    }
+    return "</Lap>\n";
 }
 
 string Edge305Device::print_dtime( uint32 t )
@@ -800,3 +831,67 @@ string Edge305Device::filterDeviceName(string name) {
     }
     return name.substr(0,name.length()-cutBytes);
 }
+
+
+
+int Edge305Device::startReadFITDirectory() {
+    // do nothing so far... startReadFitnessDirectory will be called anyway
+    return 0;
+}
+
+int Edge305Device::startReadFitnessDirectory() {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read fitness dir from garmin device: "+this->displayName);
+
+    this->workType = READFITNESSDIR;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int Edge305Device::finishReadFitnessDirectory() {
+/*
+    0 = idle
+    1 = working
+    2 = waiting
+    3 = finished
+*/
+
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+void Edge305Device::cancelReadFitnessData() {
+    cancelThread();
+}
+
+int Edge305Device::startReadFitnessDetail(string id) {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read fitness detail from garmin device: "+this->displayName+ " Searching for "+id);
+
+    this->workType = READFITNESSDETAIL;
+    this->readFitnessDetailId = id;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int Edge305Device::finishReadFitnessDetail() {
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+void Edge305Device::cancelReadFitnessDetail() {
+    cancelThread();
+}
+
