@@ -66,10 +66,10 @@ clean.OBJ += $(Release_target.BIN) $(Release_target.OBJ)
 
 Release_target : Release_target.before $(Release_target.BIN) Release_target.after_always
 Release_target : CFLAGS += -O2 -fPIC  -Os
-Release_target : INCLUDES += -I/usr/lib/xulrunner-devel-1.9.1.7/include -I../ticpp -I/usr/lib/xulrunner-devel-1.9.1.8/include -I../garmintools/src 
+Release_target : INCLUDES += -I/usr/lib/xulrunner-devel-1.9.1.7/include -I../ticpp -I/usr/lib/xulrunner-devel-1.9.1.8/include -I../garmintools/src -I/usr/include 
 Release_target : RCFLAGS += 
 Release_target : LDFLAGS += -s  $(CREATE_LIB) $(CREATE_DEF)
-Release_target : T_LDLIBS = ../ticpp/lib/libticppd.a ../garmintools/src/.libs/libgarmintools.a /usr/lib64/libusb.so 
+Release_target : T_LDLIBS = ../ticpp/lib/libticppd.a ../garmintools/src/.libs/libgarmintools.a /usr/lib64/libusb.so /usr/lib/libz.so /usr/lib/libboost_iostreams-mt.so 
 ifdef LMAKE
 Release_target : CFLAGS -= -O1 -O2 -g -pipe
 endif
@@ -93,10 +93,10 @@ clean.OBJ += $(Debug_target.BIN) $(Debug_target.OBJ)
 
 Debug_target : Debug_target.before $(Debug_target.BIN) Debug_target.after_always
 Debug_target : CFLAGS += -g -fPIC  -Os
-Debug_target : INCLUDES += -I/usr/lib/xulrunner-devel-1.9.1.8/include -I../ticpp -I../garmintools/src 
+Debug_target : INCLUDES += -I/usr/lib/xulrunner-devel-1.9.1.8/include -I../ticpp -I../garmintools/src -I/usr/lib/xulrunner-devel-1.9.1.7/include -I/usr/include 
 Debug_target : RCFLAGS += 
 Debug_target : LDFLAGS +=  $(CREATE_LIB) $(CREATE_DEF)
-Debug_target : T_LDLIBS = ../ticpp/lib/libticppd.a ../garmintools/src/.libs/libgarmintools.a /usr/lib64/libusb.so 
+Debug_target : T_LDLIBS = ../ticpp/lib/libticppd.a ../garmintools/src/.libs/libgarmintools.a /usr/lib64/libusb.so /usr/lib/libz.so 
 ifdef LMAKE
 Debug_target : CFLAGS -= -O1 -O2 -g -pipe
 endif
