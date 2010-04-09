@@ -194,9 +194,14 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
             string currentLapId = "";
             bool firstLap = true;
             for ( garmin_list_node * n = lap->head; n != NULL; n = n->next ) {
-                if (n->data->type == data_D1011) {
-                    D1011 * lapData = (D1011*)n->data->data;
+                D1011 * lapData = NULL;
+                if (n->data->type == data_D1011) { // Edge 305 uses this
+                    lapData = (D1011*)n->data->data;
+                } else if (n->data->type == data_D1015) { // Forerunner 205 uses this
+                    lapData = (D1011*)n->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+                }
 
+                if (lapData != NULL) {
                     if ((lapData->index >= runData->first_lap_index) && (lapData->index <= runData->last_lap_index)) {
 
                         activityData << getLapHeader(lapData,firstLap, readTrackData);
