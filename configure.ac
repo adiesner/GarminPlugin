@@ -19,25 +19,34 @@ PKG_PROG_PKG_CONFIG()
 #
 # XULRunner check
 
-xullibname=no
-PKG_CHECK_MODULES(XULRunner, [libxul-embedding-unstable],
-		   [xullibname=libxul-embedding-unstable],
-    [PKG_CHECK_MODULES(XULRunner, [libxul-embedding],
-		       [xullibname=libxul-embedding],
-      [PKG_CHECK_MODULES(XULRunner, [xulrunner-gtkmozembed],
-			[xullibname=xulrunner-gtkmozembed],
-	[PKG_CHECK_MODULES(XULRunner, [firefox2-gtkmozembed],
-			  [xullibname=firefox2-gtkmozembed],
-	  [PKG_CHECK_MODULES(XULRunner, [firefox-gtkmozembed],
-			    [xullibname=firefox-gtkmozembed],
-	    [xullibname=no])])])])])
+PKG_CHECK_MODULES(XULRUNNER, [libxul < 1.9.2],[ AC_MSG_NOTICE([Using libxul < 1.9.2])
+    ],[AC_MSG_WARN([libxul < 1.9.2 not found, trying another])])
 
-if test x$xullibname = xno; then
-	AC_MSG_ERROR([Unable to find xulrunner. Try sudo apt-get install xulrunner-dev.])
+if test "$XULRUNNER_CFLAGS" = ""; then
+PKG_CHECK_MODULES(XULRUNNER, [libxul >= 1.9.2],[ AC_DEFINE([HAVE_NEW_XULRUNNER],[1],[Define to 1 if using libxul 1.9.2 or higher]) AC_MSG_NOTICE([Using libxul >= 1.9.2])
+    ],[AC_MSG_NOTICE([libxul >= 1.9.2 not found, trying another])])
 fi
 
-XULRUNNER_CFLAGS=$( $PKG_CONFIG --cflags "$xullibname" )
-XULRUNNER_LIBS=$( $PKG_CONFIG --libs "$xullibname" )
+if test "$XULRUNNER_CFLAGS" = ""; then
+  xullibname=no
+  PKG_CHECK_MODULES(XULRUNNER, [libxul-embedding-unstable],
+		     [xullibname=libxul-embedding-unstable],
+      [PKG_CHECK_MODULES(XULRUNNER, [libxul-embedding],
+		         [xullibname=libxul-embedding],
+        [PKG_CHECK_MODULES(XULRUNNER, [xulrunner-gtkmozembed],
+			  [xullibname=xulrunner-gtkmozembed],
+  	  [PKG_CHECK_MODULES(XULRUNNER, [firefox2-gtkmozembed],
+			    [xullibname=firefox2-gtkmozembed],
+  	    [PKG_CHECK_MODULES(XULRUNNER, [firefox-gtkmozembed],
+		  	      [xullibname=firefox-gtkmozembed],
+  	      [xullibname=no])])])])])
+
+  if test x$xullibname = xno; then
+	  AC_MSG_ERROR([Unable to find xulrunner. Try sudo apt-get install xulrunner-dev.])
+  fi
+
+fi 
+
 AC_SUBST(XULRUNNER_CFLAGS)
 AC_SUBST(XULRUNNER_LIBS)
 

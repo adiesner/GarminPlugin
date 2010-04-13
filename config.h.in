@@ -24,6 +24,9 @@
 /* Define to 1 if you have the <mntent.h> header file. */
 #undef HAVE_MNTENT_H
 
+/* Define to 1 if using libxul 1.9.2 or higher */
+#undef HAVE_NEW_XULRUNNER
+
 /* Define to 1 if you have the <npapi.h> header file. */
 #undef HAVE_NPAPI_H
 

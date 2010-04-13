@@ -575,8 +575,6 @@ ZLIB_LIBS
 ZLIB_CPPFLAGS
 XULRUNNER_LIBS
 XULRUNNER_CFLAGS
-XULRunner_LIBS
-XULRunner_CFLAGS
 PKG_CONFIG
 ac_ct_CC
 CFLAGS
@@ -650,8 +648,8 @@ CCC
 CC
 CFLAGS
 PKG_CONFIG
-XULRunner_CFLAGS
-XULRunner_LIBS
+XULRUNNER_CFLAGS
+XULRUNNER_LIBS
 CPP'
 
 
@@ -1293,10 +1291,10 @@ Some influential environment variables:
   CC          C compiler command
   CFLAGS      C compiler flags
   PKG_CONFIG  path to pkg-config utility
-  XULRunner_CFLAGS
-              C compiler flags for XULRunner, overriding pkg-config
-  XULRunner_LIBS
-              linker flags for XULRunner, overriding pkg-config
+  XULRUNNER_CFLAGS
+              C compiler flags for XULRUNNER, overriding pkg-config
+  XULRUNNER_LIBS
+              linker flags for XULRUNNER, overriding pkg-config
   CPP         C preprocessor
 
 Use these variables to override the choices made by `configure' or to help
@@ -3448,15 +3446,172 @@ fi
 #
 # XULRunner check
 
-xullibname=no
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul < 1.9.2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libxul < 1.9.2") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "libxul < 1.9.2" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul < 1.9.2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libxul < 1.9.2") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "libxul < 1.9.2" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul < 1.9.2"`
+        else
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul < 1.9.2"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$XULRUNNER_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libxul < 1.9.2 not found, trying another" >&5
+$as_echo "$as_me: WARNING: libxul < 1.9.2 not found, trying another" >&2;}
+elif test $pkg_failed = untried; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: libxul < 1.9.2 not found, trying another" >&5
+$as_echo "$as_me: WARNING: libxul < 1.9.2 not found, trying another" >&2;}
+else
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	 { $as_echo "$as_me:${as_lineno-$LINENO}: Using libxul < 1.9.2" >&5
+$as_echo "$as_me: Using libxul < 1.9.2" >&6;}
+
+fi
+
+if test "$XULRUNNER_CFLAGS" = ""; then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul >= 1.9.2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libxul >= 1.9.2") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "libxul >= 1.9.2" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul >= 1.9.2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libxul >= 1.9.2") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "libxul >= 1.9.2" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul >= 1.9.2"`
+        else
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul >= 1.9.2"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$XULRUNNER_PKG_ERRORS" >&5
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+                { $as_echo "$as_me:${as_lineno-$LINENO}: libxul >= 1.9.2 not found, trying another" >&5
+$as_echo "$as_me: libxul >= 1.9.2 not found, trying another" >&6;}
+elif test $pkg_failed = untried; then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: libxul >= 1.9.2 not found, trying another" >&5
+$as_echo "$as_me: libxul >= 1.9.2 not found, trying another" >&6;}
+else
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+$as_echo "#define HAVE_NEW_XULRUNNER 1" >>confdefs.h
+ { $as_echo "$as_me:${as_lineno-$LINENO}: Using libxul >= 1.9.2" >&5
+$as_echo "$as_me: Using libxul >= 1.9.2" >&6;}
+
+fi
+fi
+
+if test "$XULRUNNER_CFLAGS" = ""; then
+  xullibname=no
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul-embedding-unstable\""; } >&5
@@ -3464,7 +3619,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "libxul-embedding-unstable" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "libxul-embedding-unstable" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3473,8 +3628,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul-embedding-unstable\""; } >&5
@@ -3482,7 +3637,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "libxul-embedding-unstable" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "libxul-embedding-unstable" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3501,23 +3656,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-embedding-unstable"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-embedding-unstable"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-embedding-unstable"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-embedding-unstable"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul-embedding\""; } >&5
@@ -3525,7 +3680,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "libxul-embedding" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "libxul-embedding" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3534,8 +3689,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul-embedding\""; } >&5
@@ -3543,7 +3698,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "libxul-embedding" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "libxul-embedding" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3562,23 +3717,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-embedding"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-embedding"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-embedding"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-embedding"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -3586,7 +3741,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3595,8 +3750,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -3604,7 +3759,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3623,23 +3778,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -3647,7 +3802,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3656,8 +3811,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -3665,7 +3820,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3684,23 +3839,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3708,7 +3863,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3717,8 +3872,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3726,7 +3881,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3745,12 +3900,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -3758,8 +3913,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -3767,12 +3922,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3780,7 +3935,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3789,8 +3944,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3798,7 +3953,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3817,12 +3972,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -3830,15 +3985,15 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
@@ -3846,12 +4001,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -3859,7 +4014,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3868,8 +4023,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -3877,7 +4032,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3896,23 +4051,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3920,7 +4075,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3929,8 +4084,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3938,7 +4093,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -3957,12 +4112,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -3970,8 +4125,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -3979,12 +4134,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -3992,7 +4147,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4001,8 +4156,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4010,7 +4165,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4029,12 +4184,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4042,22 +4197,22 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=xulrunner-gtkmozembed
@@ -4065,12 +4220,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -4078,7 +4233,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4087,8 +4242,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -4096,7 +4251,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4115,23 +4270,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4139,7 +4294,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4148,8 +4303,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4157,7 +4312,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4176,23 +4331,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4200,7 +4355,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4209,8 +4364,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4218,7 +4373,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4237,12 +4392,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4250,8 +4405,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -4259,12 +4414,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4272,7 +4427,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4281,8 +4436,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4290,7 +4445,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4309,12 +4464,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4322,15 +4477,15 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
@@ -4338,12 +4493,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4351,7 +4506,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4360,8 +4515,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4369,7 +4524,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4388,23 +4543,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4412,7 +4567,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4421,8 +4576,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4430,7 +4585,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4449,12 +4604,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4462,8 +4617,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -4471,12 +4626,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4484,7 +4639,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4493,8 +4648,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4502,7 +4657,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4521,12 +4676,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4534,29 +4689,29 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=xulrunner-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=libxul-embedding
@@ -4564,12 +4719,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul-embedding\""; } >&5
@@ -4577,7 +4732,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "libxul-embedding" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "libxul-embedding" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4586,8 +4741,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libxul-embedding\""; } >&5
@@ -4595,7 +4750,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "libxul-embedding" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "libxul-embedding" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4614,23 +4769,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-embedding"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "libxul-embedding"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-embedding"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "libxul-embedding"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -4638,7 +4793,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4647,8 +4802,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -4656,7 +4811,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4675,23 +4830,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4699,7 +4854,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4708,8 +4863,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4717,7 +4872,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4736,23 +4891,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4760,7 +4915,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4769,8 +4924,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4778,7 +4933,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4797,12 +4952,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4810,8 +4965,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -4819,12 +4974,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4832,7 +4987,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4841,8 +4996,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4850,7 +5005,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4869,12 +5024,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -4882,15 +5037,15 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
@@ -4898,12 +5053,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4911,7 +5066,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4920,8 +5075,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -4929,7 +5084,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4948,23 +5103,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4972,7 +5127,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -4981,8 +5136,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -4990,7 +5145,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5009,12 +5164,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -5022,8 +5177,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -5031,12 +5186,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5044,7 +5199,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5053,8 +5208,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5062,7 +5217,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5081,12 +5236,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -5094,22 +5249,22 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=xulrunner-gtkmozembed
@@ -5117,12 +5272,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -5130,7 +5285,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5139,8 +5294,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"xulrunner-gtkmozembed\""; } >&5
@@ -5148,7 +5303,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "xulrunner-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5167,23 +5322,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "xulrunner-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -5191,7 +5346,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5200,8 +5355,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -5209,7 +5364,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5228,23 +5383,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5252,7 +5407,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5261,8 +5416,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5270,7 +5425,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5289,12 +5444,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -5302,8 +5457,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -5311,12 +5466,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5324,7 +5479,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5333,8 +5488,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5342,7 +5497,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5361,12 +5516,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -5374,15 +5529,15 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
@@ -5390,12 +5545,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -5403,7 +5558,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5412,8 +5567,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox2-gtkmozembed\""; } >&5
@@ -5421,7 +5576,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox2-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5440,23 +5595,23 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox2-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5464,7 +5619,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5473,8 +5628,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5482,7 +5637,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5501,12 +5656,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -5514,8 +5669,8 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
@@ -5523,12 +5678,12 @@ fi
 elif test $pkg_failed = untried; then
 
 pkg_failed=no
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRunner" >&5
-$as_echo_n "checking for XULRunner... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XULRUNNER" >&5
+$as_echo_n "checking for XULRUNNER... " >&6; }
 
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_CFLAGS"; then
-        pkg_cv_XULRunner_CFLAGS="$XULRunner_CFLAGS"
+    if test -n "$XULRUNNER_CFLAGS"; then
+        pkg_cv_XULRUNNER_CFLAGS="$XULRUNNER_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5536,7 +5691,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_CFLAGS=`$PKG_CONFIG --cflags "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5545,8 +5700,8 @@ else
 	pkg_failed=untried
 fi
 if test -n "$PKG_CONFIG"; then
-    if test -n "$XULRunner_LIBS"; then
-        pkg_cv_XULRunner_LIBS="$XULRunner_LIBS"
+    if test -n "$XULRUNNER_LIBS"; then
+        pkg_cv_XULRUNNER_LIBS="$XULRUNNER_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
     { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"firefox-gtkmozembed\""; } >&5
@@ -5554,7 +5709,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
   test $ac_status = 0; }; then
-  pkg_cv_XULRunner_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
+  pkg_cv_XULRUNNER_LIBS=`$PKG_CONFIG --libs "firefox-gtkmozembed" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -5573,12 +5728,12 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         else
-	        XULRunner_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
+	        XULRUNNER_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "firefox-gtkmozembed"`
         fi
 	# Put the nasty error message in config.log where it belongs
-	echo "$XULRunner_PKG_ERRORS" >&5
+	echo "$XULRUNNER_PKG_ERRORS" >&5
 
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
@@ -5586,47 +5741,47 @@ $as_echo "no" >&6; }
 elif test $pkg_failed = untried; then
 	xullibname=no
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=firefox2-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=xulrunner-gtkmozembed
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=libxul-embedding
 fi
 else
-	XULRunner_CFLAGS=$pkg_cv_XULRunner_CFLAGS
-	XULRunner_LIBS=$pkg_cv_XULRunner_LIBS
+	XULRUNNER_CFLAGS=$pkg_cv_XULRUNNER_CFLAGS
+	XULRUNNER_LIBS=$pkg_cv_XULRUNNER_LIBS
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 	xullibname=libxul-embedding-unstable
 fi
 
-if test x$xullibname = xno; then
-	as_fn_error "Unable to find xulrunner. Try sudo apt-get install xulrunner-dev." "$LINENO" 5
+  if test x$xullibname = xno; then
+	  as_fn_error "Unable to find xulrunner. Try sudo apt-get install xulrunner-dev." "$LINENO" 5
+  fi
+
 fi
 
-XULRUNNER_CFLAGS=$( $PKG_CONFIG --cflags "$xullibname" )
-XULRUNNER_LIBS=$( $PKG_CONFIG --libs "$xullibname" )
 
 
 

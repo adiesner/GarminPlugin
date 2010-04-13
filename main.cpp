@@ -41,6 +41,14 @@
 #include "boost/archive/iterators/base64_from_binary.hpp"
 #include "boost/archive/iterators/transform_width.hpp"
 
+#if HAVE_NEW_XULRUNNER
+#define GETSTRING(_v)          ((_v).UTF8Characters)
+#define GETSTRINGLENGTH(_v)    ((_v).UTF8Length)
+#else
+#define GETSTRING(_v)          ((_v).utf8characters)
+#define GETSTRINGLENGTH(_v)    ((_v).utf8length)
+#endif
+
 using namespace std;
 
 /**
@@ -205,8 +213,8 @@ bool methodDevicesXmlString(NPObject *obj, const NPVariant args[], uint32_t argC
     char *outStr = (char*)npnfuncs->memalloc(deviceXml.size() + 1);
     memcpy(outStr, deviceXml.c_str(), deviceXml.size() + 1);
     result->type = NPVariantType_String;
-    result->value.stringValue.utf8characters = outStr;
-    result->value.stringValue.utf8length = deviceXml.size();
+    GETSTRING(result->value.stringValue) = outStr;
+    GETSTRINGLENGTH(result->value.stringValue) = deviceXml.size();
 
 	return true;
 }
@@ -285,7 +293,7 @@ bool methodStartWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argCo
             deviceId = args[0].value.intValue;
         } else if (args[0].type == NPVariantType_String) {
 
-            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
             Log::dbg("Device ID String: "+deviceIdStr);
             std::istringstream ss( deviceIdStr );
             ss >> deviceId;
@@ -415,8 +423,8 @@ bool methodDeviceDescription(NPObject *obj, const NPVariant args[], uint32_t arg
                 char *outStr = (char*)npnfuncs->memalloc(deviceDescr.size() + 1);
                 memcpy(outStr, deviceDescr.c_str(), deviceDescr.size() + 1);
                 result->type = NPVariantType_String;
-                result->value.stringValue.utf8characters = outStr;
-                result->value.stringValue.utf8length = deviceDescr.size();
+                GETSTRING(result->value.stringValue) = outStr;
+                GETSTRINGLENGTH(result->value.stringValue) = deviceDescr.size();
                 return true;
             } else {
                 if (Log::enabledInfo()) Log::info("DeviceDescription: Device not found");
@@ -478,7 +486,7 @@ bool methodStartReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t 
             deviceId = args[0].value.intValue;
         } else if (args[0].type == NPVariantType_String) {
 
-            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
             Log::dbg("Device ID String: "+deviceIdStr);
             std::istringstream ss( deviceIdStr );
             ss >> deviceId;
@@ -563,7 +571,7 @@ bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint
             deviceId = args[0].value.intValue;
         } else if (args[0].type == NPVariantType_String) {
 
-            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
             Log::dbg("Device ID String: "+deviceIdStr);
             std::istringstream ss( deviceIdStr );
             ss >> deviceId;
@@ -612,7 +620,7 @@ bool methodStartReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_
             deviceId = args[0].value.intValue;
         } else if (args[0].type == NPVariantType_String) {
 
-            std::string deviceIdStr = args[0].value.stringValue.utf8characters;
+            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
             Log::dbg("Device ID String: "+deviceIdStr);
             std::istringstream ss( deviceIdStr );
             ss >> deviceId;
@@ -629,7 +637,7 @@ bool methodStartReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_
         if (args[2].type == NPVariantType_Int32) {
             id = args[2].value.intValue;
         } else if (args[2].type == NPVariantType_String) {
-            id = args[2].value.stringValue.utf8characters;
+            id = GETSTRING(args[2].value.stringValue);
         } else {
             if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected STRING parameter 3");
         }
@@ -891,7 +899,7 @@ void printParameter(string name, const NPVariant args[], uint32_t argCount) {
         if (args[i].type == NPVariantType_Int32) {
             ss << args[i].value.intValue;
         } else if (args[i].type == NPVariantType_String) {
-            ss << "\"" << args[i].value.stringValue.utf8characters << "\"";
+            ss << "\"" << GETSTRING(args[i].value.stringValue) << "\"";
         } else {
             ss << " ? ";
         }
@@ -982,8 +990,8 @@ static bool getProperty(NPObject *obj, NPIdentifier propertyName, NPVariant *res
 			char *outStr = (char*)npnfuncs->memalloc(storedProperty.stringValue.size() + 1);
 			memcpy(outStr, storedProperty.stringValue.c_str(), storedProperty.stringValue.size() + 1);
 			result->type = NPVariantType_String;
-			result->value.stringValue.utf8characters = outStr;
-			result->value.stringValue.utf8length = storedProperty.stringValue.size();
+			GETSTRING(result->value.stringValue) = outStr;
+			GETSTRINGLENGTH(result->value.stringValue) = storedProperty.stringValue.size();
 		} else {
             if (Log::enabledErr()) Log::err("getProperty: Type not yet implemented");
 			return false;
@@ -1014,7 +1022,7 @@ static bool setProperty(NPObject *obj, NPIdentifier propertyName, const NPVarian
 		if (storedProperty.writeable) {
 		    storedProperty.type = value->type;
             if (value->type == NPVariantType_String) {
-                storedProperty.stringValue = value->value.stringValue.utf8characters;
+                storedProperty.stringValue = GETSTRING(value->value.stringValue);
                 propertyList[name] = storedProperty; // store
                 return true;
             } else if (value->type == NPVariantType_Int32) {
