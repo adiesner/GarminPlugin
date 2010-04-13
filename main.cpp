@@ -17,10 +17,15 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "config.h"
 #include <stdio.h>
 #include <npapi.h>
 #include <npfunctions.h>
-#include <zipstub.h>
+#if HAVE_PRTYPES_H
+	#include <prtypes.h>
+#elif HAVE_ZIPSTUB_H
+	#include <zipstub.h>
+#endif 
 #include <npruntime.h>
 #include <iostream>
 #include <map>
