@@ -47,7 +47,46 @@ The project is hosted on http://www.andreas-diesner.de/garminplugin/
 The source code is hosted on GitHub http://github.com/adiesner/GarminPlugin
 
 Dependencies to other projects:
-garmintools - http://code.google.com/p/garmintools/
-libusb      - http://www.libusb.org/
-ticpp       - http://code.google.com/p/ticpp/
+garmintools     - http://code.google.com/p/garmintools/
+libusb          - http://www.libusb.org/
+ticpp           - http://code.google.com/p/ticpp/
+boost-iostreams - http://www.boost.org
+zlib            - http://www.zlib.net
 
+Thanks goes to 
+	- Christian Kurek
+	- The contributors of the above projects
+
+Howto compile GarminPlugin:
+
+# This example shows how to compile GarminPlugin on a 64bit Ubuntu System
+
+sudo apt-get install build-essential subversion git-core xulrunner-dev zlib1g-dev libusb-dev libboost-iostreams-dev 
+git clone http://github.com/adiesner/GarminPlugin.git
+svn export http://garmintools.googlecode.com/svn/trunk/ garmintools
+svn export http://ticpp.googlecode.com/svn/trunk/ ticpp
+wget http://downloads.sourceforge.net/project/premake/Premake/4.2.1/premake-4.2.1-linux.tar.gz?use_mirror=ignum
+
+# compile ticpp
+tar xvzf premake-4.2.1-linux.tar.gz
+cd ticpp
+../premake4 --cc=gcc --os=linux --platform=x64 gmake
+# if you are not able to execute premake4 on a 64bit machine install ia32-libs and try again
+sed --in-place 's/$(CFLAGS)/$(CFLAGS) -fPIC/g' TiCPP.make
+make config=release64
+cd ..
+
+# compile garmintools
+cd garmintools
+./configure CXXFLAGS="-fPIC -g -O2" CFLAGS="-g -O2 -fPIC"
+make
+cd ..
+
+# compile GarminPlugin
+cd GarminPlugin
+./configure
+make
+cd ..
+
+# Install the plugin
+sudo cp GarminPlugin/npGarminPlugin.so /usr/lib/mozilla/plugins
