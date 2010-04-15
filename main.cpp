@@ -25,7 +25,7 @@
 	#include <prtypes.h>
 #elif HAVE_ZIPSTUB_H
 	#include <zipstub.h>
-#endif 
+#endif
 #include <npruntime.h>
 #include <iostream>
 #include <map>
@@ -59,7 +59,7 @@ char const * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-char const * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2beta";
+char const * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2";
 
 /**
  * A variable that stores the mime description of the plugin.
