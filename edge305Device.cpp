@@ -455,8 +455,11 @@ string Edge305Device::getAttachedDeviceName() {
 
     Log::dbg("Searching for garmin devices like Edge 305/Forerunner 305...");
     if ( garmin_init(&garmin,0) != 0 ) {
-        deviceName = filterDeviceName((string)((char*)garmin.product.product_description));
-        Log::dbg("Found garmin device: "+deviceName);
+        if (garmin.product.product_description != NULL) // Vista HCx also gets detected by this, but returns NULL values
+        {
+            deviceName = filterDeviceName((string)((char*)garmin.product.product_description));
+            Log::dbg("Found garmin device: "+deviceName);
+        }
         garmin_close(&garmin);
     }
     return deviceName;
@@ -782,6 +785,7 @@ xsi:schemaLocation="http://www.garmin.com/xmlschemas/GarminDevice/v2 http://www.
 
 int Edge305Device::startWriteToGps(string filename, string xml) {
     Log::err("Write to Edge305 not yet implemented!");
+    this->transferSuccessful = 0;
     return 0;
 }
 
