@@ -540,7 +540,7 @@ fi
 
 ])
 
-AX_BOOST_BASE([1.38.0],[],[AC_MSG_ERROR([Boost headers are required to build GarminTools])])
+AX_BOOST_BASE([1.34.0],[],[AC_MSG_ERROR([Boost headers are required to build GarminTools])])
 
 
 # Checks for header files.
@@ -557,6 +557,7 @@ AC_CHECK_HEADERS(npruntime.h,,
 
 AC_CHECK_HEADERS([zipstub.h],[],[],[])
 AC_CHECK_HEADERS([prtypes.h],[],[],[])
+AC_CHECK_HEADERS([npfunctions.h],[],[],[])
 CPPFLAGS="$xulrunner_save_CPPFLAGS"
 
 # Checks for typedefs, structures, and compiler characteristics.

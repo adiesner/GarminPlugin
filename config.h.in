@@ -30,6 +30,9 @@
 /* Define to 1 if you have the <npapi.h> header file. */
 #undef HAVE_NPAPI_H
 
+/* Define to 1 if you have the <npfunctions.h> header file. */
+#undef HAVE_NPFUNCTIONS_H
+
 /* Define to 1 if you have the <npruntime.h> header file. */
 #undef HAVE_NPRUNTIME_H
 

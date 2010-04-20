@@ -20,7 +20,11 @@
 #include "config.h"
 #include <stdio.h>
 #include <npapi.h>
+#if HAVE_NPFUNCTIONS_H
 #include <npfunctions.h>
+#else
+#include <npupp.h>
+#endif
 #if HAVE_PRTYPES_H
 	#include <prtypes.h>
 #elif HAVE_ZIPSTUB_H
@@ -54,17 +58,32 @@ using namespace std;
 /**
  * A variable that stores the plugin name
  */
-char const * pluginName = "Garmin Communicator";
+#if HAVE_NPFUNCTIONS_H
+const char
+#else
+char
+#endif
+	 * pluginName = "Garmin Communicator";
 
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-char const * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2";
+#if HAVE_NPFUNCTIONS_H
+const char
+#else
+char
+#endif
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2";
 
 /**
  * A variable that stores the mime description of the plugin.
  */
-char const * pluginMimeDescription = "application/vnd-garmin.mygarmin:.Garmin Device Web Control";
+#if HAVE_NPFUNCTIONS_H
+const char
+#else
+char
+#endif
+	 * pluginMimeDescription = "application/vnd-garmin.mygarmin:.Garmin Device Web Control";
 
 /**
  * Manages all attached GPS Devices
@@ -1106,11 +1125,19 @@ static NPError getValue(NPP instance, NPPVariable variable, void *value) {
 		return NPERR_GENERIC_ERROR;
 	case NPPVpluginNameString:
         if (Log::enabledDbg()) Log::dbg("getvalue - name string");
-		*((char const**)value) = pluginName;
+#if HAVE_NPFUNCTIONS_H
+		*((const char **)value) = pluginName;
+#else
+		*((char **)value) = pluginName;
+#endif
 		break;
 	case NPPVpluginDescriptionString:
         if (Log::enabledDbg()) Log::dbg("getvalue - description string");
-		*((char const **)value) = pluginDescription;
+#if HAVE_NPFUNCTIONS_H
+		*((const char **)value) = pluginDescription;
+#else
+		*((char **)value) = pluginDescription;
+#endif 
 		break;
 	case NPPVpluginScriptableNPObject:
         if (Log::enabledDbg()) Log::dbg("getvalue - scriptable object");
@@ -1236,7 +1263,10 @@ NPError OSCALL NP_Shutdown() {
 * The browser requests the mime description of the plugin with this function
 * @return Mime description
 */
-const char * NP_GetMIMEDescription(void) {
+#if HAVE_NPFUNCTIONS_H
+const
+#endif
+char * NP_GetMIMEDescription(void) {
 	if (Log::enabledDbg()) Log::dbg("NP_GetMIMEDescription");
 	return pluginMimeDescription;
 }
