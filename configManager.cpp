@@ -140,6 +140,19 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 	fitnessPath->LinkEndChild(new TiXmlText(""));
 	device->LinkEndChild( fitnessPath );
 
+/*
+    <Settings>
+        <ForerunnerTools enabled ="true"/>
+    </Settings>
+*/
+    TiXmlElement * settings = new TiXmlElement( "Settings" );
+	plugin->LinkEndChild( settings );
+
+    TiXmlElement * forerunnertools = new TiXmlElement( "ForerunnerTools" );
+	settings->LinkEndChild( forerunnertools );
+
+	forerunnertools->SetAttribute("enabled", "true");
+
     try {
         doc->SaveFile(configFile);
         configurationFile = configFile;

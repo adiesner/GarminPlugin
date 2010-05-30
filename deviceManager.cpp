@@ -173,12 +173,43 @@ void DeviceManager::startFindDevices() {
         }
     }
 
-    // Search for garmin 305
-    string deviceName = Edge305Device::getAttachedDeviceName();
-    if (deviceName.length() > 0) {  // Found a device
-        Log::dbg("Found device via garmintools: "+deviceName);
-        Edge305Device * device = new Edge305Device(deviceName);
-        gpsDeviceList.push_back(device);
+    bool searchGarmin = true;
+    if (this->configuration != NULL) {
+        TiXmlElement * pRoot = this->configuration->FirstChildElement( "GarminPlugin" );
+        TiXmlElement * settings = NULL;
+        TiXmlElement * ftools = NULL;
+
+        if (pRoot != NULL) { settings = pRoot->FirstChildElement("Settings"); }
+        if (settings != NULL) { ftools = settings->FirstChildElement("ForerunnerTools"); } else { Log::dbg("settings is null!"); }
+        if (ftools != NULL) {
+            const char * ftoolsEnabled = ftools->Attribute("enabled");
+
+            if (ftoolsEnabled != NULL) {
+                string enabledStr = ftoolsEnabled;
+                if ((enabledStr == "yes") || (enabledStr == "YES") || (enabledStr == "true") || (enabledStr == "TRUE") || (enabledStr == "1")) {
+                    searchGarmin = true;
+                } else {
+                    searchGarmin = false;
+                }
+            } else {
+				Log::dbg("ftoolsEnabled is null!");
+			}
+        } else {
+			Log::dbg("ftools is null!");
+		}
+    }
+
+    string deviceName;
+    if (searchGarmin) {
+        // Search for garmin 305
+        deviceName = Edge305Device::getAttachedDeviceName();
+        if (deviceName.length() > 0) {  // Found a device
+            Log::dbg("Found device via garmintools: "+deviceName);
+            Edge305Device * device = new Edge305Device(deviceName);
+            gpsDeviceList.push_back(device);
+        }
+    } else {
+        Log::dbg("Search via garmintools is disabled!");
     }
 
     // Now create virtual SD Card devices from configuration
