@@ -73,7 +73,7 @@ const char
 #else
 char
 #endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.1";
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.2";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -793,7 +793,7 @@ void initializePropertyList() {
 	propertyList.clear();
 	Property value;
 	value.type = NPVariantType_String;
-	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>2</VersionMajor>\n<VersionMinor>9</VersionMinor>\n<BuildMajor>1</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
+	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>2</VersionMajor>\n<VersionMinor>9</VersionMinor>\n<BuildMajor>2</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
 	propertyList["VersionXml"] = value;
 	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>Sending To Removable Disk (/mnt/blah)</Title>\n<Text></Text>\n<Text></Text>\n<Text>100% complete</Text><ProgressBar Type=\"Percentage\" Value=\"100\"/></ProgressWidget>\n";
 	propertyList["ProgressXml"] = value;
@@ -1137,7 +1137,7 @@ static NPError getValue(NPP instance, NPPVariable variable, void *value) {
 		*((const char **)value) = pluginDescription;
 #else
 		*((char **)value) = pluginDescription;
-#endif 
+#endif
 		break;
 	case NPPVpluginScriptableNPObject:
         if (Log::enabledDbg()) Log::dbg("getvalue - scriptable object");
