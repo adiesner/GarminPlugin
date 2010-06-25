@@ -28,6 +28,7 @@ Edge305Device::Edge305Device() : fitnessdata(NULL)
 {
     this->displayName = "Edge305";
     this->fitnessdata = NULL;
+	this->runType = 0;
 }
 
 Edge305Device::Edge305Device(string name) : fitnessdata(NULL)
@@ -282,12 +283,15 @@ string Edge305Device::getRunHeader(D1009 * runData) {
     switch (runData->sport_type) {
         case D1000_running:
             xmlData << "Running";
+			this->runType = 1;
             break;
         case D1000_biking:
             xmlData << "Biking";
+			this->runType = 0;
             break;
         default:
             xmlData << "Other";
+			this->runType = 2;
             break;
     }
 
@@ -341,7 +345,7 @@ string Edge305Device::getLapHeader(D1011 * lapData, bool firstLap, bool printTra
     }
     xmlData << "</Intensity>\n";
 
-    if ( lapData->avg_cadence != 0xff ) {
+    if (( lapData->avg_cadence != 0xff ) && (this->runType == 0)) {
         xmlData << "<Cadence>" << (unsigned int)(lapData->avg_cadence) << "</Cadence>\n";
     }
     xmlData << "<TriggerMethod>";
@@ -428,7 +432,7 @@ string Edge305Device::getTrackPoint ( D304 * p)
         xmlData << "<Value>" << (unsigned int)(p->heart_rate) << "</Value>\n";
         xmlData << "</HeartRateBpm>\n";
     }
-    if ( p->cadence != 0xff ) {
+    if (( p->cadence != 0xff ) && (this->runType == 0)) {
         xmlData << "<Cadence>" << (unsigned int)(p->cadence) << "</Cadence>\n";
     }
     if ( p->sensor != 0 ) {
@@ -438,9 +442,17 @@ string Edge305Device::getTrackPoint ( D304 * p)
     }
 
     if ( p->cadence != 0xff ) {
-    xmlData << "<Extensions>\n";
-    xmlData << "<TPX xmlns=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\" CadenceSensor=\"Bike\"/>\n";
-    xmlData << "</Extensions>\n";
+	    xmlData << "<Extensions>\n";
+	    xmlData << "<TPX xmlns=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\" CadenceSensor=\"";
+
+		if (this->runType == 1) { // Running
+			xmlData << "Footpod\">\n";
+			xmlData << "<RunCadence>" << (unsigned int)(p->cadence) << "</RunCadence>\n";
+			xmlData << "</TPX>\n";
+		} else {
+			xmlData << "Bike\"/>\n";
+		}
+	    xmlData << "</Extensions>\n";
     }
     xmlData << "</Trackpoint>\n";
 

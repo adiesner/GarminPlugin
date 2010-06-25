@@ -195,6 +195,11 @@ private:
     static string filterDeviceName(string name);
 
     string readFitnessDetailId;
+
+   /**
+    * Stores type of current run (0=Biking, 1=Running, 2=Other)
+    */
+    int runType;  
 };
 
 
