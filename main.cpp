@@ -73,7 +73,7 @@ const char
 #else
 char
 #endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.2";
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.3";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -154,6 +154,48 @@ typedef
    boost::archive::iterators::base64_from_binary<
         boost::archive::iterators::transform_width<string::const_iterator, 6, 8>
         > base64_t;
+
+string getParameterTypeStr(const NPVariant arg) {
+    switch (arg.type) {
+        case NPVariantType_Void:
+                return "VOID";
+        case NPVariantType_Bool:
+                return "BOOL";
+        case NPVariantType_Int32:
+                return "INT32";
+        case NPVariantType_String:
+                return "STRING";
+        case NPVariantType_Double:
+                return "DOUBLE";
+        case NPVariantType_Object:
+                return "OBJECT";
+        case NPVariantType_Null:
+                return "NULL";
+        default:
+            return "UNKNOWN";
+    }
+}
+
+int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
+    int intValue = defaultVal;
+    if (args[pos].type == NPVariantType_Int32) {
+        intValue = args[pos].value.intValue;
+    } else if (args[pos].type == NPVariantType_String) {
+        std::string intValueStr = GETSTRING(args[pos].value.stringValue);
+        Log::dbg("getIntParameter String: "+intValueStr);
+        std::istringstream ss( intValueStr );
+        ss >> intValue;
+        /* Does not work
+        if (! ss.good()) {
+            [...]
+        } */
+    } else {
+        std::ostringstream errTxt;
+        errTxt << "Expected INT parameter at position " << pos << ". Found: " << getParameterTypeStr(args[pos]);
+        if (Log::enabledErr()) Log::err(errTxt.str());
+    }
+    return intValue;
+}
 
 /**
  * Compresses a string using gzip and encodes it using base64
@@ -307,24 +349,7 @@ bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
 bool methodStartWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
     if (argCount == 1) {
-        int deviceId = -1;
-        if (args[0].type == NPVariantType_Int32) {
-            deviceId = args[0].value.intValue;
-        } else if (args[0].type == NPVariantType_String) {
-
-            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
-            Log::dbg("Device ID String: "+deviceIdStr);
-            std::istringstream ss( deviceIdStr );
-            ss >> deviceId;
-            /* Does not work
-            if (! ss.good())
-            {
-                deviceId = -1;
-                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
-            } */
-        } else {
-            if (Log::enabledErr()) Log::err("StartWriteToGps: Expected INT parameter");
-        }
+        int deviceId = getIntParameter(args, 0, -1);
 
         if (deviceId != -1) {
             currentWorkingDevice = devManager->getGpsDevice(deviceId);
@@ -435,8 +460,10 @@ bool methodCancelWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argC
 bool methodDeviceDescription(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
     if (argCount == 1) {
-        if (args[0].type == NPVariantType_Int32) {
-            GpsDevice * device = devManager->getGpsDevice(args[0].value.intValue);
+        int deviceId = getIntParameter(args, 0, -1);
+
+        if (deviceId != -1) {
+            GpsDevice * device = devManager->getGpsDevice(deviceId);
             if (device != NULL) {
                 string deviceDescr = device->getDeviceDescription();
                 char *outStr = (char*)npnfuncs->memalloc(deviceDescr.size() + 1);
@@ -448,8 +475,6 @@ bool methodDeviceDescription(NPObject *obj, const NPVariant args[], uint32_t arg
             } else {
                 if (Log::enabledInfo()) Log::info("DeviceDescription: Device not found");
             }
-        } else {
-            if (Log::enabledErr()) Log::err("DeviceDescription: Wrong parameter type");
         }
     } else {
         if (Log::enabledErr()) Log::err("DeviceDescription: Argument count is wrong");
@@ -500,24 +525,7 @@ bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t a
 bool methodStartReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
     if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
-        int deviceId = -1;
-        if (args[0].type == NPVariantType_Int32) {
-            deviceId = args[0].value.intValue;
-        } else if (args[0].type == NPVariantType_String) {
-
-            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
-            Log::dbg("Device ID String: "+deviceIdStr);
-            std::istringstream ss( deviceIdStr );
-            ss >> deviceId;
-            /* Does not work
-            if (! ss.good())
-            {
-                deviceId = -1;
-                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
-            } */
-        } else {
-            if (Log::enabledErr()) Log::err("StartReadFitnessData: Expected INT parameter");
-        }
+        int deviceId = getIntParameter(args, 0, -1);
 
         if (deviceId != -1) {
             currentWorkingDevice = devManager->getGpsDevice(deviceId);
@@ -585,24 +593,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
 
 bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
     if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
-        int deviceId = -1;
-        if (args[0].type == NPVariantType_Int32) {
-            deviceId = args[0].value.intValue;
-        } else if (args[0].type == NPVariantType_String) {
-
-            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
-            Log::dbg("Device ID String: "+deviceIdStr);
-            std::istringstream ss( deviceIdStr );
-            ss >> deviceId;
-            /* Does not work
-            if (! ss.good())
-            {
-                deviceId = -1;
-                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
-            } */
-        } else {
-            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected INT parameter");
-        }
+        int deviceId = getIntParameter(args, 0, -1);
 
         if (deviceId != -1) {
             currentWorkingDevice = devManager->getGpsDevice(deviceId);
@@ -633,25 +624,8 @@ bool methodStartReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_
     //  StartReadFitnessDetail(0,"FitnessHistory","2010-02-27T14:23:46Z")
 
     if (argCount >= 2) { // What is the second parameter for ? "FitnessHistory"
-        int deviceId = -1;
+        int deviceId = getIntParameter(args, 0, -1);
         string id = "";
-        if (args[0].type == NPVariantType_Int32) {
-            deviceId = args[0].value.intValue;
-        } else if (args[0].type == NPVariantType_String) {
-
-            std::string deviceIdStr = GETSTRING(args[0].value.stringValue);
-            Log::dbg("Device ID String: "+deviceIdStr);
-            std::istringstream ss( deviceIdStr );
-            ss >> deviceId;
-            /* Does not work
-            if (! ss.good())
-            {
-                deviceId = -1;
-                if (Log::enabledErr()) Log::err("StartWriteToGps: Unable to convert device id to int value");
-            } */
-        } else {
-            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected INT parameter 1");
-        }
 
         if (args[2].type == NPVariantType_Int32) {
             id = args[2].value.intValue;
