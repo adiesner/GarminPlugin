@@ -345,8 +345,16 @@ string Edge305Device::getLapHeader(D1011 * lapData, bool firstLap, bool printTra
     }
     xmlData << "</Intensity>\n";
 
-    if (( lapData->avg_cadence != 0xff ) && (this->runType == 0)) {
-        xmlData << "<Cadence>" << (unsigned int)(lapData->avg_cadence) << "</Cadence>\n";
+    if ( lapData->avg_cadence != 0xff ) {
+        if (this->runType == 1) { // Running
+            xmlData << "<Extensions>\n";
+            xmlData << "<LX xmlns=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\">\n";
+            xmlData << "<AvgRunCadence>" << (unsigned int)(lapData->avg_cadence) << "</AvgRunCadence>\n";
+            xmlData << "</LX>\n";
+            xmlData << "</Extensions>\n";
+        } else { // Bike
+            xmlData << "<Cadence>" << (unsigned int)(lapData->avg_cadence) << "</Cadence>\n";
+        }
     }
     xmlData << "<TriggerMethod>";
     switch (lapData->intensity) {
