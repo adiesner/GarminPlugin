@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include "oregonDevice.h"
 #include <dirent.h>
+#include "gpsFunctions.h"
 
 OregonDevice::OregonDevice()
 {
@@ -85,7 +86,6 @@ void OregonDevice::setPathesFromConfiguration() {
     // Oregon officially does not support read fitness data.
     // It is planned in the future to read the current.gpx file
     // convert that file to fitness data
-    /*
     if (massStorageNode != NULL) {
         TiXmlElement * dataTypes = new TiXmlElement( "DataType" );
         massStorageNode->LinkEndChild(dataTypes);
@@ -118,7 +118,6 @@ void OregonDevice::setPathesFromConfiguration() {
         transferDir->LinkEndChild(new TiXmlText("OutputFromUnit"));
         file->LinkEndChild(transferDir);
     }
-    */
 }
 
 
@@ -156,7 +155,11 @@ void OregonDevice::doWork() {
     if (this->workType == WRITEGPX) {
         this->writeGpxFile();
     } else if (this->workType == READFITNESS) {
-        this->readFitnessDataFromDevice();
+        this->readFitnessDataFromDevice(true, "");
+    } else if (this->workType == READFITNESSDIR) {
+        this->readFitnessDataFromDevice(false, "");
+    } else if (this->workType == READFITNESSDETAIL) {
+        this->readFitnessDataFromDevice(true, this->readFitnessDetailId);
     } else {
         Log::err("Work Type not implemented!");
     }
@@ -164,8 +167,10 @@ void OregonDevice::doWork() {
 
 // This is currently a hack - the device does not support the read of fitnessdata
 // This function still needs testing!
-void OregonDevice::readFitnessDataFromDevice() {
+void OregonDevice::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
     Log::dbg("Thread readFitnessData started");
+
+    setlocale(LC_NUMERIC,"POSIX"); // Make sure snprintf prints a dot and not a comma as separator
 /*
 Thread-Status
     0 = idle
@@ -201,23 +206,47 @@ Thread-Status
             TiXmlElement * name =inputTrack->FirstChildElement("name");
             TiXmlElement * trkseg =inputTrack->FirstChildElement("trkseg");
             if ((name != NULL) && (trkseg != NULL)) {
+                string currentLapId="";
+
                 TiXmlElement * outActivity = new TiXmlElement("Activity");
                 outActivity->SetAttribute("Sport", "Other");
                 TiXmlElement * outId = new TiXmlElement("Id");
-                outId->LinkEndChild(new TiXmlText(name->GetText()));
                 outActivity->LinkEndChild(outId);
 
                 while ( trkseg != NULL) {
                     TiXmlElement * trkpoint = trkseg->FirstChildElement("trkpt");
                     if (trkpoint != NULL) {
 
+                        double totalTrackLength = 0;
+                        string lastCoords[2] = {"",""};
+
                         TiXmlElement * trkpointTime = trkpoint->FirstChildElement("time");
                         TiXmlElement * outLap = new TiXmlElement("Lap");
+                        string startTime = "";
+                        string endTime = "";
                         if (trkpointTime != NULL) {
+                            startTime = trkpointTime->GetText();
+                            if (currentLapId == "") {
+                                currentLapId = startTime;
+                            }
                             outLap->SetAttribute("StartTime", trkpointTime->GetText());
                         }
                         TiXmlElement * outTrack = new TiXmlElement("Track");
-                        outLap->LinkEndChild(outTrack);
+
+                        /*
+                        Decode the following
+                        <trkpt lat="xx.750916" lon="yy.182019">
+                        <ele>243.83</ele>
+                        <time>2008-02-22T16:01:15Z</time>
+                        <extensions>
+                        <gpxtpx:TrackPointExtension>
+                        <gpxtpx:atemp>26.6</gpxtpx:atemp>
+                        <gpxtpx:hr>109</gpxtpx:hr>
+                        <gpxtpx:cad>47</gpxtpx:cad>
+                        </gpxtpx:TrackPointExtension>
+                        </extensions>
+                        </trkpt>
+                        */
 
                         while (trkpoint != NULL) {
                             TiXmlElement * outTrackPoint = new TiXmlElement("Trackpoint");
@@ -230,6 +259,7 @@ Thread-Status
                             }
                             trkpointTime = trkpoint->FirstChildElement("time");
                             if (trkpointTime != NULL) {
+                                endTime = trkpointTime->GetText();
                                 TiXmlElement * outTime = new TiXmlElement("Time");
                                 outTime->LinkEndChild(new TiXmlText(trkpointTime->GetText()));
                                 outTrackPoint->LinkEndChild(outTime);
@@ -244,15 +274,113 @@ Thread-Status
                             outPosition->LinkEndChild(outLon);
                             outTrackPoint->LinkEndChild(outPosition);
 
+                            if (lastCoords[0] != "") {
+                                totalTrackLength+= haversine_m_str(lastCoords[0], lastCoords[1], trkpoint->Attribute("lat"), trkpoint->Attribute("lon"));
+                            }
+                            lastCoords[0] = trkpoint->Attribute("lat");
+                            lastCoords[1] = trkpoint->Attribute("lon");
+
+                            // Extensions like HeartRate, Cadence  and Temperature
+                            TiXmlElement * extensions = trkpoint->FirstChildElement("extensions");
+                            if (extensions != NULL) {
+                                TiXmlElement * trkPntExt = extensions->FirstChildElement("gpxtpx:TrackPointExtension");
+                                if (trkPntExt != NULL) {
+                                    TiXmlElement * heartRateData = trkPntExt->FirstChildElement("gpxtpx:hr");
+                                    TiXmlElement * cadenceData = trkPntExt->FirstChildElement("gpxtpx:cad");
+                                    //TiXmlElement * tempData = trkPntExt->FirstChildElement("gpxtpx:atemp"); // Ignoring Temp Data so far
+
+                                    if (heartRateData != NULL) {
+                                    /*
+                                        Insert
+                                            <HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
+                                              <Value>119</Value>
+                                            </HeartRateBpm>
+                                    */
+                                        TiXmlElement * outHeartRateBpm = new TiXmlElement("HeartRateBpm");
+                                        outHeartRateBpm->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
+                                        TiXmlElement * outValue = new TiXmlElement("Value");
+                                        outValue->LinkEndChild(new TiXmlText(heartRateData->GetText()));
+                                        outTrackPoint->LinkEndChild(outHeartRateBpm);
+                                        outHeartRateBpm->LinkEndChild(outValue);
+                                    }
+
+                                    // Unknown how to figure out if the cadence comes from footpod or bike cadence sensor
+                                    // Just asuming it is the bike cadence sensor
+                                    if (cadenceData != NULL) {
+                                    /*
+                                        Insert
+                                            <Cadence>71</Cadence>
+                                            <Extensions>
+                                                <TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2" CadenceSensor="Bike"/>
+                                            </Extensions>
+                                    */
+                                        TiXmlElement * outCadence = new TiXmlElement("Cadence");
+                                        outCadence->LinkEndChild(new TiXmlText(cadenceData->GetText()));
+                                        outTrackPoint->LinkEndChild(outCadence);
+                                        TiXmlElement * outExtensions = new TiXmlElement("Extensions");
+                                        TiXmlElement * outTPX = new TiXmlElement("TPX");
+                                        outTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+                                        outTPX->SetAttribute("CadenceSensor","Bike");
+                                        outTrackPoint->LinkEndChild(outExtensions);
+                                        outExtensions->LinkEndChild(outTPX);
+                                    }
+
+                                }
+                            }
+
                             outTrack->LinkEndChild(outTrackPoint);
                             trkpoint = trkpoint->NextSiblingElement( "trkpt" );
                         }
+
+
+                        struct tm start, end;
+                        double totalTimeSeconds = 0;
+                        if ((strptime(startTime.c_str(), "%FT%TZ",&start) != NULL) &&
+                            (strptime(endTime.c_str(), "%FT%TZ",&end) != NULL)) {
+                            time_t tstart, tend;
+                            tstart = mktime(&start);
+                            tend = mktime(&end);
+                            totalTimeSeconds = difftime (tend,tstart);
+                        }
+                        TiXmlElement * outTotalTimeSeconds = new TiXmlElement("TotalTimeSeconds");
+                        char totalTimeBuf[50];
+                        snprintf(&totalTimeBuf[0], sizeof(totalTimeBuf), "%.2f", totalTimeSeconds);
+                        outTotalTimeSeconds->LinkEndChild(new TiXmlText(totalTimeBuf));
+
+                        snprintf(&totalTimeBuf[0], sizeof(totalTimeBuf), "%.2f", totalTrackLength); // reuse the timeBuffer for total track length
+                        TiXmlElement * outDistanceMeters = new TiXmlElement("DistanceMeters");
+                        outDistanceMeters->LinkEndChild(new TiXmlText(totalTimeBuf));
+                        TiXmlElement * outCalories = new TiXmlElement("Calories");
+                        outCalories->LinkEndChild(new TiXmlText("0"));
+                        TiXmlElement * outIntensity = new TiXmlElement("Intensity");
+                        outIntensity->LinkEndChild(new TiXmlText("Active"));
+                        TiXmlElement * outTriggerMethod = new TiXmlElement("TriggerMethod");
+                        outTriggerMethod->LinkEndChild(new TiXmlText("Manual"));
+                        outLap->LinkEndChild(outTotalTimeSeconds);
+                        outLap->LinkEndChild(outDistanceMeters);
+                        outLap->LinkEndChild(outCalories);
+                        outLap->LinkEndChild(outIntensity);
+                        outLap->LinkEndChild(outTriggerMethod);
+
                         outActivity->LinkEndChild(outLap);
+
+                        if (readTrackData) {
+                            outLap->LinkEndChild(outTrack);
+                        } else {
+                            delete outTrack;
+                        }
                     }
                     trkseg = trkseg->NextSiblingElement( "trkseg" );
                 }
+
+                if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
+                    outId->LinkEndChild(new TiXmlText(currentLapId));
+                    outActivities->LinkEndChild(outActivity);
+                } else {
+                    delete outActivity;
+                }
                 inputTrack = inputTrack->NextSiblingElement( "trk" );
-                outActivities->LinkEndChild(outActivity);
+
             }
         }
     } else {
@@ -287,3 +415,63 @@ string OregonDevice::getFitnessData() {
     return this->fitnessDataTcdXml;
 }
 
+int OregonDevice::startReadFITDirectory() {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read FITDirectory from Oregon device");
+
+    this->workType = READFITNESSDIR;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int OregonDevice::startReadFitnessDirectory() {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read FITNESSDIR from Oregon device");
+
+    this->workType = READFITNESSDIR;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int OregonDevice::finishReadFitnessDirectory() {
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+void OregonDevice::cancelReadFitnessData() {
+}
+
+
+int OregonDevice::startReadFitnessDetail(string id) {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read fitness detail from garmin device: "+this->displayName+ " Searching for "+id);
+
+    this->workType = READFITNESSDETAIL;
+    this->readFitnessDetailId = id;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int OregonDevice::finishReadFitnessDetail() {
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+void OregonDevice::cancelReadFitnessDetail() {
+    cancelThread();
+}
