@@ -38,6 +38,7 @@
 #include "log.h"
 #include <sstream>
 #include "zlib.h"
+#include <fstream>
 
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
@@ -176,6 +177,26 @@ string getParameterTypeStr(const NPVariant arg) {
     }
 }
 
+/**
+ * If debug level, it outputs all transfered tcx files to the disk
+ */
+void debugOutputTcdXml() {
+    if (Log::enabledDbg()) {
+        stringstream filename;
+        time_t rawtime;
+        time ( &rawtime );
+        filename << "/tmp/" << rawtime << ".tcx";
+        Log::dbg("Writing TcdXml content to file: "+filename.str());
+        ofstream tcxoutput(filename.str().c_str());
+        if(tcxoutput.is_open()) {
+            tcxoutput << propertyList["TcdXml"].stringValue;
+            tcxoutput.close();
+        } else {
+            Log::err("Error writing TcdXml content to file: "+filename.str());
+        }
+    }
+}
+
 int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
     int intValue = defaultVal;
     if (args[pos].type == NPVariantType_Int32) {
@@ -202,6 +223,10 @@ int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
  * Use uudecode to unpack and then gunzip
  */
 string compressStringData(const string text) {
+    if (Log::enabledDbg()) {
+        Log::dbg("Test");
+        Log::dbg("Compressing content of string with length: " + text.length());
+    }
     std::stringstream decompressed;
     std::stringstream compressed;
     std::stringstream outstream;
@@ -581,6 +606,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+                debugOutputTcdXml();
             }
 
             return true;
@@ -687,6 +713,7 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+                debugOutputTcdXml();
             }
 
             return true;
@@ -738,6 +765,7 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+                debugOutputTcdXml();
             }
 
             return true;
