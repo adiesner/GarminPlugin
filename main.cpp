@@ -224,7 +224,9 @@ int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
  */
 string compressStringData(const string text) {
     if (Log::enabledDbg()) {
-        Log::dbg("Compressing content of string with length: " + text.length());
+        stringstream ss;
+        ss << text.size();
+        Log::dbg("Compressing content of string with length: " + ss.str());
     }
     std::stringstream decompressed;
     std::stringstream compressed;
@@ -603,8 +605,9 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
                 }
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
-                propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
-                propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+                string tcdData = currentWorkingDevice->getFitnessData();
+                propertyList["TcdXml"].stringValue = tcdData;
+                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
                 debugOutputTcdXml();
             }
 
@@ -710,8 +713,9 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
                 }
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
-                propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
-                propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+                string tcdData = currentWorkingDevice->getFitnessData();
+                propertyList["TcdXml"].stringValue = tcdData;
+                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
                 debugOutputTcdXml();
             }
 
@@ -762,8 +766,9 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
                 }
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
-                propertyList["TcdXml"].stringValue = currentWorkingDevice->getFitnessData();
-                propertyList["TcdXmlz"].stringValue = compressStringData(propertyList["TcdXml"].stringValue);
+                string tcdData = currentWorkingDevice->getFitnessData();
+                propertyList["TcdXml"].stringValue = tcdData;
+                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
                 debugOutputTcdXml();
             }
 
