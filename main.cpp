@@ -224,7 +224,6 @@ int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
  */
 string compressStringData(const string text) {
     if (Log::enabledDbg()) {
-        Log::dbg("Test");
         Log::dbg("Compressing content of string with length: " + text.length());
     }
     std::stringstream decompressed;

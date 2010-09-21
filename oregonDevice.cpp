@@ -28,15 +28,22 @@
 #include <stdlib.h>
 #include "oregonDevice.h"
 #include <dirent.h>
-#include "gpsFunctions.h"
+
+#include "TcxBuilder/TcxBase.h"
 
 OregonDevice::OregonDevice()
 {
     this->displayName = "Oregon";
+    this->partNumber = "006-B0625-00"; // is actually an edge705
+    this->fitnessData = NULL;
 }
 
 OregonDevice::~OregonDevice() {
     Log::dbg("OregonDevice destructor");
+    if (this->fitnessData != NULL) {
+        delete(fitnessData);
+        fitnessData = NULL;
+    }
 }
 
 void OregonDevice::setPathesFromConfiguration() {
@@ -48,6 +55,13 @@ void OregonDevice::setPathesFromConfiguration() {
     // Set fitness directory from configuration
     if (this->deviceDescription != NULL) {
         TiXmlElement * node = this->deviceDescription->FirstChildElement("Device");
+
+        // read partNumber
+        TiXmlElement * partNbr = NULL;
+        if (node!=NULL) { partNbr = node->FirstChildElement("Model"); }
+        if (partNbr!=NULL) { partNbr = partNbr->FirstChildElement("PartNumber"); }
+        if (partNbr!=NULL) { this->partNumber = partNbr->GetText(); }
+
         if (node!=NULL) { node = node->FirstChildElement("MassStorageMode"); massStorageNode = node; }
         if (node!=NULL) { node = node->FirstChildElement("DataType"); }
         while ( node != NULL) {
@@ -168,7 +182,7 @@ void OregonDevice::doWork() {
 // This is currently a hack - the device does not support the read of fitnessdata
 // This function still needs testing!
 void OregonDevice::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
-    Log::dbg("Thread readFitnessData started");
+    Log::dbg("Thread readFitnessData started: "+this->displayName);
 
     setlocale(LC_NUMERIC,"POSIX"); // Make sure snprintf prints a dot and not a comma as separator
 /*
@@ -184,216 +198,134 @@ Thread-Status
     workFile = this->fitnessFile;
     unlockVariables();
 
-    TiXmlDocument * output = new TiXmlDocument();
-    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
-    output->LinkEndChild( decl );
+    if (this->fitnessData == NULL) {
 
-    TiXmlElement * train = new TiXmlElement( "TrainingCenterDatabase" );
-    train->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2");
-    train->SetAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
-    train->SetAttribute("xsi:schemaLocation","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd");
+        TiXmlDocument doc(workFile);
+        if (doc.LoadFile()) {
+            this->fitnessData = new TcxBase();
 
-    output->LinkEndChild( train );
+            // Add author information
+            TcxAuthor * author = new TcxAuthor();
+            author->setPartNumber(this->partNumber);
+            author->setLangId("EN");
+            author->setBuild("0.0");
+            author->setType("Release");
+            author->setVersion("2.80");
+            author->setName(this->displayName);
+            *(this->fitnessData)<<author;
 
-    TiXmlElement * outActivities = new TiXmlElement( "Activities" );
-    train->LinkEndChild( outActivities );
+            TcxActivities * activities = new TcxActivities();
+            *(this->fitnessData)<<activities;
 
-    TiXmlDocument doc(workFile);
-    if (doc.LoadFile()) {
-        TiXmlElement * gpx = doc.FirstChildElement("gpx");
-        TiXmlElement * inputTrack = gpx->FirstChildElement("trk");
-        while ( inputTrack != NULL) {
-            TiXmlElement * name =inputTrack->FirstChildElement("name");
-            TiXmlElement * trkseg =inputTrack->FirstChildElement("trkseg");
-            if ((name != NULL) && (trkseg != NULL)) {
-                string currentLapId="";
+            TiXmlElement * gpx = doc.FirstChildElement("gpx");
+            TiXmlElement * inputTrack = gpx->FirstChildElement("trk");
+            while ( inputTrack != NULL) {
+                TiXmlElement * name =inputTrack->FirstChildElement("name");
+                TiXmlElement * trkseg =inputTrack->FirstChildElement("trkseg");
+                if ((name != NULL) && (trkseg != NULL)) {
+                    string currentLapId="";
+                    TcxActivity * singleActivity = new TcxActivity("");
+                    singleActivity->setSportType(TrainingCenterDatabase::Other);
 
-                TiXmlElement * outActivity = new TiXmlElement("Activity");
-                outActivity->SetAttribute("Sport", "Other");
-                TiXmlElement * outId = new TiXmlElement("Id");
-                outActivity->LinkEndChild(outId);
+                    TcxCreator * creator = new TcxCreator();
+                    creator->setName(this->displayName);
+                    creator->setVersion("1.12");
+                    *singleActivity <<creator;
 
-                while ( trkseg != NULL) {
-                    TiXmlElement * trkpoint = trkseg->FirstChildElement("trkpt");
-                    if (trkpoint != NULL) {
+                    while ( trkseg != NULL) {
+                        TiXmlElement * trkpoint = trkseg->FirstChildElement("trkpt");
+                        if (trkpoint != NULL) {
 
-                        double totalTrackLength = 0;
-                        string lastCoords[2] = {"",""};
+                            TiXmlElement * trkpointTime = trkpoint->FirstChildElement("time");
 
-                        TiXmlElement * trkpointTime = trkpoint->FirstChildElement("time");
-                        TiXmlElement * outLap = new TiXmlElement("Lap");
-                        string startTime = "";
-                        string endTime = "";
-                        if (trkpointTime != NULL) {
-                            startTime = trkpointTime->GetText();
-                            if (currentLapId == "") {
-                                currentLapId = startTime;
-                            }
-                            outLap->SetAttribute("StartTime", trkpointTime->GetText());
-                        }
-                        TiXmlElement * outTrack = new TiXmlElement("Track");
+                            TcxLap * singleLap = new TcxLap();
+                            *singleActivity<<singleLap;
+                            singleLap->setTriggerMethod(TrainingCenterDatabase::Manual);
+                            singleLap->setIntensity(TrainingCenterDatabase::Active);
 
-                        /*
-                        Decode the following
-                        <trkpt lat="xx.750916" lon="yy.182019">
-                        <ele>243.83</ele>
-                        <time>2008-02-22T16:01:15Z</time>
-                        <extensions>
-                        <gpxtpx:TrackPointExtension>
-                        <gpxtpx:atemp>26.6</gpxtpx:atemp>
-                        <gpxtpx:hr>109</gpxtpx:hr>
-                        <gpxtpx:cad>47</gpxtpx:cad>
-                        </gpxtpx:TrackPointExtension>
-                        </extensions>
-                        </trkpt>
-                        */
+                            TcxTrack *singleTrack = new TcxTrack();
+                            /*
+                            Decode the following
+                            <trkpt lat="xx.750916" lon="yy.182019">
+                            <ele>243.83</ele>
+                            <time>2008-02-22T16:01:15Z</time>
+                            <extensions>
+                            <gpxtpx:TrackPointExtension>
+                            <gpxtpx:atemp>26.6</gpxtpx:atemp>
+                            <gpxtpx:hr>109</gpxtpx:hr>
+                            <gpxtpx:cad>47</gpxtpx:cad>
+                            </gpxtpx:TrackPointExtension>
+                            </extensions>
+                            </trkpt>
+                            */
 
-                        while (trkpoint != NULL) {
-                            TiXmlElement * outTrackPoint = new TiXmlElement("Trackpoint");
-
-                            TiXmlElement * ele = trkpoint->FirstChildElement("ele");
-                            if (ele != NULL) {
-                                TiXmlElement * outElevation = new TiXmlElement("AltitudeMeters");
-                                outElevation->LinkEndChild(new TiXmlText(ele->GetText()));
-                                outTrackPoint->LinkEndChild(outElevation);
-                            }
-                            trkpointTime = trkpoint->FirstChildElement("time");
-                            if (trkpointTime != NULL) {
-                                endTime = trkpointTime->GetText();
-                                TiXmlElement * outTime = new TiXmlElement("Time");
-                                outTime->LinkEndChild(new TiXmlText(trkpointTime->GetText()));
-                                outTrackPoint->LinkEndChild(outTime);
-                            }
-
-                            TiXmlElement * outPosition = new TiXmlElement("Position");
-                            TiXmlElement * outLat = new TiXmlElement("LatitudeDegrees");
-                            outLat->LinkEndChild(new TiXmlText(trkpoint->Attribute("lat")));
-                            TiXmlElement * outLon = new TiXmlElement("LongitudeDegrees");
-                            outLon->LinkEndChild(new TiXmlText(trkpoint->Attribute("lon")));
-                            outPosition->LinkEndChild(outLat);
-                            outPosition->LinkEndChild(outLon);
-                            outTrackPoint->LinkEndChild(outPosition);
-
-                            if (lastCoords[0] != "") {
-                                totalTrackLength+= haversine_m_str(lastCoords[0], lastCoords[1], trkpoint->Attribute("lat"), trkpoint->Attribute("lon"));
-                            }
-                            lastCoords[0] = trkpoint->Attribute("lat");
-                            lastCoords[1] = trkpoint->Attribute("lon");
-
-                            // Extensions like HeartRate, Cadence  and Temperature
-                            TiXmlElement * extensions = trkpoint->FirstChildElement("extensions");
-                            if (extensions != NULL) {
-                                TiXmlElement * trkPntExt = extensions->FirstChildElement("gpxtpx:TrackPointExtension");
-                                if (trkPntExt != NULL) {
-                                    TiXmlElement * heartRateData = trkPntExt->FirstChildElement("gpxtpx:hr");
-                                    TiXmlElement * cadenceData = trkPntExt->FirstChildElement("gpxtpx:cad");
-                                    //TiXmlElement * tempData = trkPntExt->FirstChildElement("gpxtpx:atemp"); // Ignoring Temp Data so far
-
-                                    if (heartRateData != NULL) {
-                                    /*
-                                        Insert
-                                            <HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
-                                              <Value>119</Value>
-                                            </HeartRateBpm>
-                                    */
-                                        TiXmlElement * outHeartRateBpm = new TiXmlElement("HeartRateBpm");
-                                        outHeartRateBpm->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
-                                        TiXmlElement * outValue = new TiXmlElement("Value");
-                                        outValue->LinkEndChild(new TiXmlText(heartRateData->GetText()));
-                                        outTrackPoint->LinkEndChild(outHeartRateBpm);
-                                        outHeartRateBpm->LinkEndChild(outValue);
+                            while (trkpoint != NULL) {
+                                string trackpointtime = "";
+                                trkpointTime = trkpoint->FirstChildElement("time");
+                                if (trkpointTime != NULL) {
+                                    trackpointtime = trkpointTime->GetText();
+                                    if (currentLapId == "") {
+                                        currentLapId = trackpointtime;
                                     }
-
-                                    // Unknown how to figure out if the cadence comes from footpod or bike cadence sensor
-                                    // Just asuming it is the bike cadence sensor
-                                    if (cadenceData != NULL) {
-                                    /*
-                                        Insert
-                                            <Cadence>71</Cadence>
-                                            <Extensions>
-                                                <TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2" CadenceSensor="Bike"/>
-                                            </Extensions>
-                                    */
-                                        TiXmlElement * outCadence = new TiXmlElement("Cadence");
-                                        outCadence->LinkEndChild(new TiXmlText(cadenceData->GetText()));
-                                        outTrackPoint->LinkEndChild(outCadence);
-                                        TiXmlElement * outExtensions = new TiXmlElement("Extensions");
-                                        TiXmlElement * outTPX = new TiXmlElement("TPX");
-                                        outTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
-                                        outTPX->SetAttribute("CadenceSensor","Bike");
-                                        outTrackPoint->LinkEndChild(outExtensions);
-                                        outExtensions->LinkEndChild(outTPX);
-                                    }
-
                                 }
+                                TcxTrackpoint *singlePoint = new TcxTrackpoint(trackpointtime, trkpoint->Attribute("lat"), trkpoint->Attribute("lon"));
+                                *singleTrack << singlePoint;
+
+                                TiXmlElement * ele = trkpoint->FirstChildElement("ele");
+                                if (ele != NULL) {
+                                    singlePoint->setAltitudeMeters( ele->GetText() );
+                                }
+
+
+                                // Extensions like HeartRate, Cadence  and Temperature
+                                TiXmlElement * extensions = trkpoint->FirstChildElement("extensions");
+                                if (extensions != NULL) {
+                                    TiXmlElement * trkPntExt = extensions->FirstChildElement("gpxtpx:TrackPointExtension");
+                                    if (trkPntExt != NULL) {
+                                        TiXmlElement * heartRateData = trkPntExt->FirstChildElement("gpxtpx:hr");
+                                        TiXmlElement * cadenceData = trkPntExt->FirstChildElement("gpxtpx:cad");
+                                        //TiXmlElement * tempData = trkPntExt->FirstChildElement("gpxtpx:atemp"); // Ignoring Temp Data so far
+
+                                        if (heartRateData != NULL) {
+                                            singlePoint->setHeartRateBpm(heartRateData->GetText());
+                                        }
+
+                                        // Unknown how to figure out if the cadence comes from footpod or bike cadence sensor
+                                        // Just asuming it is the bike cadence sensor
+                                        if (cadenceData != NULL) {
+                                            singlePoint-> setCadence(cadenceData->GetText());
+                                            singlePoint-> setCadenceSensorType(TrainingCenterDatabase::Bike);
+                                        }
+
+                                    }
+                                }
+                                trkpoint = trkpoint->NextSiblingElement( "trkpt" );
                             }
 
-                            outTrack->LinkEndChild(outTrackPoint);
-                            trkpoint = trkpoint->NextSiblingElement( "trkpt" );
+                            *singleLap << singleTrack;
                         }
-
-
-                        struct tm start, end;
-                        double totalTimeSeconds = 0;
-                        if ((strptime(startTime.c_str(), "%FT%TZ",&start) != NULL) &&
-                            (strptime(endTime.c_str(), "%FT%TZ",&end) != NULL)) {
-                            time_t tstart, tend;
-                            tstart = mktime(&start);
-                            tend = mktime(&end);
-                            totalTimeSeconds = difftime (tend,tstart);
-                        }
-                        TiXmlElement * outTotalTimeSeconds = new TiXmlElement("TotalTimeSeconds");
-                        char totalTimeBuf[50];
-                        snprintf(&totalTimeBuf[0], sizeof(totalTimeBuf), "%.2f", totalTimeSeconds);
-                        outTotalTimeSeconds->LinkEndChild(new TiXmlText(totalTimeBuf));
-
-                        snprintf(&totalTimeBuf[0], sizeof(totalTimeBuf), "%.2f", totalTrackLength); // reuse the timeBuffer for total track length
-                        TiXmlElement * outDistanceMeters = new TiXmlElement("DistanceMeters");
-                        outDistanceMeters->LinkEndChild(new TiXmlText(totalTimeBuf));
-                        TiXmlElement * outCalories = new TiXmlElement("Calories");
-                        outCalories->LinkEndChild(new TiXmlText("0"));
-                        TiXmlElement * outIntensity = new TiXmlElement("Intensity");
-                        outIntensity->LinkEndChild(new TiXmlText("Active"));
-                        TiXmlElement * outTriggerMethod = new TiXmlElement("TriggerMethod");
-                        outTriggerMethod->LinkEndChild(new TiXmlText("Manual"));
-                        outLap->LinkEndChild(outTotalTimeSeconds);
-                        outLap->LinkEndChild(outDistanceMeters);
-                        outLap->LinkEndChild(outCalories);
-                        outLap->LinkEndChild(outIntensity);
-                        outLap->LinkEndChild(outTriggerMethod);
-
-                        outActivity->LinkEndChild(outLap);
-
-                        if (readTrackData) {
-                            outLap->LinkEndChild(outTrack);
-                        } else {
-                            delete outTrack;
-                        }
+                        trkseg = trkseg->NextSiblingElement( "trkseg" );
                     }
-                    trkseg = trkseg->NextSiblingElement( "trkseg" );
-                }
 
-                if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
-                    outId->LinkEndChild(new TiXmlText(currentLapId));
-                    outActivities->LinkEndChild(outActivity);
-                } else {
-                    delete outActivity;
-                }
-                inputTrack = inputTrack->NextSiblingElement( "trk" );
+                    singleActivity->setId(currentLapId);
+                    *activities<<singleActivity;
 
+                    inputTrack = inputTrack->NextSiblingElement( "trk" );
+                }
             }
+        } else {
+            Log::err("Unable to load fitness file "+workFile);
+            lockVariables();
+            this->fitnessDataTcdXml = "";
+            this->threadState = 3; // Finished
+            this->transferSuccessful = false; // Failed;
+            unlockVariables();
+            return;
         }
-    } else {
-        Log::err("Unable to load fitness file "+workFile);
-        lockVariables();
-        this->fitnessDataTcdXml = "";
-        this->threadState = 3; // Finished
-        this->transferSuccessful = false; // Failed;
-        unlockVariables();
-        delete(output);
-        return;
     }
 
+
+    TiXmlDocument * output = this->fitnessData->getTcxDocument(readTrackData, fitnessDetailId);
     TiXmlPrinter printer;
     printer.SetIndent( "  " );
     output->Accept( &printer );

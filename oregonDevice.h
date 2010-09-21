@@ -6,6 +6,7 @@
 #include <string>
 #include "messageBox.h"
 #include "garminFilebasedDevice.h"
+#include "TcxBuilder/TcxBase.h"
 
 using namespace std;
 
@@ -90,18 +91,27 @@ private:
   /**
    * File where this device stores its fitness data
    */
-    string fitnessFile;
+  string fitnessFile;
 
   /**
    * Stores the fitnessData which was read from the device
    */
-    string fitnessDataTcdXml;
+  string fitnessDataTcdXml;
 
-    /**
-     * Stores the id of the track that should be read
-     */
-    string readFitnessDetailId;
+  /**
+   * Stores the id of the track that should be read
+   */
+  string readFitnessDetailId;
 
+  /**
+   * Stores the part number of the device
+   */
+  string partNumber;
+
+  /**
+   * Stores the fitness data read from current.gpx
+   */
+  TcxBase *fitnessData;
 
 };
 
