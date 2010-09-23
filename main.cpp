@@ -231,6 +231,8 @@ string compressStringData(const string text) {
     std::stringstream decompressed;
     std::stringstream compressed;
     std::stringstream outstream;
+    unsigned int bufferSize = 77;
+    char * lineBuffer = new char [bufferSize];
     decompressed << text;
 
     boost::iostreams::filtering_streambuf<boost::iostreams::input> out;
@@ -241,9 +243,28 @@ string compressStringData(const string text) {
     string bin = compressed.str();
     string enc(base64_t(bin.begin()), base64_t(bin.end()));
 
-    outstream << "begin-base64 644 data.xml.gz" << endl;
-    outstream << enc << "==" << endl;  // Don't ask me why I have to add "==" here, but otherwise it does not decompress correctly
-    outstream << "====" << endl;
+    // Maximum line length of 76 characters for a uuencoded file
+    stringstream lineSplitter;
+    lineSplitter << enc;
+    outstream << "begin-base64 644 data.xml.gz";
+    while (!lineSplitter.eof()) {
+        lineSplitter.read (lineBuffer,bufferSize-1);
+        unsigned int bytesRead = lineSplitter.gcount();
+        if (bytesRead > 0) {
+            lineBuffer[(bytesRead<bufferSize)? bytesRead : bufferSize-1] = 0;
+            outstream << endl << lineBuffer;
+        }
+    }
+    delete(lineBuffer);
+
+    // uuencoded files must always have a line length that is a multiply of 4. So fill up the remaining bytes so that it is decompressable
+    int fillUpToTripple = 4 - (enc.size() % 4);
+    while (fillUpToTripple < 4) {
+        outstream << "=";
+        fillUpToTripple++;
+    }
+
+    outstream << endl << "====" << endl;
     return outstream.str();
 }
 
