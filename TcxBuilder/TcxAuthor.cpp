@@ -2,14 +2,14 @@
 #include "TcxAuthor.h"
 
 TcxAuthor::TcxAuthor() {
-    this->name = "Unknown";
-    this->versionMajor = "0";
-    this->versionMinor = "0";
-    this->buildMajor = "";
-    this->buildMinor = "";
-    this->partNumber = "";
-    this->type = "";
-    this->langId = "";
+    this->name = "Garmin Communicator Plug-In";
+    this->versionMajor = "2";
+    this->versionMinor = "9";
+    this->buildMajor = "1";
+    this->buildMinor = "0";
+    this->partNumber = "006-A0160-00";
+    this->type = "Release";
+    this->langId = "EN";
 }
 
 TcxAuthor::~TcxAuthor() {
