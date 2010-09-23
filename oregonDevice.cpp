@@ -36,6 +36,7 @@ OregonDevice::OregonDevice()
     this->displayName = "Oregon";
     this->partNumber = "006-B0625-00"; // is actually an edge705
     this->fitnessData = NULL;
+    this->unitId = "3631881849"; // A valid Oregon 300 ID
 }
 
 OregonDevice::~OregonDevice() {
@@ -61,6 +62,11 @@ void OregonDevice::setPathesFromConfiguration() {
         if (node!=NULL) { partNbr = node->FirstChildElement("Model"); }
         if (partNbr!=NULL) { partNbr = partNbr->FirstChildElement("PartNumber"); }
         if (partNbr!=NULL) { this->partNumber = partNbr->GetText(); }
+
+        // read Unit Id
+        TiXmlElement * unitIdElement = NULL;
+        if (node!=NULL) { unitIdElement = node->FirstChildElement("Id"); }
+        if (unitIdElement!=NULL) { this->unitId = unitIdElement->GetText(); }
 
         if (node!=NULL) { node = node->FirstChildElement("MassStorageMode"); massStorageNode = node; }
         if (node!=NULL) { node = node->FirstChildElement("DataType"); }
@@ -206,12 +212,6 @@ Thread-Status
 
             // Add author information
             TcxAuthor * author = new TcxAuthor();
-            author->setPartNumber(this->partNumber);
-            author->setLangId("EN");
-            author->setBuild("0.0");
-            author->setType("Release");
-            author->setVersion("2.80");
-            author->setName(this->displayName);
             *(this->fitnessData)<<author;
 
             TcxActivities * activities = new TcxActivities();
@@ -228,8 +228,14 @@ Thread-Status
                     singleActivity->setSportType(TrainingCenterDatabase::Other);
 
                     TcxCreator * creator = new TcxCreator();
+
+                    //If you set this incorrect, connect.garmin.com will
+                    //not allow an upload of a valid tcx file
                     creator->setName(this->displayName);
-                    creator->setVersion("1.12");
+                    creator->setUnitId(this->unitId);
+                    creator->setProductId(this->partNumber); // Where do I find the ProductID of the Oregon?
+                    creator->setVersion("3.80");
+                    creator->setBuild("0.0");
                     *singleActivity <<creator;
 
                     while ( trkseg != NULL) {

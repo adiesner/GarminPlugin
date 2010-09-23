@@ -109,6 +109,11 @@ private:
   string partNumber;
 
   /**
+   * Stores the unit id of the device
+   */
+  string unitId;
+
+  /**
    * Stores the fitness data read from current.gpx
    */
   TcxBase *fitnessData;
