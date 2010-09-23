@@ -76,9 +76,10 @@ double TcxTrack::calculateTotalTime() {
     double totalTimeSeconds = 0;
 
     if ((trackpointList.front() != NULL) && (trackpointList.back() != NULL)) {
-        struct tm start, end;
+        struct tm start={0,0,0,0,0,0,0,0,0};
+        struct tm end={0,0,0,0,0,0,0,0,0};
         if ((strptime(trackpointList.front()->getTime().c_str(), "%FT%TZ",&start) != NULL) &&
-            (strptime(trackpointList.back()->getTime().c_str(), "%FT%TZ",&end) != NULL)) {
+            (strptime(trackpointList.back()->getTime().c_str(),  "%FT%TZ",&end) != NULL)) {
             time_t tstart, tend;
             tstart = mktime(&start);
             tend = mktime(&end);

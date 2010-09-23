@@ -1,7 +1,6 @@
 
 #include "TcxLap.h"
 #include "TcxTypes.h"
-#include "../log.h"
 
 TcxLap::TcxLap() {
     this->totalTimeSeconds="";
