@@ -137,6 +137,10 @@ void DeviceManager::startFindDevices() {
 
                         GpsDevice * device = NULL;
                         string::size_type position = deviceName.find( "Oregon", 0 );
+                        if (position == string::npos) {
+                            // Treat the Dakota Model the same as an Oregon Model
+                            position = deviceName.find( "Dakota", 0 );
+                        }
                         if ((device == NULL) && (position != string::npos)) { // Found Oregon in deviceName
                             OregonDevice * oregon = new OregonDevice();
                             oregon->setBaseDirectory(mountPath);
