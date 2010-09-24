@@ -24,21 +24,22 @@
 #include <sstream>
 
 
-Edge305Device::Edge305Device() : fitnessdata(NULL)
+Edge305Device::Edge305Device() : fitnessData(NULL)
 {
     this->displayName = "Edge305";
-    this->fitnessdata = NULL;
+    this->fitnessData = NULL;
 	this->runType = 0;
 }
 
-Edge305Device::Edge305Device(string name) : fitnessdata(NULL)
+Edge305Device::Edge305Device(string name) : fitnessData(NULL)
 {
     this->displayName = name;
 }
 
 Edge305Device::~Edge305Device() {
-    if (fitnessdata != NULL) {
-        garmin_free_data(fitnessdata);
+    if (this->fitnessData != NULL) {
+        delete(this->fitnessData);
+        this->fitnessData = NULL;
     }
 }
 
@@ -122,67 +123,74 @@ string Edge305Device::getFitnessData() {
 
 string Edge305Device::readFitnessData(bool readTrackData, string fitnessDetailId)
 {
-    garmin_unit garmin;
-    garmin_data *       data0;
-    garmin_data *       data1;
-    garmin_data *       data2;
-    garmin_list *       runs   = NULL;
-    garmin_list *       laps   = NULL;
-    garmin_list *       tracks = NULL;
+    if (this->fitnessData == NULL) {
 
-    std::ostringstream xmlData;
-    xmlData << getFitnessDataHeader();
+       garmin_unit garmin;
+       garmin_data *       data0;
+       garmin_data *       data1;
+       garmin_data *       data2;
+       garmin_list *       runs   = NULL;
+       garmin_list *       laps   = NULL;
+       garmin_list *       tracks = NULL;
+       if ( garmin_init(&garmin,0) != 0 ) {
+            Log::dbg("Extracting data from Garmin "+this->displayName);
+            //fitnessdata = garmin_get(&garmin,GET_RUNS); //TODO
+            garmin_data * fitnessdata = garmin_load("/home/andreas/Projekte/GeocacheDownloader/Firefox-Plugin/gpsbabel/2010/02/20100227T152346.gmn");
 
-    if ( garmin_init(&garmin,0) != 0 ) {
-        Log::dbg("Extracting data from Garmin "+this->displayName);
-        if (fitnessdata == NULL) {
-            fitnessdata = garmin_get(&garmin,GET_RUNS);
-            //fitnessdata = garmin_load("/workout/2010/02/20100227T152346.gmn");
-        } else {
-            Log::dbg("Re-using fitnessdata from last read");
-        }
-        if (fitnessdata != NULL ) {
-            Log::dbg("Received data from Garmin, processing data...");
+            if (fitnessdata != NULL ) {
+                Log::dbg("Received data from Garmin, processing data...");
 
-            data0 = garmin_list_data(fitnessdata,0);
-            data1 = garmin_list_data(fitnessdata,1);
-            data2 = garmin_list_data(fitnessdata,2);
+                this->fitnessData = new TcxBase();
+                // Add author information
+                TcxAuthor * author = new TcxAuthor();
+                *(this->fitnessData)<<author;
 
-            if ( data0 != NULL && (data0->data != NULL) &&
-                 data1 != NULL && (laps   = (garmin_list*)data1->data) != NULL &&
-                 data2 != NULL && (tracks = (garmin_list*)data2->data) != NULL ) {
-                if (data0->type == data_Dlist) {
-                    runs = (garmin_list*)(data0->data);
+                data0 = garmin_list_data(fitnessdata,0);
+                data1 = garmin_list_data(fitnessdata,1);
+                data2 = garmin_list_data(fitnessdata,2);
+
+                if ( data0 != NULL && (data0->data != NULL) &&
+                     data1 != NULL && (laps   = (garmin_list*)data1->data) != NULL &&
+                     data2 != NULL && (tracks = (garmin_list*)data2->data) != NULL ) {
+                    if (data0->type == data_Dlist) {
+                        runs = (garmin_list*)(data0->data);
+                    } else {
+                       runs = garmin_list_append(NULL,data0);
+                    }
+                    *(this->fitnessData) << printActivities(runs, laps, tracks, garmin);
+
+                    if (data0->type != data_Dlist) {
+                        garmin_free_list_only(runs);
+                    }
+                    Log::dbg("Done processing data...");
+                    transferSuccessful = true;
+
                 } else {
-                   runs = garmin_list_append(NULL,data0);
+                    Log::err("Some of the data read from the device was null (runs/laps/tracks)");
                 }
-                xmlData << printActivities(runs, laps, tracks, garmin, readTrackData, fitnessDetailId);
-
-                if (data0->type != data_Dlist) {
-                    garmin_free_list_only(runs);
-                }
-                Log::dbg("Done processing data...");
-                transferSuccessful = true;
-
             } else {
-                Log::err("Some of the data read from the device was null (runs/laps/tracks)");
+                Log::err("Unable to extract any data!");
             }
-        } else {
-            Log::err("Unable to extract any data!");
-        }
-        garmin_close(&garmin);
-    } else {
-        Log::err("Unable to open garmin device. Is it connected?");
-    }
-    xmlData << getFitnessDataFooter();
 
-    return xmlData.str();
+            garmin_free_data(fitnessdata);
+            garmin_close(&garmin);
+        } else {
+            Log::err("Unable to open garmin device. Is it connected?");
+        }
+    }
+
+    TiXmlDocument * output = this->fitnessData->getTcxDocument(readTrackData, fitnessDetailId);
+    TiXmlPrinter printer;
+    printer.SetIndent( "  " );
+    output->Accept( &printer );
+    string fitnessXml = printer.Str();
+    delete(output);
+    return fitnessXml;
 }
 
-string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin, bool readTrackData, string fitnessDetailId) {
-    std::ostringstream xmlData;
+TcxActivities * Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin) {
 
-    xmlData << "<Activities>\n";
+    TcxActivities * activities = new TcxActivities();
 
     garmin_list_node * runNode = run->head;
 
@@ -190,9 +198,26 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
         garmin_data *run = runNode->data;
         if ((run != NULL) && (run->type == data_D1009) && (run->data != NULL)) {
             D1009 * runData = (D1009*)run->data;
-            std::ostringstream activityData;
-            activityData << getRunHeader(runData);
-            string currentLapId = "";
+
+            TcxActivity * singleActivity = new TcxActivity("");
+            *activities << singleActivity;
+            *singleActivity << getCreator(garmin);
+
+            switch (runData->sport_type) {
+                case D1000_running:
+                    this->runType = 1;
+                    singleActivity->setSportType(TrainingCenterDatabase::Running);
+                    break;
+                case D1000_biking:
+                    singleActivity->setSportType(TrainingCenterDatabase::Biking);
+                    this->runType = 0;
+                    break;
+                default:
+                    singleActivity->setSportType(TrainingCenterDatabase::Other);
+                    this->runType = 2;
+                    break;
+            }
+
             bool firstLap = true;
             for ( garmin_list_node * n = lap->head; n != NULL; n = n->next ) {
                 D1011 * lapData = NULL;
@@ -205,27 +230,26 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
                 if (lapData != NULL) {
                     if ((lapData->index >= runData->first_lap_index) && (lapData->index <= runData->last_lap_index)) {
 
-                        activityData << getLapHeader(lapData,firstLap, readTrackData);
+                        TcxLap * singleLap = getLapHeader(lapData);
+                        *singleActivity<< singleLap;
                         if (firstLap) {
-                            currentLapId = print_dtime(lapData->start_time);
+                            singleActivity->setId(print_dtime(lapData->start_time));
                             firstLap = false;
                         }
 
-                        if (readTrackData) {
-                            uint32 endTime = lapData->start_time + (lapData->total_time/100);
+                        uint32 endTime = lapData->start_time + (lapData->total_time/100);
 
-                            for ( garmin_list_node * t = track->head; t != NULL; t = t->next ) {
-                                if (t->data->type == data_D304) {
-                                    D304 * trackData = (D304 *)t->data->data;
+                        TcxTrack * singleTrack = new TcxTrack();
+                        *singleLap << singleTrack;
+                        for ( garmin_list_node * t = track->head; t != NULL; t = t->next ) {
+                            if (t->data->type == data_D304) {
+                                D304 * trackData = (D304 *)t->data->data;
 
-                                    if ((trackData->time >= lapData->start_time) && (trackData->time <= endTime)) {
-                                        activityData << getTrackPoint(trackData);
-                                    }
+                                if ((trackData->time >= lapData->start_time) && (trackData->time <= endTime)) {
+                                    (*singleTrack) << getTrackPoint(trackData);
                                 }
                             }
                         }
-
-                        activityData << getLapFooter(readTrackData);
                     }
 
                 } else {
@@ -233,153 +257,97 @@ string Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garm
                 }
             }
 
-            activityData << getCreator(garmin);
-            activityData << getRunFooter();
-
-            if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
-                xmlData << activityData.str();
-            }
         } else {
             Log::dbg("Not a run :-(");
         }
         runNode = runNode->next;
     }
 
-    xmlData << "</Activities>\n";
-    return xmlData.str();
+    return activities;
 }
 
-string Edge305Device::getCreator(const garmin_unit garmin) {
-    std::ostringstream xmlData;
-    xmlData << "<Creator xsi:type=\"Device_t\">\n";
-    xmlData << "<Name>Unknown</Name>\n";        // Where is that stored???
-    xmlData << "<UnitId>" << garmin.id << "</UnitId>\n";
-    xmlData << "<ProductID>" << garmin.product.product_id << "</ProductID>\n";
-    xmlData << "<Version>\n";
+TcxCreator * Edge305Device::getCreator(const garmin_unit garmin) {
+    TcxCreator *thisCreator = new TcxCreator();
+    thisCreator->setName("GarminPlugin");
+    stringstream ss;
+    ss << garmin.id;
+    thisCreator->setUnitId(ss.str());
+    ss.str("");
+    ss << garmin.product.product_id;
+    thisCreator->setProductId(ss.str());
+
     int major = garmin.product.software_version / 100;
     int minor = garmin.product.software_version % 100;
-    xmlData << "<VersionMajor>"<< major <<"</VersionMajor>\n";
-    xmlData << "<VersionMinor>"<< minor <<"</VersionMinor>\n";
-    xmlData << "<BuildMajor>0</BuildMajor>\n"; // ??
-    xmlData << "<BuildMinor>0</BuildMinor>\n"; // ??
-    xmlData << "</Version>\n";
-    xmlData << "</Creator>\n";
-    return xmlData.str();
+    ss.str("");
+    ss << major;
+    stringstream ss2;
+    ss2 << minor;
+    thisCreator->setVersion(ss.str(),ss2.str());
+    thisCreator->setBuild("0","0");
+    return thisCreator;
 }
 
-string Edge305Device::getFitnessDataHeader() {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<TrainingCenterDatabase xmlns=\"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2 http://www.garmin.com/xmlschemas/ActivityExtensionv2.xsd http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd\">\n\n";
-}
 
-string Edge305Device::getFitnessDataFooter() {
-    return "</TrainingCenterDatabase>\n";
-}
+TcxLap * Edge305Device::getLapHeader(D1011 * lapData) {
 
-string Edge305Device::getRunHeader(D1009 * runData) {
-    if (runData == NULL) { return ""; }
-    std::ostringstream xmlData;
-    xmlData << "<Activity Sport=\"";
+    TcxLap * singleLap = new TcxLap();
 
-    switch (runData->sport_type) {
-        case D1000_running:
-            xmlData << "Running";
-			this->runType = 1;
-            break;
-        case D1000_biking:
-            xmlData << "Biking";
-			this->runType = 0;
-            break;
-        default:
-            xmlData << "Other";
-			this->runType = 2;
-            break;
-    }
-
-    xmlData << "\">\n";
-    return xmlData.str();
-}
-
-string Edge305Device::getRunFooter() {
-    return "</Activity>\n";
-}
-
-string Edge305Device::getLapHeader(D1011 * lapData, bool firstLap, bool printTrackData) {
-    std::ostringstream xmlData;
-
-    if (firstLap) {
-        xmlData << "<Id>";
-        xmlData << print_dtime(lapData->start_time);
-        xmlData << "</Id>\n";
-    }
-
-    xmlData << "<Lap StartTime=\"";
-    xmlData << print_dtime(lapData->start_time);
-    xmlData << "\">\n";
-
+    //TODO: Think about letting it calculate that itself
     uint32 dur = lapData->total_time;
+    stringstream ss;
     int  hun = dur % 100;
     dur -= hun;
     dur /= 100;
-    xmlData << "<TotalTimeSeconds>" << dur << "." << hun << "</TotalTimeSeconds>\n";
+    ss << dur << "." << hun ;
+    singleLap->setTotalTimeSeconds(ss.str());
 
-    xmlData << "<DistanceMeters>" << lapData->total_dist << "</DistanceMeters>\n";
-    xmlData << "<MaximumSpeed>" << lapData->max_speed << "</MaximumSpeed>\n";
-    xmlData << "<Calories>" << lapData->calories << "</Calories>\n";
+    ss.str(""); ss << lapData->total_dist;
+    singleLap->setDistanceMeters(ss.str());
+    ss.str(""); ss << lapData->max_speed;
+    singleLap->setMaximumSpeed(ss.str());
+    ss.str(""); ss << lapData->calories;
+    singleLap->setCalories(ss.str());
 
     if ( lapData->avg_heart_rate != 0 ) {
-        xmlData << "<AverageHeartRateBpm xsi:type=\"HeartRateInBeatsPerMinute_t\">\n";
-        xmlData << "<Value>" << (unsigned int)(lapData->avg_heart_rate) << "</Value>\n";
-        xmlData << "</AverageHeartRateBpm>\n";
+        ss.str("");
+        ss << (unsigned int)(lapData->avg_heart_rate);
+        singleLap->setAverageHeartRateBpm(ss.str());
     }
     if ( lapData->max_heart_rate != 0 ) {
-        xmlData << "<MaximumHeartRateBpm xsi:type=\"HeartRateInBeatsPerMinute_t\">\n";
-        xmlData << "<Value>" << (unsigned int)(lapData->max_heart_rate) << "</Value>\n";
-        xmlData << "</MaximumHeartRateBpm>\n";
+        ss.str("");
+        ss << (unsigned int)(lapData->max_heart_rate);
+        singleLap->setMaximumHeartRateBpm(ss.str());
     }
 
-    xmlData << "<Intensity>";
     if (lapData->intensity == D1001_active) {
-        xmlData << "Active";
+        singleLap->setIntensity(TrainingCenterDatabase::Active);
     } else {
-        xmlData << "Rest";
+        singleLap->setIntensity(TrainingCenterDatabase::Resting);
     }
-    xmlData << "</Intensity>\n";
+
+    if (this->runType == 1) {
+        singleLap->setCadenceSensorType(TrainingCenterDatabase::Footpod);
+    } else {
+        singleLap->setCadenceSensorType(TrainingCenterDatabase::Bike);
+    }
 
     if ( lapData->avg_cadence != 0xff ) {
-        if (this->runType == 1) { // Running
-            xmlData << "<Extensions>\n";
-            xmlData << "<LX xmlns=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\">\n";
-            xmlData << "<AvgRunCadence>" << (unsigned int)(lapData->avg_cadence) << "</AvgRunCadence>\n";
-            xmlData << "</LX>\n";
-            xmlData << "</Extensions>\n";
-        } else { // Bike
-            xmlData << "<Cadence>" << (unsigned int)(lapData->avg_cadence) << "</Cadence>\n";
-        }
+        ss.str("");
+        ss << (unsigned int)(lapData->avg_cadence);
+        singleLap->setCadence(ss.str());
     }
-    xmlData << "<TriggerMethod>";
+
     switch (lapData->intensity) {
-        case   D1011_manual: xmlData << "Manual"; break;
-        case   D1011_distance: xmlData << "Distance"; break;
-        case   D1011_location: xmlData << "Location"; break;
-        case   D1011_time: xmlData << "Time"; break;
-        case   D1011_heart_rate: xmlData << "Heart Rate"; break;
-    }
-    xmlData << "</TriggerMethod>\n";
-
-    if (printTrackData) {
-        xmlData << "<Track>\n";
+        case   D1011_manual: singleLap->setTriggerMethod(TrainingCenterDatabase::Manual); break;
+        case   D1011_distance: singleLap->setTriggerMethod(TrainingCenterDatabase::Distance); break;
+        case   D1011_location: singleLap->setTriggerMethod(TrainingCenterDatabase::Location); break;
+        case   D1011_time: singleLap->setTriggerMethod(TrainingCenterDatabase::Time); break;
+        case   D1011_heart_rate: singleLap->setTriggerMethod(TrainingCenterDatabase::HeartRate); break;
     }
 
-    return xmlData.str();
+    return singleLap;
 }
 
-
-string Edge305Device::getLapFooter(bool printTrackData) {
-    if (printTrackData) {
-        return "</Track>\n</Lap>\n";
-    }
-    return "</Lap>\n";
-}
 
 string Edge305Device::print_dtime( uint32 t )
 {
@@ -416,55 +384,50 @@ string Edge305Device::print_dtime( uint32 t )
   return (string)buf;
 }
 
-string Edge305Device::getTrackPoint ( D304 * p)
+TcxTrackpoint * Edge305Device::getTrackPoint ( D304 * p)
 {
-    std::ostringstream xmlData;
-    xmlData << "<Trackpoint>\n";
-    xmlData << "<Time>" << print_dtime(p->time) << "</Time>\n";
+    TcxTrackpoint * singlePoint = new TcxTrackpoint(print_dtime(p->time));
 
     if (( p->posn.lat != 0x7fffffff ) && ( p->posn.lon != 0x7fffffff )) {
-        xmlData << "<Position>\n";
-        xmlData << "<LatitudeDegrees>" << SEMI2DEG(p->posn.lat) << "</LatitudeDegrees>\n";
-        xmlData << "<LongitudeDegrees>" << SEMI2DEG(p->posn.lon) << "</LongitudeDegrees>\n";
-        xmlData << "</Position>\n";
+        stringstream lat;
+        stringstream lon;
+        lat << SEMI2DEG(p->posn.lat);
+        lon << SEMI2DEG(p->posn.lon);
+        singlePoint->setPosition(lat.str(), lon.str());
     }
 
+    stringstream ss;
     if (p->alt < 1.0e24 ) {
-        xmlData << "<AltitudeMeters>" << p->alt << "</AltitudeMeters>\n";
+        ss << p->alt;
+        singlePoint->setAltitudeMeters(ss.str());
     }
     if (p->distance < 1.0e24 ) {
-        xmlData << "<DistanceMeters>" << p->distance << "</DistanceMeters>\n";
+        ss.str("");
+        ss << p->distance;
+        singlePoint->setDistanceMeters(ss.str());
     }
     if ( p->heart_rate != 0 ) {
-        xmlData << "<HeartRateBpm xsi:type=\"HeartRateInBeatsPerMinute_t\">\n";
-        xmlData << "<Value>" << (unsigned int)(p->heart_rate) << "</Value>\n";
-        xmlData << "</HeartRateBpm>\n";
+        ss.str("");
+        ss << (unsigned int)(p->heart_rate);
+        singlePoint->setHeartRateBpm(ss.str());
     }
-    if (( p->cadence != 0xff ) && (this->runType == 0)) {
-        xmlData << "<Cadence>" << (unsigned int)(p->cadence) << "</Cadence>\n";
+    if (this->runType == 0) {
+        singlePoint->setCadenceSensorType(TrainingCenterDatabase::Bike);
+    } else {
+        singlePoint->setCadenceSensorType(TrainingCenterDatabase::Footpod);
+    }
+    if ( p->cadence != 0xff ) {
+        ss.str("");
+        ss << (unsigned int)(p->cadence);
+        singlePoint->setCadence(ss.str());
     }
     if ( p->sensor != 0 ) {
-        xmlData << "<SensorState>Present</SensorState>\n";
+        singlePoint->setSensorState(TrainingCenterDatabase::Present);
     } else {
-        xmlData << "<SensorState>Absent</SensorState>\n";
+        singlePoint->setSensorState(TrainingCenterDatabase::Absent);
     }
 
-    if ( p->cadence != 0xff ) {
-	    xmlData << "<Extensions>\n";
-	    xmlData << "<TPX xmlns=\"http://www.garmin.com/xmlschemas/ActivityExtension/v2\" CadenceSensor=\"";
-
-		if (this->runType == 1) { // Running
-			xmlData << "Footpod\">\n";
-			xmlData << "<RunCadence>" << (unsigned int)(p->cadence) << "</RunCadence>\n";
-			xmlData << "</TPX>\n";
-		} else {
-			xmlData << "Bike\"/>\n";
-		}
-	    xmlData << "</Extensions>\n";
-    }
-    xmlData << "</Trackpoint>\n";
-
-    return xmlData.str();
+    return singlePoint;
 }
 
 /*static*/

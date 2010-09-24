@@ -7,6 +7,7 @@
 #include "messageBox.h"
 #include "gpsDevice.h"
 #include "garmin.h"
+#include "TcxBuilder/TcxBase.h"
 
 using namespace std;
 
@@ -120,12 +121,6 @@ protected:
      */
     string readFitnessData(bool readTrackData, string fitnessDetailId);
 
-
-    /**
-     * Stores the data read from the device to speed up things
-     */
-    garmin_data * fitnessdata;
-
 private:
 
     /**
@@ -136,33 +131,7 @@ private:
      * @param garmin device descriptor
      * @return xml string that describes all activities provided by the given lists
      */
-    string printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin, bool readTrackData, string fitnessDetailId);
-
-
-    /**
-     * Prints the fitness data header
-     * @return xml string
-     */
-    string getFitnessDataHeader();
-
-    /**
-     * Prints the fitness data footer
-     * @return xml string
-     */
-    string getFitnessDataFooter();
-
-    /**
-     * Prints the header of a run
-     * @param D1009 internal run format of garmintools
-     * @return xml string
-     */
-    string getRunHeader(D1009 * runData) ;
-
-    /**
-     * Prints the footer of a run
-     * @return xml string
-     */
-    string getRunFooter();
+    TcxActivities * printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin);
 
     /**
      * Prints the header of a lap
@@ -171,14 +140,7 @@ private:
      * @param printTrackData if <Track> should be outputted
      * @return xml string
      */
-    string getLapHeader(D1011 * lapData, bool firstLap, bool printTrackData);
-
-    /**
-     * Prints the footer of a lap
-     * @param printTrackData set to true if you have track data
-     * @return xml string
-     */
-    string getLapFooter(bool printTrackData);
+    TcxLap * getLapHeader(D1011 * lapData);
 
     /**
      * Prints a time in the format 2007-04-20T23:55:01Z
@@ -192,14 +154,14 @@ private:
      * @param D304 internal track point format of garmintools
      * @return xml string
      */
-    string getTrackPoint ( D304 * p);
+    TcxTrackpoint * getTrackPoint ( D304 * p);
 
     /**
      * Prints information about the device
      * @param garmin device descriptor
      * @return xml string
      */
-    string getCreator(const garmin_unit garmin);
+    TcxCreator * getCreator(const garmin_unit garmin);
 
   /**
    * Stores the fitnessData which was read from the device
@@ -216,6 +178,11 @@ private:
     * Stores type of current run (0=Biking, 1=Running, 2=Other)
     */
     int runType;
+
+   /**
+    * Stores the fitness data read from current.gpx
+    */
+   TcxBase *fitnessData;
 };
 
 
