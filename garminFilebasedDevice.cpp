@@ -4,7 +4,6 @@
 #include <fstream>
 
 
-
 GarminFilebasedDevice::GarminFilebasedDevice() {
     this->deviceDescription = NULL;
 }
@@ -237,6 +236,8 @@ bool GarminFilebasedDevice::isDeviceAvailable() {
 
 void GarminFilebasedDevice::setPathesFromConfiguration() {
     this->gpxDirectory = this->baseDirectory; // Fallback
+    this->fitnessFile = this->baseDirectory+"/Garmin/gpx/current/Current.gpx"; // Fallback
+
     if (this->deviceDescription != NULL) {
         TiXmlElement * node = this->deviceDescription->FirstChildElement("Device");
         if (node!=NULL) { node = node->FirstChildElement("MassStorageMode"); }
@@ -250,6 +251,8 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
                     while (node2 != NULL) {
                         TiXmlElement * transferDirection = node2->FirstChildElement("TransferDirection");
                         string transDir = transferDirection->GetText();
+
+                        // Get directory to write GPX
                         if ((transDir.compare("InputToUnit") == 0) || (transDir.compare("InputOutput") == 0)) {
                             TiXmlElement * loc = NULL;
                             if (node2!=NULL) { loc = node2->FirstChildElement("Location"); }
@@ -262,6 +265,23 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
                             if (loc!=NULL)   { node2 = loc->FirstChildElement("FileExtension"); }
                             if (node2!=NULL) {
                                 this->gpxFileExtension = node2->GetText();
+                            }
+                        }
+
+                        // Get location of current.gpx file
+                        if ((transDir.compare("OutputFromUnit") == 0) || (transDir.compare("InputOutput") == 0)) {
+                            TiXmlElement * loc = NULL;
+                            TiXmlElement * path = NULL;
+                            TiXmlElement * basename = NULL;
+                            TiXmlElement * ext = NULL;
+                            if (node2!=NULL) { loc = node2->FirstChildElement("Location"); }
+                            if (loc!=NULL)   { path = loc->FirstChildElement("Path"); }
+                            if (loc!=NULL)   { basename = loc->FirstChildElement("BaseName"); }
+                            if (loc!=NULL)   { ext = loc->FirstChildElement("FileExtension"); }
+
+                            if ((path != NULL) && (basename != NULL) && (ext != NULL)) {
+                                this->fitnessFile = this->baseDirectory + "/" + path->GetText() +"/"+basename->GetText()+"."+ext->GetText();
+                                Log::dbg("Fitness file is: "+this->fitnessFile);
                             }
                         }
 
@@ -304,4 +324,57 @@ int GarminFilebasedDevice::finishReadFitnessDetail() {
 
 void GarminFilebasedDevice::cancelReadFitnessDetail() {
     Log::err("Please implement me GarminFilebasedDevice::cancelReadFitnessDetail");
+}
+
+int GarminFilebasedDevice::startReadFromGps() {
+    struct stat stFileInfo;
+    int intStat;
+
+    // Attempt to get the file attributes
+    intStat = stat(this->fitnessFile.c_str(),&stFileInfo);
+    if(intStat != 0) {
+        Log::err("The file "+this->fitnessFile+" could not be found. Unable to read Gpx data.");
+        this->transferSuccessful = 0;
+        return 0;
+    }
+
+    this->transferSuccessful = 1;
+    if (Log::enabledDbg()) Log::dbg("No thread necessary to read from device, gpx file exists");
+
+    return 1;
+}
+
+int GarminFilebasedDevice::finishReadFromGps() {
+/*
+    0 = idle
+    1 = working
+    2 = waiting
+    3 = finished
+*/
+
+    return 3; // No processing of data necessary, therefore finish instantly
+}
+
+
+string GarminFilebasedDevice::getGpxData() {
+    stringstream filecontent;
+    std::ifstream file;
+    file.open (this->fitnessFile.c_str());
+    if (file) {
+        string line;
+        while (getline(file, line)) {
+            filecontent << line << "\n";
+        }
+        file.close();
+    } else {
+        Log::err("GetGpxData(): Unable to open file "+this->fitnessFile);
+    }
+
+    return filecontent.str();
+}
+
+void GarminFilebasedDevice::cancelReadFromGps() {
+    this->transferSuccessful = 0;
+    Log::dbg("Canceling ReadFromGps...");
+    // Nothing much to do here as no thread was started
 }

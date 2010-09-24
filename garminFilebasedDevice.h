@@ -83,6 +83,22 @@ public:
 
     virtual void cancelReadFitnessDetail();
 
+    virtual string getGpxData();
+
+    /**
+     * Start the reading of a file in the GPX format (like current.gpx on Oregon)
+     */
+    virtual int startReadFromGps();
+    /**
+     * This is used to indicate the status of the read process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishReadFromGps();
+    /**
+     * Cancels the current read from the device.
+     */
+    virtual void cancelReadFromGps();
+
 protected:
 
   /**
@@ -165,11 +181,14 @@ protected:
   /**
    * The thread stores the success state in this variable
    */
-    bool transferSuccessful;
+  bool transferSuccessful;
 
-    virtual void setPathesFromConfiguration();
+  virtual void setPathesFromConfiguration();
 
-
+  /**
+   * File where this device stores its fitness/gpx data
+   */
+  string fitnessFile;
 
 };
 

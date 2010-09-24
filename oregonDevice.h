@@ -89,11 +89,6 @@ protected:
 private:
 
   /**
-   * File where this device stores its fitness data
-   */
-  string fitnessFile;
-
-  /**
    * Stores the fitnessData which was read from the device
    */
   string fitnessDataTcdXml;

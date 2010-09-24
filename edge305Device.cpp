@@ -805,7 +805,7 @@ xsi:schemaLocation="http://www.garmin.com/xmlschemas/GarminDevice/v2 http://www.
 
 int Edge305Device::startWriteToGps(string filename, string xml) {
     Log::err("Write to Edge305 not yet implemented!");
-    this->transferSuccessful = 0;
+    this->transferSuccessful = false;
     return 0;
 }
 
@@ -923,3 +923,23 @@ void Edge305Device::cancelReadFitnessDetail() {
     cancelThread();
 }
 
+
+int Edge305Device::startReadFromGps() {
+    Log::err("Function Edge305.startReadFromGps is not yet implemented!");
+    this->transferSuccessful = false;
+    return 0;
+}
+
+int Edge305Device::finishReadFromGps() {
+    Log::err("Function Edge305.finishReadFromGps is not yet implemented!");
+    return 0;
+}
+
+void Edge305Device::cancelReadFromGps() {
+    Log::err("Function Edge305.cancelReadFromGps is not yet implemented!");
+}
+
+string Edge305Device::getGpxData() {
+    Log::err("Function Edge305.getGpxData is not yet implemented!");
+    return "";
+}

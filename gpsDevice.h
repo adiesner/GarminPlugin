@@ -147,7 +147,7 @@ public:
     virtual void cancelReadFitnessData() = 0;
 
     /**
-     *
+     * Starts reading of fitness history. Returns only tracks that match the given id
      */
     virtual int startReadFitnessDetail(string id) = 0;
 
@@ -155,13 +155,34 @@ public:
 
     virtual void cancelReadFitnessDetail() = 0;
 
+    /**
+     * Start the reading of a file in the GPX format (like current.gpx on Oregon)
+     */
+    virtual int startReadFromGps() = 0;
+    /**
+     * This is used to indicate the status of the read process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishReadFromGps() = 0;
+    /**
+     * Cancels the current read from the device.
+     */
+    virtual void cancelReadFromGps() = 0;
+
+    /**
+     * Gets the gpx data xml
+     * @return xml containing gpx data read from garmin device
+     */
+    virtual string getGpxData() = 0;
+
 protected:
     enum WorkType
     {
       WRITEGPX,
       READFITNESS,
       READFITNESSDIR,
-      READFITNESSDETAIL
+      READFITNESSDETAIL,
+      READFROMGPS
     };
     WorkType workType;
 

@@ -87,6 +87,22 @@ public:
     virtual void cancelReadFitnessDetail();
 
 
+    /**
+     * Start the reading of a file in the GPX format (like current.gpx on Oregon)
+     */
+    virtual int startReadFromGps();
+    /**
+     * This is used to indicate the status of the read process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishReadFromGps();
+    /**
+     * Cancels the current read from the device.
+     */
+    virtual void cancelReadFromGps();
+
+    virtual string getGpxData();
+
 protected:
     virtual void doWork();
     void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);
@@ -199,7 +215,7 @@ private:
    /**
     * Stores type of current run (0=Biking, 1=Running, 2=Other)
     */
-    int runType;  
+    int runType;
 };
 
 

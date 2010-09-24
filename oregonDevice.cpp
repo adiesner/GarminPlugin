@@ -52,7 +52,6 @@ void OregonDevice::setPathesFromConfiguration() {
 
     TiXmlElement * massStorageNode = NULL; // needed later to add ReadFitnessData Functionality
 
-    this->fitnessFile = this->baseDirectory+"/Garmin/gpx/current/Current.gpx"; // Fallback
     // Set fitness directory from configuration
     if (this->deviceDescription != NULL) {
         TiXmlElement * node = this->deviceDescription->FirstChildElement("Device");
@@ -69,43 +68,11 @@ void OregonDevice::setPathesFromConfiguration() {
         if (unitIdElement!=NULL) { this->unitId = unitIdElement->GetText(); }
 
         if (node!=NULL) { node = node->FirstChildElement("MassStorageMode"); massStorageNode = node; }
-        if (node!=NULL) { node = node->FirstChildElement("DataType"); }
-        while ( node != NULL) {
-            TiXmlElement * node2 = node->FirstChildElement("Name");
-            if (node2 != NULL) {
-                string nameText = node2->GetText();
-                if (nameText.compare("GPSData") == 0) {
-                    node2 = node->FirstChildElement("File");
-                    while (node2 != NULL) {
-
-                        TiXmlElement * transferDirection = node2->FirstChildElement("TransferDirection");
-                        string transDir = transferDirection->GetText();
-                        if ((transDir.compare("OutputFromUnit") == 0) || (transDir.compare("InputOutput") == 0)) {
-                            TiXmlElement * loc = NULL;
-                            TiXmlElement * path = NULL;
-                            TiXmlElement * basename = NULL;
-                            TiXmlElement * ext = NULL;
-                            if (node2!=NULL) { loc = node2->FirstChildElement("Location"); }
-                            if (loc!=NULL)   { path = loc->FirstChildElement("Path"); }
-                            if (loc!=NULL)   { basename = loc->FirstChildElement("BaseName"); }
-                            if (loc!=NULL)   { ext = loc->FirstChildElement("FileExtension"); }
-
-                            if ((path != NULL) && (basename != NULL) && (ext != NULL)) {
-                                this->fitnessFile = this->baseDirectory + "/" + path->GetText() +"/"+basename->GetText()+"."+ext->GetText();
-                                Log::dbg("Fitness file is: "+this->fitnessFile);
-                            }
-                        }
-                        node2 = node2->NextSiblingElement("File");
-                    }
-                }
-            }
-            node = node->NextSiblingElement( "DataType" );
-        }
     }
 
     // Oregon officially does not support read fitness data.
-    // It is planned in the future to read the current.gpx file
-    // convert that file to fitness data
+    // We need to add this xml element to the DeviceDescription
+    // so that the javascript detects it's fitness data functionality
     if (massStorageNode != NULL) {
         TiXmlElement * dataTypes = new TiXmlElement( "DataType" );
         massStorageNode->LinkEndChild(dataTypes);
@@ -186,7 +153,6 @@ void OregonDevice::doWork() {
 }
 
 // This is currently a hack - the device does not support the read of fitnessdata
-// This function still needs testing!
 void OregonDevice::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
     Log::dbg("Thread readFitnessData started: "+this->displayName);
 

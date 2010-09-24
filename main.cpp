@@ -178,21 +178,21 @@ string getParameterTypeStr(const NPVariant arg) {
 }
 
 /**
- * If debug level, it outputs all transfered tcx files to the disk
+ * If debug level, it outputs the content of string property variables into files in /tmp
  */
-void debugOutputTcdXml() {
+void debugOutputPropertyToFile(string property) {
     if (Log::enabledDbg()) {
         stringstream filename;
         time_t rawtime;
         time ( &rawtime );
-        filename << "/tmp/" << rawtime << ".tcx";
-        Log::dbg("Writing TcdXml content to file: "+filename.str());
-        ofstream tcxoutput(filename.str().c_str());
-        if(tcxoutput.is_open()) {
-            tcxoutput << propertyList["TcdXml"].stringValue;
-            tcxoutput.close();
+        filename << "/tmp/" << rawtime << "." << property;
+        Log::dbg("Writing "+property+" content to file: "+filename.str());
+        ofstream output(filename.str().c_str());
+        if(output.is_open()) {
+            output << propertyList[property].stringValue;
+            output.close();
         } else {
-            Log::err("Error writing TcdXml content to file: "+filename.str());
+            Log::err("Error writing "+property+" content to file: "+filename.str());
         }
     }
 }
@@ -629,7 +629,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
                 string tcdData = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXml"].stringValue = tcdData;
                 propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
-                debugOutputTcdXml();
+                debugOutputPropertyToFile("TcdXml");
             }
 
             return true;
@@ -737,13 +737,91 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
                 string tcdData = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXml"].stringValue = tcdData;
                 propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
-                debugOutputTcdXml();
+                debugOutputPropertyToFile("TcdXml");
             }
 
             return true;
         } else {
             if (Log::enabledInfo()) Log::info("FinishReadFitnessDetail: No working device specified");
         }
+    }
+    return false;
+}
+
+bool methodStartReadFromGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (argCount >= 1) {
+        int deviceId = getIntParameter(args, 0, -1);
+
+        if (deviceId != -1) {
+            currentWorkingDevice = devManager->getGpsDevice(deviceId);
+            if (currentWorkingDevice != NULL) {
+                result->type = NPVariantType_Int32;
+                result->value.intValue = currentWorkingDevice->startReadFromGps();
+                return true;
+            } else {
+                if (Log::enabledInfo()) Log::info("StartReadFromGps: Device not found");
+            }
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFromGps: Unable to determine device id");
+        }
+
+    } else {
+        if (Log::enabledErr()) Log::err("StartReadFromGps: Wrong parameter count");
+    }
+
+    return false;
+}
+
+bool methodFinishReadFromGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishReadFromGps();
+            printFinishState("FinishReadFromGps", result->value.intValue);
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["GpsTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                string gpxdata = currentWorkingDevice->getGpxData();
+                propertyList["GpsXml"].stringValue = gpxdata;
+                debugOutputPropertyToFile("GpsXml");
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishReadFitnessDetail: No working device specified");
+        }
+    }
+    return false;
+}
+
+bool methodCancelReadFromGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (currentWorkingDevice != NULL) {
+        Log::dbg("Calling cancel read from gps");
+
+        currentWorkingDevice->cancelReadFromGps();
+        return true;
     }
     return false;
 }
@@ -790,7 +868,7 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
                 string tcdData = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXml"].stringValue = tcdData;
                 propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
-                debugOutputTcdXml();
+                debugOutputPropertyToFile("TcdXml");
             }
 
             return true;
@@ -832,7 +910,6 @@ void initializePropertyList() {
 	value.stringValue = "";
 	propertyList["TcdXmlz"] = value; // Compressed
 
-
     // can be written from the outside
     value.writeable = true;
     value.stringValue = "";
@@ -845,8 +922,6 @@ void initializePropertyList() {
 	value.intValue = 0;
 	propertyList["GpsTransferSucceeded"] = value;
 	propertyList["Locked"] = value; // unlock
-	value.intValue = 1;
-	propertyList["ProgressXml"] = value;
 
 	value.intValue = 1;
 	propertyList["FitnessTransferSucceeded"] = value;
@@ -903,6 +978,14 @@ void initializePropertyList() {
 
     fooPointer = &methodCancelReadFitnessDetail;
     methodList["CancelReadFitnessDetail"] = fooPointer;
+
+    fooPointer = &methodStartReadFromGps;
+    methodList["StartReadFromGps"] = fooPointer;
+    fooPointer = &methodFinishReadFromGps;
+    methodList["FinishReadFromGps"] = fooPointer;
+    fooPointer = &methodCancelReadFromGps;
+    methodList["CancelReadFromGps"] = fooPointer;
+
 
 }
 
@@ -1020,15 +1103,16 @@ static bool hasProperty(NPObject *obj, NPIdentifier propertyName) {
  */
 static bool getProperty(NPObject *obj, NPIdentifier propertyName, NPVariant *result) {
     string name = npnfuncs->utf8fromidentifier(propertyName);
-    if (Log::enabledDbg()) Log::dbg("getProperty: "+name);
 
 	map<string,Property>::iterator it;
 	it = propertyList.find(name);
 	if (it != propertyList.end()) {
+	    stringstream dbgOut;
 		Property storedProperty = it->second;
 		result->type = storedProperty.type;
 		if (NPVARIANT_IS_INT32(storedProperty)) {
 			INT32_TO_NPVARIANT(storedProperty.intValue, *result);
+			dbgOut << storedProperty.intValue;
 		} else if (NPVARIANT_IS_STRING(storedProperty)) {
 			// We have:
 			// std::string str as the string to store
@@ -1038,10 +1122,17 @@ static bool getProperty(NPObject *obj, NPIdentifier propertyName, NPVariant *res
 			result->type = NPVariantType_String;
 			GETSTRING(result->value.stringValue) = outStr;
 			GETSTRINGLENGTH(result->value.stringValue) = storedProperty.stringValue.size();
+
+            if (storedProperty.stringValue.size() > 50) {
+                dbgOut << storedProperty.stringValue.substr(0,47) << "...";
+            } else {
+                dbgOut << storedProperty.stringValue;
+            }
 		} else {
-            if (Log::enabledErr()) Log::err("getProperty: Type not yet implemented");
+            if (Log::enabledErr()) Log::err("getProperty "+name+": Type not yet implemented");
 			return false;
 		}
+		if (Log::enabledDbg()) Log::dbg("getProperty: "+name +" = ["+dbgOut.str()+"]");
 		return true;
 	} else {
         if (Log::enabledInfo()) Log::info("getProperty: Property "+name+" not found");
