@@ -17,6 +17,7 @@ public:
     void addActivity(TcxActivity* activity);
 
     TiXmlElement * getTiXml(bool readTrackData, string fitnessDetailId);
+    vector<TiXmlElement*> getGpxTiXml();
 
     friend TcxActivities& operator<<(TcxActivities& base, TcxActivity* activity);
 

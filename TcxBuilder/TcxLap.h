@@ -22,6 +22,7 @@ public:
     void addTrack(TcxTrack* track);
 
     TiXmlElement * getTiXml(bool readTrackData);
+    TiXmlElement * getGpxTiXml();
 
     void setTotalTimeSeconds(string time);
     void setDistanceMeters(string distance);

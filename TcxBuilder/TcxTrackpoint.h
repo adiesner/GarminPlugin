@@ -27,7 +27,10 @@ public:
     string getTime();
     double calculateDistanceTo(double totalTrackDistance, TcxTrackpoint * nextPoint);
 
+    bool hasCoordinates();
+
     TiXmlElement * getTiXml();
+    TiXmlElement * getGpxTiXml();
 
 private:
     void initializeVariables();

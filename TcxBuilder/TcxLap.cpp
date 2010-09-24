@@ -49,18 +49,18 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
     xmlDistanceMeters->LinkEndChild(new TiXmlText(this->distanceMeters));
     xmlLap->LinkEndChild(xmlDistanceMeters);
 
+    if (this->maximumSpeed.length() > 0) {
+        TiXmlElement * xmlMaxSpeed = new TiXmlElement("MaximumSpeed");
+        xmlMaxSpeed->LinkEndChild(new TiXmlText(this->maximumSpeed));
+        xmlLap->LinkEndChild(xmlMaxSpeed);
+    }
+
     if (this->calories.length() == 0) {
         calculateCalories();
     }
     TiXmlElement * xmlCalories = new TiXmlElement("Calories");
     xmlCalories->LinkEndChild(new TiXmlText(this->calories));
     xmlLap->LinkEndChild(xmlCalories);
-
-    if (this->maximumSpeed.length() > 0) {
-        TiXmlElement * xmlMaxSpeed = new TiXmlElement("MaximumSpeed");
-        xmlMaxSpeed->LinkEndChild(new TiXmlText(this->maximumSpeed));
-        xmlLap->LinkEndChild(xmlMaxSpeed);
-    }
 
     if (this->averageHeartRateBpm.length() > 0) {
         //TODO: Think about calculating averageHeartRateBpm value
@@ -88,6 +88,17 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
     xmlIntensity->LinkEndChild(new TiXmlText(getIntensity(this->intensity)));
     xmlLap->LinkEndChild(xmlIntensity);
 
+    if ((this->cadence.length() > 0) && (this->cadenceSensorType != TrainingCenterDatabase::UndefinedCadenceType)) {
+        this->cadence = TrainingCenterDatabase::limitIntValue(this->cadence, 0,255);
+        if (this->cadence != "255") {
+            if (this->cadenceSensorType == TrainingCenterDatabase::Bike) {
+                TiXmlElement * xmlCadence = new TiXmlElement("Cadence");
+                xmlCadence->LinkEndChild(new TiXmlText(this->cadence));
+                xmlLap->LinkEndChild(xmlCadence);
+            }
+        }
+    }
+
     TiXmlElement * xmlTriggerMethod = new TiXmlElement("TriggerMethod");
     xmlTriggerMethod->LinkEndChild(new TiXmlText(getTriggerMethod(this->triggerMethod)));
     xmlLap->LinkEndChild(xmlTriggerMethod);
@@ -103,13 +114,8 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
 
     TiXmlElement * xmlLapExtensions = NULL;
     if ((this->cadence.length() > 0) && (this->cadenceSensorType != TrainingCenterDatabase::UndefinedCadenceType)) {
-        this->cadence = TrainingCenterDatabase::limitIntValue(this->cadence, 0,255);
         if (this->cadence != "255") {
-            if (this->cadenceSensorType == TrainingCenterDatabase::Bike) {
-                TiXmlElement * xmlCadence = new TiXmlElement("Cadence");
-                xmlCadence->LinkEndChild(new TiXmlText(this->cadence));
-                xmlLap->LinkEndChild(xmlCadence);
-            } else {
+            if (this->cadenceSensorType != TrainingCenterDatabase::Bike) {
                 if (xmlLapExtensions == NULL) {
                     xmlLapExtensions = new TiXmlElement("Extensions");
                     xmlLap->LinkEndChild(xmlLapExtensions);
@@ -126,6 +132,24 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
     }
 
     return xmlLap;
+}
+
+TiXmlElement * TcxLap::getGpxTiXml() {
+    TiXmlElement * segment = new TiXmlElement("trkseg");
+
+    vector<TcxTrack*>::iterator it;
+    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    {
+        TcxTrack* track = *it;
+        vector<TiXmlElement *> trkPointList = track->getGpxTiXml();
+        vector<TiXmlElement *>::iterator it;
+        for ( it=trkPointList.begin() ; it < trkPointList.end(); it++ ) {
+            TiXmlElement * elem = *it;
+            segment->LinkEndChild(elem);
+        }
+    }
+
+    return segment;
 }
 
 void TcxLap::setTotalTimeSeconds(string time) {

@@ -109,7 +109,21 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
                 xmlCad->LinkEndChild(new TiXmlText(this->cadence));
                 xmlTrackPoint->LinkEndChild(xmlCad);
             }
+        }
+    }
 
+    if (this->sensorState != TrainingCenterDatabase::UndefinedSensorState) {
+        TiXmlElement * xmlSensor = new TiXmlElement("SensorState");
+        string state = "Absent";
+        if (this->sensorState == TrainingCenterDatabase::Present) {
+            state = "Present";
+        }
+        xmlSensor->LinkEndChild(new TiXmlText(state));
+        xmlTrackPoint->LinkEndChild(xmlSensor);
+    }
+
+    if ((this->cadence.length() > 0) && ((this->cadenceSensorType != TrainingCenterDatabase::UndefinedCadenceType))) {
+        if (this->cadence != "255") {
             if (xmlTrackPointExtensions == NULL) {
                 xmlTrackPointExtensions = new TiXmlElement("Extensions");
                 xmlTrackPoint->LinkEndChild(xmlTrackPointExtensions);
@@ -134,15 +148,23 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
         }
     }
 
-    if (this->sensorState != TrainingCenterDatabase::UndefinedSensorState) {
-        TiXmlElement * xmlSensor = new TiXmlElement("SensorState");
-        string state = "Absent";
-        if (this->sensorState == TrainingCenterDatabase::Present) {
-            state = "Present";
-        }
-        xmlSensor->LinkEndChild(new TiXmlText(state));
-        xmlTrackPoint->LinkEndChild(xmlSensor);
+    return xmlTrackPoint;
+}
+
+TiXmlElement * TcxTrackpoint::getGpxTiXml() {
+    TiXmlElement * xmlTrackPoint = new TiXmlElement("trkpt");
+
+    if (this->latitude.length() > 0) { xmlTrackPoint->SetAttribute("lat",this->latitude); }
+    if (this->longitude.length() > 0) { xmlTrackPoint->SetAttribute("lon",this->longitude); }
+
+    if (this->altitudeMeters.length() > 0) {
+        TiXmlElement * xmlAlt = new TiXmlElement("ele");
+        xmlAlt->LinkEndChild(new TiXmlText(this->altitudeMeters));
+        xmlTrackPoint->LinkEndChild(xmlAlt);
     }
+    TiXmlElement * xmlTime = new TiXmlElement("time");
+    xmlTime->LinkEndChild(new TiXmlText(this->time));
+    xmlTrackPoint->LinkEndChild(xmlTime);
 
     return xmlTrackPoint;
 }
@@ -160,4 +182,11 @@ double TcxTrackpoint::calculateDistanceTo(double totalTrackDistance, TcxTrackpoi
     this->distanceMeters = distanceBuf;
 
     return distance;
+}
+
+bool TcxTrackpoint::hasCoordinates() {
+    if ((this->longitude.length() > 0) && (this->latitude.length() > 0)) {
+        return true;
+    }
+    return false;
 }

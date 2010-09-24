@@ -20,6 +20,7 @@ public:
     string getId();
 
     TiXmlElement * getTiXml(bool readTrackData);
+    TiXmlElement * getGpxTiXml();
 
     void setSportType(TrainingCenterDatabase::Sport_t type);
     void setId(string id);

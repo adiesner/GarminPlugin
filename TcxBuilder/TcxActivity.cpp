@@ -56,6 +56,22 @@ TiXmlElement * TcxActivity::getTiXml(bool readTrackData) {
     return xmlActivity;
 }
 
+TiXmlElement * TcxActivity::getGpxTiXml() {
+    TiXmlElement* trk = new TiXmlElement("trk");
+
+    TiXmlElement * gpxname = new TiXmlElement("name");
+    trk->LinkEndChild(gpxname);
+    gpxname->LinkEndChild(new TiXmlText(this->id));
+
+    vector<TcxLap*>::iterator it;
+    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    {
+        TcxLap* lap = *it;
+        trk->LinkEndChild( lap->getGpxTiXml() );
+    }
+    return trk;
+}
+
 string TcxActivity::getId() {
     return this->id;
 }

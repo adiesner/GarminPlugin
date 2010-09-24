@@ -30,6 +30,20 @@ TiXmlElement * TcxTrack::getTiXml() {
     return xmlTrack;
 }
 
+vector<TiXmlElement *> TcxTrack::getGpxTiXml() {
+    vector<TiXmlElement *> pointList;
+
+    vector<TcxTrackpoint*>::iterator it;
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); it++ )
+    {
+        TcxTrackpoint* trackpoint = *it;
+        if (trackpoint->hasCoordinates()) {
+            pointList.push_back(trackpoint->getGpxTiXml());
+        }
+    }
+    return pointList;
+}
+
 TcxTrack& operator<<(TcxTrack& track, TcxTrackpoint* point)
 {
     track.addTrackpoint(point);

@@ -18,6 +18,7 @@ public:
     void addTrackpoint(TcxTrackpoint* track);
 
     TiXmlElement * getTiXml();
+    vector<TiXmlElement *> getGpxTiXml();
 
     friend TcxTrack& operator<<(TcxTrack& base, TcxTrackpoint* track);
 

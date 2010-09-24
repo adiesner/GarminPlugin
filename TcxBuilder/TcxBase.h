@@ -20,6 +20,7 @@ public:
     void addActivities(TcxActivities* activities);
 
     TiXmlDocument * getTcxDocument(bool readTrackData, string fitnessDetailId);
+    TiXmlDocument * getGpxDocument();
 
     friend TcxBase& operator<<(TcxBase& base, TcxActivities* activities);
     friend TcxBase& operator<<(TcxBase& base, TcxAuthor* author);
