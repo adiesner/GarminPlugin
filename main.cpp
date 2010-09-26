@@ -900,7 +900,7 @@ void initializePropertyList() {
 	value.type = NPVariantType_String;
 	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>2</VersionMajor>\n<VersionMinor>9</VersionMinor>\n<BuildMajor>2</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
 	propertyList["VersionXml"] = value;
-	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>Sending To Removable Disk (/mnt/blah)</Title>\n<Text></Text>\n<Text></Text>\n<Text>100% complete</Text><ProgressBar Type=\"Percentage\" Value=\"100\"/></ProgressWidget>\n";
+	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>GarminPlugin Status not yet implemented</Title>\n<Text></Text>\n<Text></Text>\n<Text>90% complete</Text><ProgressBar Type=\"Percentage\" Value=\"90\"/></ProgressWidget>\n";
 	propertyList["ProgressXml"] = value;
 	value.stringValue = "";
 	propertyList["MessageBoxXml"] = value;
