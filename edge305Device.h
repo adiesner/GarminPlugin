@@ -121,6 +121,22 @@ protected:
      */
     string readFitnessData(bool readTrackData, string fitnessDetailId);
 
+    /**
+     * Reads fitnessdata into fitnessData xml from a garmin device like Edge 305/Forerunner 305
+     * @return xml containing fitness data read from garmin device
+     */
+    TcxBase * readFitnessDataFromGarmin();
+
+    /**
+     * Starts reading from garmin device and stores gpx data in gpxDataGpsXml;
+     */
+    void readGpxDataFromDevice();
+
+    /**
+     * Reads the gpx data from the device and returns a string in gpx format
+     */
+    string readGpxData();
+
 private:
 
     /**
@@ -163,10 +179,20 @@ private:
      */
     TcxCreator * getCreator(const garmin_unit garmin);
 
+    /**
+     * Returns the state of the thread idle/busy/waiting/finished
+     */
+    int getThreadState();
+
   /**
    * Stores the fitnessData which was read from the device
    */
     string fitnessDataTcdXml;
+
+  /**
+   * Stores the gpxData which was read from the device
+   */
+    string gpxDataGpsXml;
 
     bool transferSuccessful;
 
