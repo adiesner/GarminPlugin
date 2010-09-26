@@ -261,3 +261,15 @@ string TcxLap::getStartTime() {
     }
     return "1970-01-01T00:00:00Z";
 }
+
+bool TcxLap::isEmpty() {
+    vector<TcxTrack*>::iterator it;
+    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    {
+        TcxTrack* track = *it;
+        if (!track->isEmpty()) {
+            return false;
+        }
+    }
+    return true;
+}

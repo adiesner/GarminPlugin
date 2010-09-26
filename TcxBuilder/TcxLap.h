@@ -36,7 +36,7 @@ public:
     void setNotes(string note);
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
 
-
+    bool isEmpty();
 
     friend TcxLap& operator<<(TcxLap& base, TcxTrack* track);
 

@@ -98,3 +98,15 @@ void TcxActivity::setSportType(TrainingCenterDatabase::Sport_t type) {
 void TcxActivity::setId(string id) {
     this->id = id;
 }
+
+bool TcxActivity::isEmpty() {
+    vector<TcxLap*>::iterator it;
+    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    {
+        TcxLap* lap = *it;
+        if (!lap->isEmpty()) {
+            return false;
+        }
+    }
+    return true;
+}

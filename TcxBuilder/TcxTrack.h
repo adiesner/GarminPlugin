@@ -27,6 +27,8 @@ public:
     double calculateDistanceMeters();
     double calculateTotalTime();
 
+    bool isEmpty();
+
 private:
     vector<TcxTrackpoint*> trackpointList;
 

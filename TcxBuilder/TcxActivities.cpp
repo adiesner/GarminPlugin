@@ -24,8 +24,10 @@ TiXmlElement * TcxActivities::getTiXml(bool readTrackData, string fitnessDetailI
     for ( it=activityList.begin() ; it < activityList.end(); it++ )
     {
         TcxActivity* activity = *it;
-        if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(activity->getId())==0)) {
-            xmlActivities->LinkEndChild( activity->getTiXml(readTrackData) );
+        if (!activity->isEmpty()) {
+            if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(activity->getId())==0)) {
+                xmlActivities->LinkEndChild( activity->getTiXml(readTrackData) );
+            }
         }
     }
     return xmlActivities;
@@ -38,7 +40,9 @@ vector<TiXmlElement*> TcxActivities::getGpxTiXml() {
     for ( it=activityList.begin() ; it < activityList.end(); it++ )
     {
         TcxActivity* activity = *it;
-        trkElements.push_back(activity->getGpxTiXml());
+        if (!activity->isEmpty()) {
+            trkElements.push_back(activity->getGpxTiXml());
+        }
     }
     return trkElements;
 }

@@ -102,3 +102,11 @@ double TcxTrack::calculateTotalTime() {
     }
     return totalTimeSeconds;
 }
+
+
+bool TcxTrack::isEmpty() {
+    if (trackpointList.size() == 0) {
+        return true;
+    }
+    return false;
+}

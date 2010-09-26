@@ -25,6 +25,8 @@ public:
     void setSportType(TrainingCenterDatabase::Sport_t type);
     void setId(string id);
 
+    bool isEmpty();
+
     friend TcxActivity& operator<<(TcxActivity& activity, TcxLap* lap);
     friend TcxActivity& operator<<(TcxActivity& activity, TcxCreator* creator);
 
