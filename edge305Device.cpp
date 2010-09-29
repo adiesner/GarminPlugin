@@ -234,75 +234,89 @@ TcxBase * Edge305Device::readFitnessDataFromGarmin() {
     return fitData;
 }
 
-TcxActivities * Edge305Device::printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin) {
+TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_list * lap, garmin_list * track, const garmin_unit garmin) {
 
     TcxActivities * activities = new TcxActivities();
 
-    garmin_list_node * runNode = run->head;
+    garmin_list_node * runNode = runList->head;
 
     while (runNode != NULL) {
         garmin_data *run = runNode->data;
         if ((run != NULL) && (run->type == data_D1009) && (run->data != NULL)) {
-            D1009 * runData = (D1009*)run->data;
 
-            TcxActivity * singleActivity = new TcxActivity("");
-            *activities << singleActivity;
-            *singleActivity << getCreator(garmin);
+            uint32 track_index;
+            uint32 first_lap_index;
+            uint32 last_lap_index;
+            uint8  sport_type;
 
-            switch (runData->sport_type) {
-                case D1000_running:
-                    this->runType = 1;
-                    singleActivity->setSportType(TrainingCenterDatabase::Running);
-                    break;
-                case D1000_biking:
-                    singleActivity->setSportType(TrainingCenterDatabase::Biking);
-                    this->runType = 0;
-                    break;
-                default:
-                    singleActivity->setSportType(TrainingCenterDatabase::Other);
-                    this->runType = 2;
-                    break;
-            }
+            if ( _get_run_track_lap_info(run,&track_index,&first_lap_index,&last_lap_index,&sport_type) != 0 ) {
+                TcxActivity * singleActivity = new TcxActivity("");
+                *activities << singleActivity;
+                *singleActivity << getCreator(garmin);
 
-            bool firstLap = true;
-            for ( garmin_list_node * n = lap->head; n != NULL; n = n->next ) {
-                D1011 * lapData = NULL;
-                if (n->data->type == data_D1011) { // Edge 305 uses this
-                    lapData = (D1011*)n->data->data;
-                } else if (n->data->type == data_D1015) { // Forerunner 205 uses this
-                    lapData = (D1011*)n->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+                switch (sport_type) {
+                    case D1000_running:
+                        this->runType = 1;
+                        singleActivity->setSportType(TrainingCenterDatabase::Running);
+                        break;
+                    case D1000_biking:
+                        singleActivity->setSportType(TrainingCenterDatabase::Biking);
+                        this->runType = 0;
+                        break;
+                    default:
+                        singleActivity->setSportType(TrainingCenterDatabase::Other);
+                        this->runType = 2;
+                        break;
                 }
 
-                if (lapData != NULL) {
-                    if ((lapData->index >= runData->first_lap_index) && (lapData->index <= runData->last_lap_index)) {
+                bool firstLap = true;
+                for ( garmin_list_node * n = lap->head; n != NULL; n = n->next ) {
+                    D1011 * lapData = NULL;
+                    if (n->data->type == data_D1011) { // Edge 305 uses this
+                        lapData = (D1011*)n->data->data;
+                    } else if (n->data->type == data_D1015) { // Forerunner 205 uses this
+                        lapData = (D1011*)n->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+                    }
 
-                        TcxLap * singleLap = getLapHeader(lapData);
-                        *singleActivity<< singleLap;
-                        if (firstLap) {
-                            singleActivity->setId(print_dtime(lapData->start_time));
-                            firstLap = false;
-                        }
+                    if (lapData != NULL) {
+                        if ((lapData->index >= first_lap_index) && (lapData->index <= last_lap_index)) {
 
-                        uint32 endTime = lapData->start_time + (lapData->total_time/100);
+                            TcxLap * singleLap = getLapHeader(lapData);
+                            *singleActivity<< singleLap;
+                            if (firstLap) {
+                                singleActivity->setId(print_dtime(lapData->start_time));
+                                firstLap = false;
+                            }
 
-                        TcxTrack * singleTrack = new TcxTrack();
-                        *singleLap << singleTrack;
-                        for ( garmin_list_node * t = track->head; t != NULL; t = t->next ) {
-                            if (t->data->type == data_D304) {
-                                D304 * trackData = (D304 *)t->data->data;
-
-                                if ((trackData->time >= lapData->start_time) && (trackData->time <= endTime)) {
-                                    (*singleTrack) << getTrackPoint(trackData);
+                            uint32 currentTrackIndex = 0;
+                            TcxTrack * singleTrack = NULL;
+                            for ( garmin_list_node * t = track->head; t != NULL; t = t->next ) {
+                                if (t->data->type == data_D311) {
+                                    D311 * d311 = (D311 *)t->data->data;
+                                    currentTrackIndex = d311->index;
+                                    if (d311->index == track_index) {
+                                        singleTrack = new TcxTrack();
+                                        *singleLap << singleTrack;
+                                    }
+                                }
+                                if (t->data->type == data_D304) {
+                                    D304 * trackData = (D304 *)t->data->data;
+                                    if (currentTrackIndex == track_index) {
+                                        if (singleTrack != NULL) {
+                                            (*singleTrack) << getTrackPoint(trackData);
+                                        } else {
+                                            Log::err("Current track is null - but track index matches !?");
+                                        }
+                                    }
                                 }
                             }
                         }
-                    }
 
-                } else {
-                    Log::dbg("Unknown Lap Type found in data");
+                    } else {
+                        Log::dbg("Unknown Lap Type found in data");
+                    }
                 }
             }
-
         } else {
             Log::dbg("Not a run :-(");
         }
@@ -314,7 +328,7 @@ TcxActivities * Edge305Device::printActivities(garmin_list * run, garmin_list * 
 
 TcxCreator * Edge305Device::getCreator(const garmin_unit garmin) {
     TcxCreator *thisCreator = new TcxCreator();
-    thisCreator->setName("GarminPlugin");
+    thisCreator->setName(this->displayName);
     stringstream ss;
     ss << garmin.id;
     thisCreator->setUnitId(ss.str());
@@ -961,4 +975,50 @@ int Edge305Device::getThreadState() {
     unlockVariables();
 
     return status;
+}
+
+
+bool Edge305Device::_get_run_track_lap_info ( garmin_data * run,
+			 uint32 *      track_index,
+			 uint32 *      first_lap_index,
+			 uint32 *      last_lap_index,
+			 uint8  *      sport_type )
+{
+  D1000 * d1000;
+  D1009 * d1009;
+  D1010 * d1010;
+
+  bool ok = true;
+
+  switch ( run->type ) {
+  case data_D1000:
+    d1000            = (D1000*)(run->data);
+    *track_index     = d1000->track_index;
+    *first_lap_index = d1000->first_lap_index;
+    *last_lap_index  = d1000->last_lap_index;
+    *sport_type      = d1000->sport_type;
+    break;
+  case data_D1009:
+    d1009            = (D1009*)run->data;
+    *track_index     = d1009->track_index;
+    *first_lap_index = d1009->first_lap_index;
+    *last_lap_index  = d1009->last_lap_index;
+    *sport_type      = d1009->sport_type;
+    break;
+  case data_D1010:
+    d1010            = (D1010*)run->data;
+    *track_index     = d1010->track_index;
+    *first_lap_index = d1010->first_lap_index;
+    *last_lap_index  = d1010->last_lap_index;
+    *sport_type      = d1010->sport_type;
+    break;
+  default:
+    stringstream ss;
+    ss << "get_run_track_lap_info: run type " << run->type << " is invalid!";
+    Log::err(ss.str());
+    ok = false;
+    break;
+  }
+
+  return ok;
 }

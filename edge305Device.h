@@ -147,7 +147,7 @@ private:
      * @param garmin device descriptor
      * @return xml string that describes all activities provided by the given lists
      */
-    TcxActivities * printActivities(garmin_list * run, garmin_list * lap, garmin_list * track, const garmin_unit garmin);
+    TcxActivities * printActivities(garmin_list * runList, garmin_list * lap, garmin_list * track, const garmin_unit garmin);
 
     /**
      * Prints the header of a lap
@@ -209,6 +209,8 @@ private:
     * Stores the fitness data read from current.gpx
     */
    TcxBase *fitnessData;
+
+   bool _get_run_track_lap_info ( garmin_data * run,uint32 * track_index,uint32 * first_lap_index,uint32 * last_lap_index, uint8  * sport_type );
 };
 
 
