@@ -8,10 +8,11 @@ Long description:
 This browser plugin has the same methods and properties as the official 
 Garmin Communicator Plugin (http://www8.garmin.com/products/communicator/).
 It can be used to transfer GPX files (Geocache Descriptions) to your garmin
-device using the official Garmin Javascript API. Its functionality is
-currently limited to transfering files to the device, other functionality
-like reading data from the device might follow soon. 
- 
+device using the official Garmin Javascript API. Its functionality depends on
+the device you use. 
+- Edge305/Forerunner305: ReadFitnessData, ReadGpsData, No write support
+- Edge705/Oregon/Dakota: ReadFitnessData, ReadGpsData, Write Gpx files
+- Other devices: Executes external command to write Gpx to device 
 
 Motivation:
 Garmin introduced paperless geocaching a while ago on their devices. This

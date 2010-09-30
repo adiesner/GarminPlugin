@@ -1,4 +1,25 @@
+2010-09-29 - Version 0.2.4
+- Bugfix: Edge305/Forerunner305 did not provide the complete route when (auto)pause function was used
 
+2010-09-26 - Version 0.2.3
+- Added support for Oregon/Dakota to read FitnessData from Device
+- Added support for gpsies.com (only Oregon/Dakota/Edge705/Edge305/Forerunner305)
+- Bugfix: Sometimes the compressed fitness data was corrupted
+- Added support for runningahead.com
+
+2010-06-27 - Version 0.2.2
+- Bugfix for Forerunner 305 used with a footpod. Used to report bike cadence, now reports run cadence
+- Update version number of garmin plugin from 2.9.1 to 2.9.2
+
+2010-05-30 - Version 0.2.1
+- Bugfix for devices like GPSmap 60CSx which turn itself of after a device scan using garmintools (device scan can now be switched of in the xml configuration)
+
+2010-04-20 - Version 0.2.0
+- Created repository in Launchpad PPA
+- Support for Hardy (8.04) to Lucid (10.04)
+- Bugfix for Vista HCx which crashed browser on autodetect of Garmin Edge 305
+- Bugfix for Forerunner 205 - read fitness data did not work
+- Added support for connect.garmin.com
 
 2010-03-25 - Version 0.2beta
 - Autodetect devices like Oregon 300, Edge 705, Edge 305
