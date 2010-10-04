@@ -1066,6 +1066,8 @@ uint32 Edge305Device::getNextLapStartTime(garmin_list_node * node) {
         lapData = (D1011*)nextNode->data->data;
     } else if (nextNode->data->type == data_D1015) { // Forerunner 205 uses this
         lapData = (D1011*)nextNode->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+    } else {
+        return 0;
     }
 
     return lapData->start_time;
