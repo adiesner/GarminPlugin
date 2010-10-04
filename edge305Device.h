@@ -211,6 +211,8 @@ private:
    TcxBase *fitnessData;
 
    bool _get_run_track_lap_info ( garmin_data * run,uint32 * track_index,uint32 * first_lap_index,uint32 * last_lap_index, uint8  * sport_type );
+
+   uint32 getNextLapStartTime(garmin_list_node * node);
 };
 
 

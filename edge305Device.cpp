@@ -242,7 +242,7 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
 
     while (runNode != NULL) {
         garmin_data *run = runNode->data;
-        if ((run != NULL) && (run->type == data_D1009) && (run->data != NULL)) {
+        if ((run != NULL) && (run->data != NULL)) {
 
             uint32 track_index;
             uint32 first_lap_index;
@@ -250,6 +250,13 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
             uint8  sport_type;
 
             if ( _get_run_track_lap_info(run,&track_index,&first_lap_index,&last_lap_index,&sport_type) != 0 ) {
+
+                if (Log::enabledDbg()) {
+                    stringstream ss;
+                    ss << "This run goes from lap id " << first_lap_index << " to " << last_lap_index << " with track id: " << track_index;
+                    Log::dbg(ss.str());
+                }
+
                 TcxActivity * singleActivity = new TcxActivity("");
                 *activities << singleActivity;
                 *singleActivity << getCreator(garmin);
@@ -281,7 +288,15 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                     if (lapData != NULL) {
                         if ((lapData->index >= first_lap_index) && (lapData->index <= last_lap_index)) {
 
+                            uint32 startTimeNextLap = getNextLapStartTime(n);
+
                             TcxLap * singleLap = getLapHeader(lapData);
+                            int pointCount = 0;
+                            if (Log::enabledDbg()) {
+                                stringstream ss;
+                                ss << "Creating new lap: " << lapData->index ;
+                                Log::dbg(ss.str());
+                            }
                             *singleActivity<< singleLap;
                             if (firstLap) {
                                 singleActivity->setId(print_dtime(lapData->start_time));
@@ -298,17 +313,34 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                                         singleTrack = new TcxTrack();
                                         *singleLap << singleTrack;
                                     }
-                                }
-                                if (t->data->type == data_D304) {
-                                    D304 * trackData = (D304 *)t->data->data;
+                                } else if (t->data->type == data_D304) {
+                                    D304 * trackpointData = (D304 *)t->data->data;
                                     if (currentTrackIndex == track_index) {
                                         if (singleTrack != NULL) {
-                                            (*singleTrack) << getTrackPoint(trackData);
+                                            if (trackpointData->time >= lapData->start_time) {
+                                                if (startTimeNextLap > 0) {
+                                                    if (trackpointData->time < startTimeNextLap) {
+                                                        (*singleTrack) << getTrackPoint(trackpointData);
+                                                        pointCount++;
+                                                    }
+                                                } else {
+                                                    (*singleTrack) << getTrackPoint(trackpointData);
+                                                    pointCount++;
+                                                }
+                                            }
+
                                         } else {
                                             Log::err("Current track is null - but track index matches !?");
                                         }
                                     }
+                                } else {
+                                    Log::dbg("Unknown track type!!!");
                                 }
+                            }
+                            if (Log::enabledDbg()) {
+                                stringstream ss;
+                                ss << "Point count for this lap: " << pointCount;
+                                Log::dbg(ss.str());
                             }
                         }
 
@@ -1021,4 +1053,20 @@ bool Edge305Device::_get_run_track_lap_info ( garmin_data * run,
   }
 
   return ok;
+}
+
+
+uint32 Edge305Device::getNextLapStartTime(garmin_list_node * node) {
+    if (node == NULL) { return 0; }
+    garmin_list_node * nextNode = node->next;
+    if (nextNode == NULL) { return 0; }
+
+    D1011 * lapData = NULL;
+    if (nextNode->data->type == data_D1011) { // Edge 305 uses this
+        lapData = (D1011*)nextNode->data->data;
+    } else if (nextNode->data->type == data_D1015) { // Forerunner 205 uses this
+        lapData = (D1011*)nextNode->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+    }
+
+    return lapData->start_time;
 }
