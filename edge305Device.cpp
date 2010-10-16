@@ -482,7 +482,9 @@ TcxTrackpoint * Edge305Device::getTrackPoint ( D304 * p)
 
     if (( p->posn.lat != 0x7fffffff ) && ( p->posn.lon != 0x7fffffff )) {
         stringstream lat;
+        lat.precision(10); // default 4 decimal chars which is not enough
         stringstream lon;
+        lon.precision(10); // default 4 decimal chars which is not enough
         lat << SEMI2DEG(p->posn.lat);
         lon << SEMI2DEG(p->posn.lon);
         singlePoint->setPosition(lat.str(), lon.str());
