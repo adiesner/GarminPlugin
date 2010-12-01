@@ -40,12 +40,6 @@
 #include "zlib.h"
 #include <fstream>
 
-#include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
-#include "boost/archive/iterators/base64_from_binary.hpp"
-#include "boost/archive/iterators/transform_width.hpp"
-
 #if HAVE_NEW_XULRUNNER
 #define GETSTRING(_v)          ((_v).UTF8Characters)
 #define GETSTRINGLENGTH(_v)    ((_v).UTF8Length)
@@ -151,11 +145,6 @@ std::vector<MessageBox*> messageList;
  */
 GpsDevice * currentWorkingDevice = NULL;
 
-typedef
-   boost::archive::iterators::base64_from_binary<
-        boost::archive::iterators::transform_width<string::const_iterator, 6, 8>
-        > base64_t;
-
 string getParameterTypeStr(const NPVariant arg) {
     switch (arg.type) {
         case NPVariantType_Void:
@@ -218,53 +207,104 @@ int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
     return intValue;
 }
 
+
+/*
+** encodeBase64
+**
+** base64 encode a stream adding padding and line breaks as per spec.
+** Thanks to Bob Trower 08/04/01
+** http://base64.sourceforge.net/b64.c
+*/
+static const char cb64[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+void encodeBase64( stringstream * input, stringstream *output , int linesize )
+{
+    unsigned char in[3], out[4];
+    int i, len, blocksout = 0;
+
+    while( !input->eof() ) {
+        len = 0;
+        for( i = 0; i < 3; i++ ) {
+            input->get((char&)in[i]);
+            if( !input->eof() ) {
+                len++;
+            }
+            else {
+                in[i] = 0;
+            }
+        }
+        if( len ) {
+            out[0] = cb64[ in[0] >> 2 ];
+            out[1] = cb64[ ((in[0] & 0x03) << 4) | ((in[1] & 0xf0) >> 4) ];
+            out[2] = (unsigned char) (len > 1 ? cb64[ ((in[1] & 0x0f) << 2) | ((in[2] & 0xc0) >> 6) ] : '=');
+            out[3] = (unsigned char) (len > 2 ? cb64[ in[2] & 0x3f ] : '=');
+            for( i = 0; i < 4; i++ ) {
+                output->put(out[i]);
+            }
+            blocksout++;
+        }
+        if( blocksout >= (linesize/4)) {
+            input->peek(); // Read but do not remove one character, so that eof really returns eof if at the end of the file
+            if (( blocksout ) && (!input->eof())) {
+                (*output) << endl;
+            }
+            blocksout = 0;
+        }
+    }
+}
+
 /**
  * Compresses a string using gzip and encodes it using base64
  * Use uudecode to unpack and then gunzip
  */
+#define CHUNK 16384
 string compressStringData(const string text) {
     if (Log::enabledDbg()) {
         stringstream ss;
         ss << text.size();
         Log::dbg("Compressing content of string with length: " + ss.str());
     }
-    std::stringstream decompressed;
-    std::stringstream compressed;
-    std::stringstream outstream;
-    unsigned int bufferSize = 77;
-    char * lineBuffer = new char [bufferSize];
-    decompressed << text;
+    std::stringstream compressed ("");
+    int ret;
+    unsigned have;
+    z_stream strm;
+    char out[CHUNK];
 
-    boost::iostreams::filtering_streambuf<boost::iostreams::input> out;
-    out.push(boost::iostreams::gzip_compressor());
-    out.push(decompressed);
-    boost::iostreams::copy(out, compressed);
+    /* allocate deflate state */
+    strm.zalloc = Z_NULL;
+    strm.zfree = Z_NULL;
+    strm.opaque = Z_NULL;
+    ret = deflateInit2(&strm, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 31, 8, Z_DEFAULT_STRATEGY);
+    if (ret != Z_OK) {
+         Log::err("zLib Initialization failed at deflateInit2()");
+         return "";
+    }
 
-    string bin = compressed.str();
-    string enc(base64_t(bin.begin()), base64_t(bin.end()));
+    strm.avail_in = text.length();
+    strm.next_in = (Bytef*) text.c_str();
 
-    // Maximum line length of 76 characters for a uuencoded file
-    stringstream lineSplitter;
-    lineSplitter << enc;
-    outstream << "begin-base64 644 data.xml.gz";
-    while (!lineSplitter.eof()) {
-        lineSplitter.read (lineBuffer,bufferSize-1);
-        unsigned int bytesRead = lineSplitter.gcount();
-        if (bytesRead > 0) {
-            lineBuffer[(bytesRead<bufferSize)? bytesRead : bufferSize-1] = 0;
-            outstream << endl << lineBuffer;
+    /* run deflate() on input until output buffer not full, finish
+       compression if all of source has been read in */
+    do {
+        strm.avail_out = CHUNK;
+        strm.next_out = (Bytef*) out;
+        ret = deflate(&strm, Z_FINISH);    /* no bad return value */
+        have = CHUNK - strm.avail_out;
+        compressed.write(out, have);
+        if (compressed.bad()) {
+            (void)deflateEnd(&strm);
+            Log::err("compressStringData error during compression and writing to output buffer");
+            return "";
         }
-    }
-    delete(lineBuffer);
+    } while (strm.avail_out == 0);
 
-    // uuencoded files must always have a line length that is a multiply of 4. So fill up the remaining bytes so that it is decompressable
-    int fillUpToTripple = 4 - (enc.size() % 4);
-    while (fillUpToTripple < 4) {
-        outstream << "=";
-        fillUpToTripple++;
-    }
+    /* clean up */
+    (void)deflateEnd(&strm);
 
+    std::stringstream outstream;
+    outstream << "begin-base64 644 data.xml.gz" << endl;
+    encodeBase64(&compressed,&outstream, 76);
     outstream << endl << "====" << endl;
+
     return outstream.str();
 }
 

@@ -51,7 +51,6 @@ Dependencies to other projects:
 garmintools     - http://code.google.com/p/garmintools/
 libusb          - http://www.libusb.org/
 ticpp           - http://code.google.com/p/ticpp/
-boost-iostreams - http://www.boost.org
 zlib            - http://www.zlib.net
 
 Thanks goes to 

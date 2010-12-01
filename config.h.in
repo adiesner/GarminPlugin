@@ -1,8 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* define if the Boost library is available */
-#undef HAVE_BOOST
-
 /* Define to 1 if you have the `getmntent' function. */
 #undef HAVE_GETMNTENT
 
