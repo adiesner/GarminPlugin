@@ -68,7 +68,7 @@ const char
 #else
 char
 #endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.6";
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.7-devel";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -78,7 +78,7 @@ const char
 #else
 char
 #endif
-	 * pluginMimeDescription = "application/vnd-garmin.mygarmin:.Garmin Device Web Control";
+	 * pluginMimeDescription = "application/vnd-garmin.mygarmin:garmin:Garmin Device Web Control";
 
 /**
  * Manages all attached GPS Devices
@@ -91,7 +91,7 @@ DeviceManager *devManager = NULL;
 ConfigManager * confManager = NULL;
 
 /**
- * Unknown
+ * plugin_scriptable_object
  */
 static NPObject        *so       = NULL;
 
@@ -144,6 +144,12 @@ std::vector<MessageBox*> messageList;
  * Stores the last device a write was started to
  */
 GpsDevice * currentWorkingDevice = NULL;
+
+/**
+ * Stores if the browser supports XEmbed - need to report true to Chrome to get the plugin detected
+ */
+PRBool supportsXEmbed = PR_FALSE;
+
 
 string getParameterTypeStr(const NPVariant arg) {
     switch (arg.type) {
@@ -1251,6 +1257,59 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
 	inst = instance;
 	if (Log::enabledDbg()) Log::dbg("new");
 
+    if(!so) {
+        so = npnfuncs->createobject(instance, &npcRefObject);
+    }
+
+    if (Log::enabledDbg()) Log::dbg("Overwriting Garmin Javascript Browser detection!");
+    NPString str;
+    char buf[100];
+
+
+    NPObject* windowObject = NULL;
+    NPError err = npnfuncs->getvalue(inst, NPNVWindowNPObject, &windowObject);
+    if (err != NPERR_NO_ERROR) {
+        Log::err("Error fetching NPNVWindowNPObject");
+        return NPERR_NO_ERROR;
+    }
+    NPVariant ret;
+
+    string javascriptCode = "var BrowserDetect = { OS:'Windows', browser:'Firefox' }";
+    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
+    GETSTRING(str) = buf;
+    GETSTRINGLENGTH(str) = javascriptCode.size();
+    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
+        Log::err("Unable to execute javascript: "+javascriptCode);
+    }
+
+    javascriptCode = "BrowserDetect.init = function() { }";
+    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
+    GETSTRING(str) = buf;
+    GETSTRINGLENGTH(str) = javascriptCode.size();
+    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
+        Log::err("Unable to execute javascript: "+javascriptCode);
+    }
+
+    javascriptCode = "BrowserSupport.isBrowserSupported = function() { return 1; }";
+    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
+    GETSTRING(str) = buf;
+    GETSTRINGLENGTH(str) = javascriptCode.size();
+    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
+        Log::err("Unable to execute javascript: "+javascriptCode);
+    }
+
+    javascriptCode = "BrowserDetect.OS='Windows';BrowserDetect.browser='Firefox';";
+    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
+    GETSTRING(str) = buf;
+    GETSTRINGLENGTH(str) = javascriptCode.size();
+    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
+        Log::err("Unable to execute javascript: "+javascriptCode);
+    }
+
+    if (Log::enabledDbg()) Log::dbg("End Overwriting Garmin Javascript Browser detection!");
+
+    npnfuncs->releaseobject(windowObject);
+
 	return NPERR_NO_ERROR;
 }
 
@@ -1299,14 +1358,15 @@ static NPError getValue(NPP instance, NPPVariable variable, void *value) {
 		break;
 	case NPPVpluginScriptableNPObject:
         if (Log::enabledDbg()) Log::dbg("getvalue - scriptable object");
-		if(!so)
+		if(!so) {
 			so = npnfuncs->createobject(instance, &npcRefObject);
-		npnfuncs->retainobject(so);
+		}
+        npnfuncs->retainobject(so);
 		*(NPObject **)value = so;
 		break;
 	case NPPVpluginNeedsXEmbed:
         if (Log::enabledDbg()) Log::dbg("getvalue - xembed");
-		*((PRBool *)value) = PR_FALSE;
+		*((PRBool *)value) = supportsXEmbed; // Support XEmbed (without Chrome does not work)
 		break;
 	}
 	return NPERR_NO_ERROR;
@@ -1382,6 +1442,31 @@ NPError OSCALL NP_Initialize(NPNetscapeFuncs *npnf
 	npnfuncs = npnf;
 	NP_GetEntryPoints(nppfuncs);
 
+    // Setup Configuration (which also initializes logging)
+    if (confManager != NULL) {
+        delete confManager;
+    }
+	confManager = new ConfigManager();
+	confManager->readConfiguration();
+    Log::getInstance()->setConfiguration(confManager->getConfiguration());
+
+    // Check for browser support of XEmbed
+    NPError err = NPERR_NO_ERROR;
+    err = npnfuncs->getvalue(NULL, NPNVSupportsXEmbedBool,(void *)&supportsXEmbed);
+
+    if (err != NPERR_NO_ERROR) {
+        supportsXEmbed = PR_FALSE;
+        Log::err("Error while asking for XEmbed support");
+    }
+
+    if (Log::enabledDbg()) {
+        if (supportsXEmbed == PR_FALSE) {
+            Log::dbg("Browser does not support XEmbed");
+        } else {
+            Log::dbg("Browser supports XEmbed");
+        }
+    }
+
 	initializePropertyList();
 
     if (devManager != NULL) {
@@ -1389,17 +1474,11 @@ NPError OSCALL NP_Initialize(NPNetscapeFuncs *npnf
     }
 	devManager = new DeviceManager();
 
-    if (confManager != NULL) {
-        delete confManager;
-    }
-	confManager = new ConfigManager();
-	confManager->readConfiguration();
 	devManager->setConfiguration(confManager->getConfiguration());
 	MessageBox * msg = confManager->getMessage();
 	if (msg != NULL) {
 	    messageList.push_back(msg);
 	}
-    Log::getInstance()->setConfiguration(confManager->getConfiguration());
     if (Log::enabledDbg()) Log::dbg("NP_Initialize successfull");
 
 	return NPERR_NO_ERROR;
