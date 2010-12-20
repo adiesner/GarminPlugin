@@ -23,6 +23,7 @@
 #include <mntent.h>
 #include <dirent.h>
 #include "edge705Device.h"
+#include "edge800Device.h"
 #include "oregonDevice.h"
 #include "edge305Device.h"
 #include "sdCardDevice.h"
@@ -147,6 +148,15 @@ void DeviceManager::startFindDevices() {
                             oregon->setDeviceDescription(&doc);
                             oregon->setDisplayName(deviceName);
                             device = oregon;
+                        }
+
+                        position = deviceName.find( "Edge 800", 0 );
+                        if ((device == NULL) && (position != string::npos)) {
+                            Edge800Device * edge = new Edge800Device();
+                            edge->setBaseDirectory(mountPath);
+                            edge->setDeviceDescription(&doc);
+                            edge->setDisplayName(deviceName);
+                            device = edge;
                         }
 
                         position = deviceName.find( "EDGE", 0 );

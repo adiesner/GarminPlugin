@@ -1,6 +1,6 @@
 Short description:
 GarminPlugin is a browser plugin to support Garmin Devices on Linux. 
-Currently (31.01.2010) there is no official browser plugin support for Linux from Garmin.
+Currently (02.12.2010) there is no official browser plugin support for Linux from Garmin.
 
 This plugin has nothing to do with the company Garmin (http://www.garmin.com)
 
@@ -12,6 +12,7 @@ device using the official Garmin Javascript API. Its functionality depends on
 the device you use. 
 - Edge305/Forerunner305: ReadFitnessData, ReadGpsData, No write support
 - Edge705/Oregon/Dakota: ReadFitnessData, ReadGpsData, Write Gpx files
+- Edge800: ReadFitnessData
 - Other devices: Executes external command to write Gpx to device 
 
 Motivation:
@@ -55,13 +56,14 @@ zlib            - http://www.zlib.net
 
 Thanks goes to 
 	- Christian Kurek
+	- Bob Trower (http://base64.sourceforge.net)
 	- The contributors of the above projects
 
 Howto compile GarminPlugin:
 
 # This example shows how to compile GarminPlugin on a 64bit Ubuntu System
 
-sudo apt-get install build-essential subversion git-core xulrunner-dev zlib1g-dev libusb-dev libboost-iostreams-dev 
+sudo apt-get install build-essential subversion git-core xulrunner-dev zlib1g-dev libusb-dev
 git clone http://github.com/adiesner/GarminPlugin.git
 svn export http://garmintools.googlecode.com/svn/trunk/ garmintools
 svn export http://ticpp.googlecode.com/svn/trunk/ ticpp
