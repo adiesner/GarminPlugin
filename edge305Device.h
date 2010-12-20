@@ -7,6 +7,7 @@
 #include "messageBox.h"
 #include "gpsDevice.h"
 #include "garmin.h"
+#include "gpsFunctions.h"
 #include "TcxBuilder/TcxBase.h"
 
 using namespace std;
@@ -59,10 +60,27 @@ public:
     bool isDeviceAvailable();
 
   /**
-   * Starts reading the fitness data without points
+   * Starts reading the FIT data directory
    * @return int returns 1 if successful otherwise 0
    */
     virtual int startReadFITDirectory();
+
+  /**
+   * Checks status reading FIT data directory
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFITDirectory();
+
+  /**
+   * Cancels reading the FIT data directory
+   */
+    virtual void cancelReadFITDirectory();
+
+    /**
+     * Gets the FIT data xml
+     * @return xml containing FIT directory data read from garmin device
+     */
+    virtual string getFITData();
 
   /**
    * Starts reading the fitness data without points
@@ -103,6 +121,11 @@ public:
     virtual void cancelReadFromGps();
 
     virtual string getGpxData();
+
+    /**
+     * Returns a file from the device
+     */
+    virtual string getBinaryFile(string relativeFilePath);
 
 protected:
     virtual void doWork();
@@ -157,13 +180,6 @@ private:
      * @return xml string
      */
     TcxLap * getLapHeader(D1011 * lapData);
-
-    /**
-     * Prints a time in the format 2007-04-20T23:55:01Z
-     * @param t timestamp
-     * @return string
-     */
-    string print_dtime( uint32 t );
 
     /**
      * Prints a track point

@@ -240,6 +240,10 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
 
     if (this->deviceDescription != NULL) {
         TiXmlElement * node = this->deviceDescription->FirstChildElement("Device");
+        if (node!=NULL) { node = node->FirstChildElement("Id"); }
+        if (node!=NULL) { deviceId = node->GetText(); }
+
+        node = this->deviceDescription->FirstChildElement("Device");
         if (node!=NULL) { node = node->FirstChildElement("MassStorageMode"); }
         if (node!=NULL) { node = node->FirstChildElement("DataType"); }
         while ( node != NULL) {
@@ -295,8 +299,26 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
 }
 
 int GarminFilebasedDevice::startReadFITDirectory() {
-    Log::err("Reading fitness directory is not implemented for this device "+this->displayName);
-    return 0;
+    Log::err("startReadFITDirectory is not implemented for this device "+this->displayName);
+    return 1;
+}
+
+int GarminFilebasedDevice::finishReadFITDirectory() {
+    Log::err("finishReadFITDirectory is not implemented for this device "+this->displayName);
+    return 3; // transfer finished
+}
+
+void GarminFilebasedDevice::cancelReadFITDirectory() {
+    Log::err("cancelReadFITDirectory is not implemented for this device "+this->displayName);
+}
+
+string GarminFilebasedDevice::getFITData() {
+    Log::err("getFITData is not implemented for this device "+this->displayName);
+
+    // Return empty listing
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\
+            <DirectoryListing xmlns=\"http://www.garmin.com/xmlschemas/DirectoryListing/v1\" RequestedPath=\"\" UnitId=\"3815526107\" VolumePrefix=\"\">\
+            </DirectoryListing>";
 }
 
 int GarminFilebasedDevice::startReadFitnessDirectory() {
@@ -377,4 +399,9 @@ void GarminFilebasedDevice::cancelReadFromGps() {
     this->transferSuccessful = 0;
     Log::dbg("Canceling ReadFromGps...");
     // Nothing much to do here as no thread was started
+}
+
+string GarminFilebasedDevice::getBinaryFile(string relativeFilePath) {
+    Log::err("getBinaryFile is not yet implemented for "+this->displayName);
+    return "";
 }

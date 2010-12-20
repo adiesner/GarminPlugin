@@ -40,6 +40,9 @@
 #include "zlib.h"
 #include <fstream>
 
+#include <unistd.h>
+
+
 #if HAVE_NEW_XULRUNNER
 #define GETSTRING(_v)          ((_v).UTF8Characters)
 #define GETSTRINGLENGTH(_v)    ((_v).UTF8Length)
@@ -213,7 +216,38 @@ int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
     return intValue;
 }
 
+string getStringParameter(const NPVariant args[], int pos, string defaultVal) {
+    string strValue = defaultVal;
+    if (args[pos].type == NPVariantType_Int32) {
+        stringstream ss;
+        ss << args[pos].value.intValue;
+        strValue = ss.str();
+    } else if (args[pos].type == NPVariantType_String) {
+        strValue = GETSTRING(args[pos].value.stringValue);
+    } else {
+        std::ostringstream errTxt;
+        errTxt << "Expected STRING parameter at position " << pos << ". Found: " << getParameterTypeStr(args[pos]);
+        if (Log::enabledErr()) Log::err(errTxt.str());
+    }
+    return strValue;
+}
 
+bool getBoolParameter(const NPVariant args[], int pos, bool defaultVal) {
+    bool boolValue = defaultVal;
+    if (args[pos].type == NPVariantType_Int32) {
+        boolValue = (args[pos].value.intValue == 1) ? true : false;
+    } else if (args[pos].type == NPVariantType_String) {
+        string strValue = GETSTRING(args[pos].value.stringValue);
+        boolValue = (strValue.compare("1") == 0) ? true : false;
+    } else if (args[pos].type == NPVariantType_Bool) {
+        boolValue = args[pos].value.boolValue;
+    } else {
+        std::ostringstream errTxt;
+        errTxt << "Expected BOOL parameter at position " << pos << ". Found: " << getParameterTypeStr(args[pos]);
+        if (Log::enabledErr()) Log::err(errTxt.str());
+    }
+    return boolValue;
+}
 /*
 ** encodeBase64
 **
@@ -263,7 +297,7 @@ void encodeBase64( stringstream * input, stringstream *output , int linesize )
  * Use uudecode to unpack and then gunzip
  */
 #define CHUNK 16384
-string compressStringData(const string text) {
+string compressStringData(const string text, const string filename) {
     if (Log::enabledDbg()) {
         stringstream ss;
         ss << text.size();
@@ -307,7 +341,7 @@ string compressStringData(const string text) {
     (void)deflateEnd(&strm);
 
     std::stringstream outstream;
-    outstream << "begin-base64 644 data.xml.gz" << endl;
+    outstream << "begin-base64 644 " << filename << endl;
     encodeBase64(&compressed,&outstream, 76);
     outstream << endl << "====" << endl;
 
@@ -674,7 +708,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 string tcdData = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXml"].stringValue = tcdData;
-                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
+                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData, "data.xml.gz");
                 debugOutputPropertyToFile("TcdXml");
             }
 
@@ -711,7 +745,76 @@ bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint
 }
 
 bool methodStartReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
-    Log::err("Please implement me!");
+    if (argCount >= 1) {
+        int deviceId = getIntParameter(args, 0, -1);
+
+        if (deviceId != -1) {
+            currentWorkingDevice = devManager->getGpsDevice(deviceId);
+            if (currentWorkingDevice != NULL) {
+                result->type = NPVariantType_Int32;
+                result->value.intValue = currentWorkingDevice->startReadFITDirectory();
+                return true;
+            } else {
+                if (Log::enabledInfo()) Log::info("StartReadFITDirectory: Device not found");
+            }
+        } else {
+            if (Log::enabledErr()) Log::err("StartReadFITDirectory: Unable to determine device id");
+        }
+
+    } else {
+        if (Log::enabledErr()) Log::err("StartReadFITDirectory: Wrong parameter count");
+    }
+
+    return false;
+}
+
+bool methodFinishReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishReadFITDirectory();
+            printFinishState("FinishReadFITDirectory", result->value.intValue);
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                propertyList["DirectoryListingXml"].stringValue = currentWorkingDevice->getFITData();
+                debugOutputPropertyToFile("DirectoryListingXml");
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishReadFITDirectory: No working device specified");
+        }
+    }
+    return false;
+}
+
+bool methodCancelReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (currentWorkingDevice != NULL) {
+        currentWorkingDevice -> cancelReadFITDirectory();
+    }
     return true;
 }
 
@@ -782,7 +885,7 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 string tcdData = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXml"].stringValue = tcdData;
-                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
+                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData, "data.xml.gz");
                 debugOutputPropertyToFile("TcdXml");
             }
 
@@ -879,6 +982,48 @@ bool methodCancelReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
     return true;
 }
 
+bool methodGetBinaryFile(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+
+    if ((argCount < 2) || (argCount > 3)) {
+        Log::err("GetBinaryFile: Wrong parameter count. Three parameter required! (DeviceID, Filename, [Compress])");
+        return false;
+    }
+
+    int deviceId = getIntParameter(args, 0, -1);
+    if (deviceId != -1) {
+        GpsDevice * device = devManager->getGpsDevice(deviceId);
+        if (device != NULL) {
+            string fileName = getStringParameter(args,1,"");
+            bool doCompress = false;
+            if (argCount == 3) { doCompress = getBoolParameter(args,2,false); }
+            string binaryData = device->getBinaryFile(fileName);
+            string fileNameOnly = basename(fileName.c_str());
+            if (doCompress) {
+                binaryData = compressStringData(binaryData, fileNameOnly + ".gz");
+            } else {
+                std::stringstream outstream;
+                std::stringstream binaryDataStream;
+                binaryDataStream << binaryData;
+                outstream << "begin-base64 644 " << fileNameOnly << endl;
+                encodeBase64(&binaryDataStream,&outstream, 76);
+                outstream << endl << "====" << endl;
+                binaryData = outstream.str();
+            }
+            char *outStr = (char*)npnfuncs->memalloc(binaryData.size() + 1);
+            memcpy(outStr, binaryData.c_str(), binaryData.size() + 1);
+            result->type = NPVariantType_String;
+            GETSTRING(result->value.stringValue) = outStr;
+            GETSTRINGLENGTH(result->value.stringValue) = binaryData.size();
+            return true;
+        } else {
+            Log::err("GetBinaryFile: No device with this ID!");
+        }
+    } else {
+        Log::err("GetBinaryFile: Device ID is invalid");
+    }
+    return false;
+}
+
 
 bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
 /* Return Values are
@@ -913,7 +1058,7 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 string tcdData = currentWorkingDevice->getFitnessData();
                 propertyList["TcdXml"].stringValue = tcdData;
-                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData);
+                propertyList["TcdXmlz"].stringValue = compressStringData(tcdData, "data.xml.gz");
                 debugOutputPropertyToFile("TcdXml");
             }
 
@@ -955,6 +1100,9 @@ void initializePropertyList() {
 	propertyList["TcdXml"] = value;
 	value.stringValue = "";
 	propertyList["TcdXmlz"] = value; // Compressed
+
+	value.stringValue = "";
+	propertyList["DirectoryListingXml"] = value;
 
     // can be written from the outside
     value.writeable = true;
@@ -1007,6 +1155,12 @@ void initializePropertyList() {
     fooPointer = &methodStartReadFITDirectory;
     methodList["StartReadFITDirectory"] = fooPointer;
 
+    fooPointer = &methodFinishReadFITDirectory;
+    methodList["FinishReadFITDirectory"] = fooPointer;
+
+    fooPointer = &methodCancelReadFITDirectory;
+    methodList["CancelReadFITDirectory"] = fooPointer;
+
     fooPointer = &methodStartReadFitnessDirectory;
     methodList["StartReadFitnessDirectory"] = fooPointer;
 
@@ -1032,6 +1186,8 @@ void initializePropertyList() {
     fooPointer = &methodCancelReadFromGps;
     methodList["CancelReadFromGps"] = fooPointer;
 
+    fooPointer = &methodGetBinaryFile;
+    methodList["GetBinaryFile"] = fooPointer;
 
 }
 
@@ -1075,6 +1231,12 @@ void printParameter(string name, const NPVariant args[], uint32_t argCount) {
             ss << args[i].value.intValue;
         } else if (args[i].type == NPVariantType_String) {
             ss << "\"" << GETSTRING(args[i].value.stringValue) << "\"";
+        } else if (args[i].type == NPVariantType_Bool) {
+            if (args[i].value.boolValue) {
+                ss << "true";
+            } else {
+                ss << "false";
+            }
         } else {
             ss << " ? ";
         }

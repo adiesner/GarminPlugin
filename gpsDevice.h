@@ -124,10 +124,27 @@ public:
     virtual string getFitnessData() = 0;
 
   /**
-   * Starts reading the fitness data without points
+   * Starts reading the FIT binary data directory
    * @return int returns 1 if successful otherwise 0
    */
     virtual int startReadFITDirectory() = 0;
+
+  /**
+   * Checks if the read of the FIT binary data directory finished
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFITDirectory() = 0;
+
+  /**
+   * Cancels the read of the FIT binary data directory
+   */
+    virtual void cancelReadFITDirectory() = 0;
+
+    /**
+     * Gets the FIT data xml
+     * @return xml containing FIT directory data read from garmin device
+     */
+    virtual string getFITData() = 0;
 
   /**
    * Starts reading the fitness data without points
@@ -175,6 +192,11 @@ public:
      */
     virtual string getGpxData() = 0;
 
+    /**
+     * Returns a file from the device
+     */
+    virtual string getBinaryFile(string relativeFilePath) = 0;
+
 protected:
     enum WorkType
     {
@@ -182,7 +204,8 @@ protected:
       READFITNESS,
       READFITNESSDIR,
       READFITNESSDETAIL,
-      READFROMGPS
+      READFROMGPS,
+      READFITDIRECTORY
     };
     WorkType workType;
 

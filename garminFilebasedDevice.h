@@ -57,9 +57,26 @@ public:
 
 
   /**
-   * Starts reading the fitness data without points
+   * Starts reading the FIT data directory
    */
     virtual int startReadFITDirectory();
+
+  /**
+   * Checks if the read of the FIT data directory finished
+   * @return 0 = idle 1 = working 2 = waiting 3 = finished
+   */
+    virtual int finishReadFITDirectory();
+
+  /**
+   * Cancels reading the FIT data directory
+   */
+    virtual void cancelReadFITDirectory();
+
+    /**
+     * Gets the FIT data xml
+     * @return xml containing FIT directory data read from garmin device
+     */
+    virtual string getFITData();
 
   /**
    * Starts reading the fitness data without points
@@ -98,6 +115,11 @@ public:
      * Cancels the current read from the device.
      */
     virtual void cancelReadFromGps();
+
+    /**
+     * Returns a file from the device
+     */
+    virtual string getBinaryFile(string relativeFilePath);
 
 protected:
 
@@ -190,6 +212,10 @@ protected:
    */
   string fitnessFile;
 
+  /**
+   * Contains the device id
+   */
+   string deviceId;
 };
 
 #endif // GARMINFILEBASEDDEVICE_H_INCLUDED

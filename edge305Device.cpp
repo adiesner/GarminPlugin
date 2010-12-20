@@ -23,7 +23,6 @@
 #include "edge305Device.h"
 #include <sstream>
 
-
 Edge305Device::Edge305Device() : fitnessData(NULL)
 {
     this->displayName = "Edge305";
@@ -299,7 +298,7 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                             }
                             *singleActivity<< singleLap;
                             if (firstLap) {
-                                singleActivity->setId(print_dtime(lapData->start_time));
+                                singleActivity->setId(GpsFunctions::print_dtime(lapData->start_time));
                                 firstLap = false;
                             }
 
@@ -441,44 +440,10 @@ TcxLap * Edge305Device::getLapHeader(D1011 * lapData) {
 }
 
 
-string Edge305Device::print_dtime( uint32 t )
-{
-  time_t     tval;
-  struct tm  tmval;
-  char       buf[128];
-  int        len;
-
-  /*
-                                  012345678901234567890123
-     This will make, for example, 2007-04-20T23:55:01-0700, but that date
-     isn't quite ISO 8601 compliant.  We need to stick a ':' in the time
-     zone between the hours and the minutes.
-  */
-
-  tval = t + TIME_OFFSET;
-  //localtime_r(&tval,&tmval);
-  gmtime_r(&tval,&tmval);
-  strftime(buf,sizeof(buf)-1,"%FT%TZ",&tmval);
-
-  /*
-     If the last character is a 'Z', don't do anything.  Otherwise, we
-     need to move the last two characters out one and stick a colon in
-     the vacated spot.  Let's not forget the trailing '\0' that needs to
-     be moved as well.
-  */
-
-  len = strlen(buf);
-  if ( len > 0 && buf[len-1] != 'Z' ) {
-    memmove(buf+len-1,buf+len-2,3);
-    buf[len-2] = ':';
-  }
-
-  return (string)buf;
-}
 
 TcxTrackpoint * Edge305Device::getTrackPoint ( D304 * p)
 {
-    TcxTrackpoint * singlePoint = new TcxTrackpoint(print_dtime(p->time));
+    TcxTrackpoint * singlePoint = new TcxTrackpoint(GpsFunctions::print_dtime(p->time));
 
     if (( p->posn.lat != 0x7fffffff ) && ( p->posn.lon != 0x7fffffff )) {
         stringstream lat;
@@ -917,11 +882,26 @@ string Edge305Device::filterDeviceName(string name) {
     return name.substr(0,name.length()-cutBytes);
 }
 
-
-
 int Edge305Device::startReadFITDirectory() {
-    // do nothing so far... startReadFitnessDirectory will be called anyway
+    Log::err("startReadFITDirectory is not implemented for this device "+this->displayName);
     return 0;
+}
+
+int Edge305Device::finishReadFITDirectory() {
+    Log::err("finishReadFITDirectory is not implemented for this device "+this->displayName);
+    return 3; // Finished
+}
+
+void Edge305Device::cancelReadFITDirectory() {
+    Log::err("cancelReadFITDirectory is not implemented for this device "+this->displayName);
+}
+
+string Edge305Device::getFITData() {
+    Log::err("getFITData is not implemented for this device "+this->displayName);
+    // Return empty listing
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\
+            <DirectoryListing xmlns=\"http://www.garmin.com/xmlschemas/DirectoryListing/v1\" RequestedPath=\"\" UnitId=\"3815526107\" VolumePrefix=\"\">\
+            </DirectoryListing>";
 }
 
 int Edge305Device::startReadFitnessDirectory() {
@@ -1073,4 +1053,9 @@ uint32 Edge305Device::getNextLapStartTime(garmin_list_node * node) {
     }
 
     return lapData->start_time;
+}
+
+string Edge305Device::getBinaryFile(string relativeFilePath) {
+    Log::err("getBinaryFile is not yet implemented for "+this->displayName);
+    return "";
 }
