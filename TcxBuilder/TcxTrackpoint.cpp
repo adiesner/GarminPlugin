@@ -175,7 +175,7 @@ string TcxTrackpoint::getTime() {
 
 double TcxTrackpoint::calculateDistanceTo(double totalTrackDistance, TcxTrackpoint * nextPoint) {
     double distance = 0;
-    distance = haversine_m_str(this->latitude, this->longitude, nextPoint->latitude, nextPoint->longitude);
+    distance = GpsFunctions::haversine_m_str(this->latitude, this->longitude, nextPoint->latitude, nextPoint->longitude);
 
     char distanceBuf[50];
     snprintf(&distanceBuf[0], sizeof(distanceBuf), "%.2f", totalTrackDistance);
