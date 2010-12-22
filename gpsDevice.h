@@ -197,6 +197,40 @@ public:
      */
     virtual string getBinaryFile(string relativeFilePath) = 0;
 
+    /**
+     * Starts a binary file write to the device
+     * @return number of downloads found in data
+     */
+    virtual int startDownloadData(string gpsDataString) = 0;
+
+    /**
+     * Retrieves the next download url
+     * @return url to download
+     */
+    virtual string getNextDownloadDataUrl() = 0;
+
+    /**
+     * This is used to indicate the status of the write download data process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishDownloadData() = 0;
+
+    /**
+     * Writes some bytes into the file opened by startDownloadData
+     * @return Bytes written to file
+     */
+    virtual int writeDownloadData(char *, int length) = 0;
+
+    /**
+     * Saves/Closes the current file
+     */
+    virtual void saveDownloadData() = 0;
+
+    /**
+     * Cancels the current file download
+     */
+    virtual void cancelDownloadData() = 0;
+
 protected:
     enum WorkType
     {

@@ -1024,6 +1024,81 @@ bool methodGetBinaryFile(NPObject *obj, const NPVariant args[], uint32_t argCoun
     return false;
 }
 
+bool methodStartDownloadData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (argCount != 2) {
+        Log::err("StartDownloadData: Wrong parameter count. Two parameter required! (gpsDataString, DeviceId)");
+        return false;
+    }
+
+    int deviceId = getIntParameter(args, 1, -1);
+    if (deviceId != -1) {
+        currentWorkingDevice = devManager->getGpsDevice(deviceId);
+        if (currentWorkingDevice != NULL) {
+            string gpsDataString = getStringParameter(args,0,"");
+            int urlsFound = currentWorkingDevice->startDownloadData(gpsDataString);
+            if (urlsFound > 0) {
+                string urlToDownload = currentWorkingDevice->getNextDownloadDataUrl();
+                if (urlToDownload.length() > 0) {
+                    if (Log::enabledDbg()) { Log::dbg("Requesting download for URL: "+urlToDownload); }
+
+                    if (NPERR_NO_ERROR != npnfuncs->geturlnotify(inst, urlToDownload.c_str(), NULL, NULL)) {
+                        Log::err("Unable to get url: "+urlToDownload);
+                        return false;
+                    }
+                    return true;
+                }
+            } else {
+                Log::err("StartDownloadData: No URLs found to download");
+            }
+        } else {
+            Log::err("StartDownloadData: Unknown Device ID");
+        }
+    } else {
+        Log::err("StartDownloadData: Device ID is invalid");
+    }
+    return false;
+}
+
+bool methodFinishDownloadData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishDownloadData();
+            printFinishState("FinishDownloadData", result->value.intValue);
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["DownloadDataSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+            }
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishDownloadData: No working device specified");
+        }
+    }
+    return false;
+}
+
 
 bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
 /* Return Values are
@@ -1120,6 +1195,8 @@ void initializePropertyList() {
 	value.intValue = 1;
 	propertyList["FitnessTransferSucceeded"] = value;
 
+	value.intValue = 1;
+	propertyList["DownloadDataSucceeded"] = value;
 
 	// Functions
 	pt2Func fooPointer = &methodDevicesXmlString;
@@ -1188,6 +1265,12 @@ void initializePropertyList() {
 
     fooPointer = &methodGetBinaryFile;
     methodList["GetBinaryFile"] = fooPointer;
+
+    fooPointer = &methodStartDownloadData;
+    methodList["StartDownloadData"] = fooPointer;
+
+    fooPointer = &methodFinishDownloadData;
+    methodList["FinishDownloadData"] = fooPointer;
 
 }
 
@@ -1560,6 +1643,81 @@ setWindow(NPP instance, NPWindow* pNPWindow) {
 	return NPERR_NO_ERROR;
 }
 
+static void nppUrlNotify(NPP instance, const char* url, NPReason reason, void* notifyData) {
+	if (reason == NPRES_DONE) {
+        if (Log::enabledDbg()) Log::dbg("nppUrlNotify: Request was finished.");
+
+        if (currentWorkingDevice != NULL) {
+            string urlToDownload = currentWorkingDevice->getNextDownloadDataUrl();
+            if (urlToDownload.length() > 0) {
+                if (Log::enabledDbg()) { Log::dbg("Requesting download for URL: "+urlToDownload); }
+                if (NPERR_NO_ERROR != npnfuncs->geturlnotify(inst, urlToDownload.c_str(), NULL, NULL)) {
+                    Log::err("Unable to get url: "+urlToDownload);
+                }
+            }
+        }
+	} else if (reason == NPRES_USER_BREAK) {
+        Log::err("nppUrlNotify: User canceled request");
+        if (currentWorkingDevice != NULL) {
+            currentWorkingDevice->cancelDownloadData();
+        }
+	} else if (reason == NPRES_NETWORK_ERR) {
+        Log::err("nppUrlNotify: Canceled because of Network Error");
+        if (currentWorkingDevice != NULL) {
+            currentWorkingDevice->cancelDownloadData();
+        }
+	} else {
+        if (Log::enabledDbg()) Log::dbg("nppUrlNotify: Unknown notify reason!");
+	}
+}
+
+static NPError nppNewStream(NPP instance, NPMIMEType type, NPStream*  stream, NPBool seekable, uint16* stype) {
+	if (*stype == NP_NORMAL) {
+        if (Log::enabledDbg()) Log::dbg("nppNewStream Type: NP_NORMAL");
+        return NPERR_NO_ERROR;
+	} else {
+	    Log::err("nppNewStream: Unknown stream type!");
+	}
+	return NPERR_GENERIC_ERROR;
+}
+
+#define NPP_STREAM_BUFFER_SIZE 5120
+static int32 nppWriteReady(NPP instance, NPStream* stream) {
+	if (Log::enabledDbg()) Log::dbg("nppWriteReady");
+    return NPP_STREAM_BUFFER_SIZE;
+}
+
+static int32 nppWrite(NPP instance, NPStream* stream, int32 offset, int32 len, void* buf) {
+	if (Log::enabledDbg()) {
+        stringstream ss;
+        ss << "nppWrite Parameter: Offset: " << offset << " Length: " << len;
+	    Log::dbg(ss.str());
+	}
+
+    if (currentWorkingDevice != NULL) {
+        return currentWorkingDevice->writeDownloadData((char*)buf, len);
+    } else {
+        if (Log::enabledDbg()) Log::dbg("nppWrite: No working device!?");
+    }
+    return -1;
+}
+
+static NPError nppDestroyStream(NPP instance, NPStream* stream, NPReason  reason) {
+    if (currentWorkingDevice != NULL) {
+        if (reason == NPRES_DONE) {
+            if (Log::enabledDbg()) Log::dbg("nppDestroyStream: Stream done");
+            currentWorkingDevice->saveDownloadData();
+        } else {
+            currentWorkingDevice->cancelDownloadData();
+            Log::err("nppDestroyStream: Download to device was canceled because of errors");
+        }
+    } else {
+        if (Log::enabledDbg()) Log::dbg("nppDestroyStream: No working device!?");
+    }
+    return NPERR_NO_ERROR;
+}
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -1577,6 +1735,11 @@ NPError OSCALL NP_GetEntryPoints(NPPluginFuncs *nppfuncs) {
 	nppfuncs->getvalue      = getValue;
 	nppfuncs->event         = handleEvent;
 	nppfuncs->setwindow     = setWindow;
+	nppfuncs->urlnotify     = nppUrlNotify;
+	nppfuncs->newstream     = nppNewStream;
+	nppfuncs->writeready    = nppWriteReady;
+	nppfuncs->write         = nppWrite;
+	nppfuncs->destroystream = nppDestroyStream;
 
 	return NPERR_NO_ERROR;
 }

@@ -1059,3 +1059,31 @@ string Edge305Device::getBinaryFile(string relativeFilePath) {
     Log::err("getBinaryFile is not yet implemented for "+this->displayName);
     return "";
 }
+
+int Edge305Device::startDownloadData(string gpsDataString) {
+    Log::err("startDownloadData is not yet implemented for "+this->displayName);
+    return 0;
+}
+
+int Edge305Device::writeDownloadData(char *, int length) {
+    Log::err("writeDownloadData is not yet implemented for "+this->displayName);
+    return -1;
+}
+
+void Edge305Device::saveDownloadData() {
+    Log::err("saveDownloadData is not yet implemented for "+this->displayName);
+}
+
+void Edge305Device::cancelDownloadData() {
+    Log::err("cancelDownloadData is not yet implemented for "+this->displayName);
+}
+
+int Edge305Device::finishDownloadData() {
+    Log::err("finishDownloadData is not yet implemented for "+this->displayName);
+    return 0;
+}
+
+string Edge305Device::getNextDownloadDataUrl() {
+    Log::err("getNextDownloadDataUrl is not yet implemented for "+this->displayName);
+    return "";
+}

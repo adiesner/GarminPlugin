@@ -127,6 +127,40 @@ public:
      */
     virtual string getBinaryFile(string relativeFilePath);
 
+    /**
+     * Starts a binary file write to the device
+     * @return number of urls detected in gpsDataString
+     */
+    virtual int startDownloadData(string gpsDataString);
+
+    /**
+     * Retrieves the next download url
+     * @return url to download
+     */
+    virtual string getNextDownloadDataUrl();
+
+    /**
+     * This is used to indicate the status of the write download data process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishDownloadData();
+
+    /**
+     * Writes some bytes into the file opened by startDownloadData
+     * @return Bytes written to file
+     */
+    virtual int writeDownloadData(char *, int length);
+
+    /**
+     * Saves/Closes the current file
+     */
+    virtual void saveDownloadData();
+
+    /**
+     * Cancels the current file download
+     */
+    virtual void cancelDownloadData();
+
 protected:
     virtual void doWork();
     void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);

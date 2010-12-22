@@ -4,6 +4,9 @@
 #define TIXML_USE_TICPP
 #include "ticpp.h"
 #include <string>
+#include <list>
+#include <iostream>
+#include <fstream>
 #include "messageBox.h"
 #include "gpsDevice.h"
 #include "log.h"
@@ -121,6 +124,40 @@ public:
      */
     virtual string getBinaryFile(string relativeFilePath);
 
+    /**
+     * Starts a binary file write to the device
+     * @return number of downloads found in data
+     */
+    virtual int startDownloadData(string gpsDataString);
+
+    /**
+     * Retrieves the next download url
+     * @return url to download
+     */
+    virtual string getNextDownloadDataUrl();
+
+    /**
+     * Writes some bytes into the file opened by startDownloadData
+     * @return Bytes written to file
+     */
+    virtual int writeDownloadData(char *, int length);
+
+    /**
+     * This is used to indicate the status of the write download data process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishDownloadData();
+
+    /**
+     * Saves/Closes the current file
+     */
+    virtual void saveDownloadData();
+
+    /**
+     * Cancels the current file download
+     */
+    virtual void cancelDownloadData();
+
 protected:
 
   /**
@@ -216,6 +253,37 @@ protected:
    * Contains the device id
    */
    string deviceId;
+
+    /**
+     * Is used to store the data given by startDownloadData()
+     */
+   typedef struct _DeviceDownloadData {
+        string url;          /**< URL to download */
+        string destination;  /**< Local path to store url */
+        string regionId;     /**< RegionId - unknown purpose */
+   } DeviceDownloadData;
+
+    /**
+     * stores a list of files to download and store on the device (provided by startDownloadData())
+     */
+   list <DeviceDownloadData> deviceDownloadList;
+
+    /**
+     * File hande for downloadData
+     */
+   ofstream downloadDataOutputStream;
+
+    /**
+     * Counts errors during file download to the device
+     */
+   int downloadDataErrorCount;
+
+    /**
+     * Contains a list of writeable directories (read from garmindevice.xml)
+     */
+   list <string> writeableDirectories;
+
+
 };
 
 #endif // GARMINFILEBASEDDEVICE_H_INCLUDED
