@@ -265,7 +265,8 @@ protected:
       READFITNESSDIR,
       READFITNESSDETAIL,
       READFROMGPS,
-      READFITDIRECTORY
+      READFITDIRECTORY,
+      WRITEFITNESSDATA
     };
     WorkType workType;
 

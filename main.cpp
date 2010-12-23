@@ -1260,6 +1260,7 @@ void initializePropertyList() {
 	// Properties
 	propertyList.clear();
 	Property value;
+	value.writeable = false;
 	value.type = NPVariantType_String;
 	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>2</VersionMajor>\n<VersionMinor>9</VersionMinor>\n<BuildMajor>2</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
 	propertyList["VersionXml"] = value;
@@ -1268,8 +1269,6 @@ void initializePropertyList() {
 	value.stringValue = "";
 	propertyList["MessageBoxXml"] = value;
 
-	value.stringValue = "";
-	propertyList["TcdXml"] = value;
 	value.stringValue = "";
 	propertyList["TcdXmlz"] = value; // Compressed
 
@@ -1282,6 +1281,8 @@ void initializePropertyList() {
 	propertyList["GpsXml"] = value;
     value.stringValue = "";
 	propertyList["FileName"] = value;
+	value.stringValue = "";
+	propertyList["TcdXml"] = value;
     value.writeable = false;
 
 	value.type = NPVariantType_Int32;

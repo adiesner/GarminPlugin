@@ -304,10 +304,17 @@ protected:
      */
    int downloadDataErrorCount;
 
+    typedef struct _MassStorageDirectoryType {
+        string path;
+        string name;
+        bool writeable;
+        bool readable;
+    } MassStorageDirectoryType;
+
     /**
-     * Contains a list of writeable directories (read from garmindevice.xml)
+     * Contains a list of directories available on device (read from garmindevice.xml)
      */
-   list <string> writeableDirectories;
+   list <MassStorageDirectoryType> deviceDirectories;
 
 
 };

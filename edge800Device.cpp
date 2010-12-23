@@ -185,7 +185,8 @@ int Edge800Device::finishReadFitnessData()
 
 
 void Edge800Device::doWork() {
-    if (this->workType == WRITEGPX) {
+    if ((this->workType == WRITEGPX) ||
+        (this->workType == WRITEFITNESSDATA)) {
         this->writeGpxFile();
     } else if (this->workType == READFITNESS) {
         this->readFitnessDataFromDevice(true, "");

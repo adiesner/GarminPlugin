@@ -153,7 +153,8 @@ void GarminFilebasedDevice::writeGpxFile() {
 }
 
 void GarminFilebasedDevice::doWork() {
-    if (this->workType == WRITEGPX) {
+    if ((this->workType == WRITEGPX) ||
+        (this->workType == WRITEFITNESSDATA)) {
         this->writeGpxFile();
     } else {
         Log::err("Work Type not implemented!");
@@ -236,7 +237,7 @@ bool GarminFilebasedDevice::isDeviceAvailable() {
 }
 
 void GarminFilebasedDevice::setPathesFromConfiguration() {
-    if (!writeableDirectories.empty()) { writeableDirectories.clear(); }
+    if (!deviceDirectories.empty()) { deviceDirectories.clear(); }
     this->gpxDirectory = this->baseDirectory; // Fallback
     this->fitnessFile = this->baseDirectory+"/Garmin/gpx/current/Current.gpx"; // Fallback
 
@@ -257,47 +258,47 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
                     TiXmlElement * transferDirection = node2->FirstChildElement("TransferDirection");
                     string transDir = transferDirection->GetText();
 
-                    // Get directory to write GPX
-                    if ((transDir.compare("InputToUnit") == 0) || (transDir.compare("InputOutput") == 0)) {
-                        TiXmlElement * loc = NULL;
-                        string path = "";
-                        string ext = "";
-                        if (node2!=NULL) { loc = node2->FirstChildElement("Location"); }
-                        if (loc!=NULL)   { node2 = loc->FirstChildElement("Path"); }
+                    MassStorageDirectoryType dirType;
+                    dirType.name = nameText;
 
-                        if (node2!=NULL) {
-                            path = node2->GetText();
-                        }
-                        if (loc!=NULL)   { node2 = loc->FirstChildElement("FileExtension"); }
-                        if (node2!=NULL) {
-                            ext = node2->GetText();
-                        }
-                        if ((nameText.compare("GPSData") == 0) && (path.length() > 0)) {
-                            Log::dbg("Found path: "+ string(node2->GetText()) + " for GPSData");
-                            this->gpxDirectory = this->baseDirectory + "/" + path;
-                            this->gpxFileExtension  = ext;
-                        }
-                        // add to list of writeable directories
-                        if (Log::enabledDbg()) { Log::dbg("Adding directory to writeable directory list: "+path); }
-                        writeableDirectories.push_back(path);
+                    if (transDir.compare("InputToUnit") == 0) {
+                        dirType.writeable = true;
+                        dirType.readable  = false;
+                    } else if (transDir.compare("InputOutput") == 0) {
+                        dirType.writeable = true;
+                        dirType.readable  = true;
+                    } else if (transDir.compare("OutputFromUnit") == 0) {
+                        dirType.writeable = false;
+                        dirType.readable  = true;
                     }
 
-                    // Get location of current.gpx file
-                    if ((nameText.compare("GPSData") == 0) && ((transDir.compare("OutputFromUnit") == 0) || (transDir.compare("InputOutput") == 0))) {
-                        TiXmlElement * loc = NULL;
-                        TiXmlElement * path = NULL;
-                        TiXmlElement * basename = NULL;
-                        TiXmlElement * ext = NULL;
-                        if (node2!=NULL) { loc = node2->FirstChildElement("Location"); }
-                        if (loc!=NULL)   { path = loc->FirstChildElement("Path"); }
-                        if (loc!=NULL)   { basename = loc->FirstChildElement("BaseName"); }
-                        if (loc!=NULL)   { ext = loc->FirstChildElement("FileExtension"); }
+                    TiXmlElement * ti_loc = NULL;
+                    TiXmlElement * ti_path = NULL;
+                    TiXmlElement * ti_basename = NULL;
+                    TiXmlElement * ti_ext = NULL;
+                    if (node2!=NULL)  { ti_loc      = node2->FirstChildElement("Location"); }
+                    if (ti_loc!=NULL) { ti_path     = ti_loc->FirstChildElement("Path"); }
+                    if (ti_loc!=NULL) { ti_basename = ti_loc->FirstChildElement("BaseName"); }
+                    if (ti_loc!=NULL) { ti_ext      = ti_loc->FirstChildElement("FileExtension"); }
 
-                        if ((path != NULL) && (basename != NULL) && (ext != NULL)) {
-                            this->fitnessFile = this->baseDirectory + "/" + path->GetText() +"/"+basename->GetText()+"."+ext->GetText();
-                            Log::dbg("Fitness file is: "+this->fitnessFile);
-                        }
+                    if (ti_path != NULL) {
+                        dirType.path = ti_path->GetText();
                     }
+
+                    if ((nameText.compare("GPSData") == 0) && (dirType.writeable) && (ti_path != NULL) && (ti_ext != NULL)) {
+                        string path = ti_path->GetText();
+                        string ext  = ti_ext->GetText();
+                        Log::dbg("Found path: "+ path + " for GPSData");
+                        this->gpxDirectory = this->baseDirectory + "/" + path;
+                        this->gpxFileExtension  = ext;
+                    }
+
+                    if ((nameText.compare("GPSData") == 0) && (dirType.readable) && (ti_path != NULL) && (ti_basename != NULL) && (ti_ext != NULL)) {
+                        this->fitnessFile = this->baseDirectory + "/" + ti_path->GetText() +"/"+ti_basename->GetText()+"."+ti_ext->GetText();
+                        Log::dbg("Fitness file is: "+this->fitnessFile);
+                    }
+
+                    deviceDirectories.push_back(dirType);
 
                     node2 = node2->NextSiblingElement("File");
                 }
@@ -462,8 +463,9 @@ int GarminFilebasedDevice::startDownloadData(string gpsDataString) {
                             directoryOnly = strDest.substr(0,strDest.length()-fileNameOnly.length()-1);
                         }
                         Log::dbg("Comparing with "+directoryOnly);
-                        for (list<string>::iterator it=writeableDirectories.begin(); it!=writeableDirectories.end(); it++) {
-                            if (directoryOnly.compare((*it)) == 0) { directoryIsValid = true; }
+                        for (list<MassStorageDirectoryType>::iterator it=deviceDirectories.begin(); it!=deviceDirectories.end(); it++) {
+                            MassStorageDirectoryType dt = (*it);
+                            if ((directoryOnly.compare( dt.path ) == 0) && (dt.writeable)) { directoryIsValid = true; }
                         }
 
                         if (directoryIsValid) {
@@ -584,7 +586,42 @@ int GarminFilebasedDevice::finishDownloadData() {
 * @return int returns 1 if successful otherwise 0
 */
 int GarminFilebasedDevice::startWriteFitnessData(string filename, string data, string dataTypeName) {
-    if (Log::enabledDbg()) { Log::dbg("startWriteFitnessData is not yet implemented for "+this->displayName); }
+    string::size_type loc = filename.find( "../", 0 );
+    if( loc != string::npos ) {
+        Log::err("SECURITY WARNING: Filenames with ../ are not allowed! "+filename);
+        return 0;
+    }
+
+    string pathToWrite = "";
+    for (list<MassStorageDirectoryType>::iterator it=deviceDirectories.begin(); it!=deviceDirectories.end(); it++) {
+        MassStorageDirectoryType dt = (*it);
+        if ((dataTypeName.compare(dt.name) == 0) && (dt.writeable)) {
+            pathToWrite = dt.path;
+        }
+    }
+
+    if (pathToWrite.length() == 0) {
+        Log::err("Path for " + dataTypeName + " not found. Not writing to device!");
+        return 0;
+    }
+
+    // There shouldn't be a thread running... but who knows...
+    lockVariables();
+    this->xmlToWrite = data;
+    this->filenameToWrite = this->baseDirectory + "/" + pathToWrite + "/" + filename;
+    this->overwriteFile = 2; // not yet asked
+    this->workType = WRITEFITNESSDATA;
+    unlockVariables();
+
+    if (Log::enabledDbg()) Log::dbg("Saving to file: "+this->filenameToWrite);
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+
+
     return 0;
 }
 
@@ -593,15 +630,18 @@ int GarminFilebasedDevice::startWriteFitnessData(string filename, string data, s
  * @return 0 = idle 1 = working 2 = waiting 3 = finished
  */
 int GarminFilebasedDevice::finishWriteFitnessData() {
-    if (Log::enabledDbg()) { Log::dbg("finishWriteFitnessData is not yet implemented for "+this->displayName); }
-    return 3;
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
 }
 
 /**
  * Cancels the current write of fitness data
  */
 void GarminFilebasedDevice::cancelWriteFitnessData() {
-    if (Log::enabledDbg()) { Log::dbg("cancelWriteFitnessData is not yet implemented for "+this->displayName); }
+    cancelThread();
 }
 
 /**
