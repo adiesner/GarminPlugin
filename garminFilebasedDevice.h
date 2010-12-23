@@ -158,6 +158,26 @@ public:
      */
     virtual void cancelDownloadData();
 
+  /**
+   * Starts a thread that writes the passed xml string to the given filename
+   * @param filename - filename on disk
+   * @param data - the filename to write to on the device.
+   * @param dataTypeName - a Fitness DataType from the GarminDevice.xml retrieved with DeviceDescription
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startWriteFitnessData(string filename, string data, string dataTypeName);
+
+    /**
+     * This is used to indicate the status of the write fitness data process.
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishWriteFitnessData();
+
+    /**
+     * Cancels the current write of fitness data
+     */
+    virtual void cancelWriteFitnessData();
+
 protected:
 
   /**

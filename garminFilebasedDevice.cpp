@@ -574,3 +574,31 @@ int GarminFilebasedDevice::finishDownloadData() {
         return 3;
     }
 }
+
+/**
+* Starts a thread that writes the passed xml string to the given filename
+* @param filename - filename on disk
+* @param data - the filename to write to on the device.
+* @param dataTypeName - a Fitness DataType from the GarminDevice.xml retrieved with DeviceDescription
+* @return int returns 1 if successful otherwise 0
+*/
+int GarminFilebasedDevice::startWriteFitnessData(string filename, string data, string dataTypeName) {
+    if (Log::enabledDbg()) { Log::dbg("startWriteFitnessData is not yet implemented for "+this->displayName); }
+    return 0;
+}
+
+/**
+ * This is used to indicate the status of the write fitness data process.
+ * @return 0 = idle 1 = working 2 = waiting 3 = finished
+ */
+int GarminFilebasedDevice::finishWriteFitnessData() {
+    if (Log::enabledDbg()) { Log::dbg("finishWriteFitnessData is not yet implemented for "+this->displayName); }
+    return 3;
+}
+
+/**
+ * Cancels the current write of fitness data
+ */
+void GarminFilebasedDevice::cancelWriteFitnessData() {
+    if (Log::enabledDbg()) { Log::dbg("cancelWriteFitnessData is not yet implemented for "+this->displayName); }
+}

@@ -1155,6 +1155,80 @@ bool methodCancelReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
     return false;
 }
 
+bool methodStartWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (argCount != 2) {
+        Log::err("StartWriteFitnessData: Wrong parameter count. Two parameter required! (deviceNumber, dataTypeName)");
+        return false;
+    }
+
+    int deviceId = getIntParameter(args, 0, -1);
+    if (deviceId != -1) {
+        currentWorkingDevice = devManager->getGpsDevice(deviceId);
+        if (currentWorkingDevice != NULL) {
+            string dataTypeName = getStringParameter(args,1,"");
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->startWriteFitnessData(propertyList["FileName"].stringValue, propertyList["TcdXml"].stringValue, dataTypeName);
+            return true;
+        } else {
+            Log::err("StartWriteFitnessData: Unknown Device ID");
+        }
+    } else {
+        Log::err("StartWriteFitnessData: Device ID is invalid");
+    }
+    return false;
+}
+
+bool methodFinishWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishWriteFitnessData();
+            printFinishState("FinishWriteFitnessData", result->value.intValue);
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                //TODO: Is this the correct property?
+                propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishWriteFitnessData: No working device specified");
+        }
+    }
+    return false;
+}
+
+bool methodCancelWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (currentWorkingDevice != NULL) {
+        Log::dbg("Calling CancelWriteFitnessData");
+
+        currentWorkingDevice->cancelWriteFitnessData();
+        return true;
+    }
+    return false;
+}
 
 /**
  * Initializes the Property List and Function List that are accessible from the outside
@@ -1271,6 +1345,13 @@ void initializePropertyList() {
 
     fooPointer = &methodFinishDownloadData;
     methodList["FinishDownloadData"] = fooPointer;
+
+    fooPointer = &methodStartWriteFitnessData;
+    methodList["StartWriteFitnessData"] = fooPointer;
+    fooPointer = &methodFinishWriteFitnessData;
+    methodList["FinishWriteFitnessData"] = fooPointer;
+    fooPointer = &methodCancelWriteFitnessData;
+    methodList["CancelWriteFitnessData"] = fooPointer;
 
 }
 
