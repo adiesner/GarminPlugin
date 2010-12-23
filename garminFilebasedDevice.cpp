@@ -2,7 +2,8 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <fstream>
-
+#include "sys/statfs.h"
+#include <limits.h>
 
 GarminFilebasedDevice::GarminFilebasedDevice() {
     this->deviceDescription = NULL;
@@ -601,4 +602,31 @@ int GarminFilebasedDevice::finishWriteFitnessData() {
  */
 void GarminFilebasedDevice::cancelWriteFitnessData() {
     if (Log::enabledDbg()) { Log::dbg("cancelWriteFitnessData is not yet implemented for "+this->displayName); }
+}
+
+/**
+ * Returns the bytes available in the given path on the device
+ * @return bytes available (-1 for non-mass storage mode devices.)
+ */
+int GarminFilebasedDevice::bytesAvailable(string path) {
+    if (Log::enabledDbg()) { Log::dbg("bytesAvailable called for path "+path); }
+    string fullPath = baseDirectory + "/" + path;
+
+    struct statfs st;
+    if (statfs(fullPath.c_str(), &st) == 0) {
+        long freeBytes = st.f_bfree * st.f_bsize;
+        if (Log::enabledDbg()) {
+            stringstream ss;
+            ss << "Bytes available for path " << fullPath << ": " << freeBytes;
+            Log::dbg(ss.str());
+        }
+        if (freeBytes > INT_MAX) {
+            return INT_MAX;
+        } else {
+            return (int)freeBytes;
+        }
+    } else {
+        Log::err("Error getting bytes available for path: "+fullPath);
+        return -1;
+    }
 }

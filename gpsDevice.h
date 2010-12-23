@@ -251,7 +251,11 @@ public:
      */
     virtual void cancelWriteFitnessData() = 0;
 
-
+    /**
+     * Returns the bytes available in the given path on the device
+     * @return bytes available (-1 for non-mass storage mode devices.)
+     */
+    virtual int bytesAvailable(string path) = 0;
 
 protected:
     enum WorkType

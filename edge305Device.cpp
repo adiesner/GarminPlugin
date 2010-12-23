@@ -1115,3 +1115,12 @@ int Edge305Device::finishWriteFitnessData() {
 void Edge305Device::cancelWriteFitnessData() {
     if (Log::enabledDbg()) { Log::dbg("cancelWriteFitnessData is not yet implemented for "+this->displayName); }
 }
+
+/**
+ * Returns the bytes available in the given path on the device
+ * @return bytes available (-1 for non-mass storage mode devices.)
+ */
+int Edge305Device::bytesAvailable(string path) {
+    if (Log::enabledDbg()) { Log::dbg("bytesAvailable is not yet implemented for "+this->displayName); }
+    return -1;
+}

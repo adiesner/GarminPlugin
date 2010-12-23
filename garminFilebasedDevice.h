@@ -178,6 +178,12 @@ public:
      */
     virtual void cancelWriteFitnessData();
 
+    /**
+     * Returns the bytes available in the given path on the device
+     * @return bytes available (-1 for non-mass storage mode devices.)
+     */
+    virtual int bytesAvailable(string path);
+
 protected:
 
   /**

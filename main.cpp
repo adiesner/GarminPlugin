@@ -1230,6 +1230,29 @@ bool methodCancelWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_
     return false;
 }
 
+bool methodBytesAvailable(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (argCount != 2) {
+        Log::err("BytesAvailable: Wrong parameter count. Two parameter required! (deviceNumber, relativeFilePath)");
+        return false;
+    }
+
+    int deviceId = getIntParameter(args, 0, -1);
+    if (deviceId != -1) {
+        currentWorkingDevice = devManager->getGpsDevice(deviceId);
+        if (currentWorkingDevice != NULL) {
+            string relativeFilePath = getStringParameter(args, 1, "");
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->bytesAvailable(relativeFilePath);
+            return true;
+        } else {
+            Log::err("BytesAvailable: Unknown Device ID");
+        }
+    } else {
+        Log::err("BytesAvailable: Device ID is invalid");
+    }
+    return false;
+}
+
 /**
  * Initializes the Property List and Function List that are accessible from the outside
  */
@@ -1352,6 +1375,9 @@ void initializePropertyList() {
     methodList["FinishWriteFitnessData"] = fooPointer;
     fooPointer = &methodCancelWriteFitnessData;
     methodList["CancelWriteFitnessData"] = fooPointer;
+
+    fooPointer = &methodBytesAvailable;
+    methodList["BytesAvailable"] = fooPointer;
 
 }
 
