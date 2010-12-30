@@ -1616,7 +1616,7 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
 
     if (Log::enabledDbg()) Log::dbg("Overwriting Garmin Javascript Browser detection!");
     NPString str;
-    char buf[100];
+    char buf[1000];
 
 
     NPObject* windowObject = NULL;
@@ -1627,31 +1627,22 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
     }
     NPVariant ret;
 
-    string javascriptCode = "var BrowserDetect = { OS:'Windows', browser:'Firefox' }";
-    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
-    GETSTRING(str) = buf;
-    GETSTRINGLENGTH(str) = javascriptCode.size();
-    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
-        Log::err("Unable to execute javascript: "+javascriptCode);
-    }
-
-    javascriptCode = "BrowserDetect.init = function() { }";
-    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
-    GETSTRING(str) = buf;
-    GETSTRINGLENGTH(str) = javascriptCode.size();
-    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
-        Log::err("Unable to execute javascript: "+javascriptCode);
-    }
-
-    javascriptCode = "BrowserSupport.isBrowserSupported = function() { return 1; }";
-    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
-    GETSTRING(str) = buf;
-    GETSTRINGLENGTH(str) = javascriptCode.size();
-    if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
-        Log::err("Unable to execute javascript: "+javascriptCode);
-    }
-
-    javascriptCode = "BrowserDetect.OS='Windows';BrowserDetect.browser='Firefox';";
+    // This is needed for google chrome and firefox to get rid of the browser check
+    string javascriptCode =  "var garminOverwriteBrowserDetectRunCount = 0;\
+                              var garminOverwriteBrowserDetect = function() {\
+                                if(typeof(BrowserDetect.init) != \"undefined\"){\
+                                  BrowserDetect.init = function() { };\
+                                }\
+                                if(typeof(BrowserDetect.OS) != \"undefined\"){\
+                                    BrowserDetect.OS='Windows';\
+                                    BrowserDetect.browser='Firefox';\
+                                }\
+                                garminOverwriteBrowserDetectRunCount++;\
+                                if (garminOverwriteBrowserDetectRunCount < 20) {\
+                                    setTimeout ( \"garminOverwriteBrowserDetect()\", 100 );\
+                                }\
+                              };\
+                              garminOverwriteBrowserDetect();";
     memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
     GETSTRING(str) = buf;
     GETSTRINGLENGTH(str) = javascriptCode.size();
