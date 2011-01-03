@@ -12,7 +12,7 @@ device using the official Garmin Javascript API. Its functionality depends on
 the device you use. 
 - Edge305/Forerunner305: ReadFitnessData, ReadGpsData, No write support
 - Edge705/Oregon/Dakota: ReadFitnessData, ReadGpsData, Write Gpx files
-- Edge800: ReadFitnessData
+- Edge800: ReadFitnessData, Write Gpx/Tcx Files
 - Other devices: Executes external command to write Gpx to device 
 
 Motivation:
