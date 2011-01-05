@@ -151,6 +151,10 @@ void DeviceManager::startFindDevices() {
                         }
 
                         position = deviceName.find( "Edge 800", 0 );
+                        if ((device == NULL) && (position == string::npos)) {
+                            // Edge 800 and Edge 500 behave the same
+                            position = deviceName.find( "Edge 500", 0 );
+                        }
                         if ((device == NULL) && (position != string::npos)) {
                             Edge800Device * edge = new Edge800Device();
                             edge->setBaseDirectory(mountPath);
