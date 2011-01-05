@@ -1,3 +1,13 @@
+2011-01-05 - Version 0.2.8
+- Added support for Edge 500
+- Changed official garmin plugin version number to 2.9.3.0
+
+2011-01-03 - Version 0.2.7
+- Added support for Edge 800
+- Manipulation of Garmin Javascript to disable browser check (no more User Agent setting necessary)
+- Removed dependency to libboost (Better portability)
+- Now working with Chrome
+
 2010-10-16 - Version 0.2.6
 - Bugfix: Edge305/Forerunner305 reported long/lat with only 4 positions after decimal point (which is not enough)
 
