@@ -29,87 +29,89 @@
 #include "edge800Device.h"
 #include <dirent.h>
 
-#include "fit/fit_decode.hpp"
-#include "fit/fit_mesg_broadcaster.hpp"
-
 #include "gpsFunctions.h"
 
-class Listener : public fit::FileIdMesgListener
-{
-   public :
-      void setXmlElement(TiXmlElement * elem) {
-          this->fileElement = elem;
-      }
-
-      void OnMesg(fit::FileIdMesg& mesg)
-      {
-         if (fileElement == NULL) { return; }
-
-         if (mesg.GetTimeCreated() != FIT_UINT32Z_INVALID) {
-            TiXmlElement * timeElem = new TiXmlElement( "CreationTime" );
-            timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(mesg.GetTimeCreated())));
-            fileElement->LinkEndChild(timeElem);
-         }
-
-         TiXmlElement * fitId = fileElement->FirstChildElement("FitId");
-         if (fitId == NULL) {
-            fitId = new TiXmlElement( "FitId" );
-            fileElement->LinkEndChild( fitId );
-         }
-
-         if (mesg.GetType() != FIT_FILE_INVALID) {
-            TiXmlElement * typeElem = new TiXmlElement( "Id" );
-            stringstream ss;
-            ss << (unsigned int)mesg.GetTimeCreated();
-            typeElem->LinkEndChild(new TiXmlText(ss.str()));
-            fitId->LinkEndChild(typeElem);
-         }
-
-         if (mesg.GetType() != FIT_FILE_INVALID) {
-            TiXmlElement * typeElem = new TiXmlElement( "FileType" );
-            stringstream ss;
-            ss << (int)mesg.GetType();
-            typeElem->LinkEndChild(new TiXmlText(ss.str()));
-            fitId->LinkEndChild(typeElem);
-         }
-         if (mesg.GetManufacturer() != FIT_MANUFACTURER_INVALID) {
-            TiXmlElement * manElem = new TiXmlElement( "Manufacturer" );
-            stringstream ss;
-            ss << mesg.GetManufacturer();
-            manElem->LinkEndChild(new TiXmlText(ss.str()));
-            fitId->LinkEndChild(manElem);
-         }
-         if (mesg.GetProduct() != FIT_UINT16_INVALID) {
-            TiXmlElement * prodElem = new TiXmlElement( "Product" );
-            stringstream ss;
-            ss << mesg.GetProduct();
-            prodElem->LinkEndChild(new TiXmlText(ss.str()));
-            fitId->LinkEndChild(prodElem);
-         }
-         if (mesg.GetSerialNumber() != FIT_UINT32Z_INVALID) {
-            TiXmlElement * serElem = new TiXmlElement( "SerialNumber" );
-            stringstream ss;
-            ss << mesg.GetSerialNumber();
-            serElem->LinkEndChild(new TiXmlText(ss.str()));
-            fitId->LinkEndChild(serElem);
-         }
-      }
-   private :
-
-   TiXmlElement * fileElement;
-
-};
-
+#include "fit/fitMsg.hpp"
+#include "fit/fitMsg_File_ID.hpp"
+#include "fit/fitFileException.hpp"
 
 Edge800Device::Edge800Device()
 {
     this->displayName = "Edge 800";
     this->fitnessFileExtension = "fit";
+    this->fitFileElement = NULL;
 }
 
 Edge800Device::~Edge800Device() {
     Log::dbg("Edge800Device destructor");
 }
+
+void Edge800Device::fitMsgReceived(FitMsg *msg) {
+    if (this->fitFileElement == NULL) { return; }
+
+    if (msg->GetType() == FIT_MESSAGE_FILE_ID) {
+        FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (msg);
+         if (fileid != NULL) {
+
+            if (fileid->GetTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
+                TiXmlElement * timeElem = new TiXmlElement( "CreationTime" );
+                timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(fileid->GetTimeCreated())));
+                this->fitFileElement->LinkEndChild(timeElem);
+            }
+
+            TiXmlElement * fitId = this->fitFileElement->FirstChildElement("FitId");
+                if (fitId == NULL) {
+                fitId = new TiXmlElement( "FitId" );
+                this->fitFileElement->LinkEndChild( fitId );
+            }
+
+            if (fileid->GetTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
+                TiXmlElement * typeElem = new TiXmlElement( "Id" );
+                stringstream ss;
+                ss << (unsigned int)fileid->GetTimeCreated();
+                typeElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(typeElem);
+            }
+
+            if (fileid->GetFileType() != FIT_FILE_ID_TYPE_INVALID) {
+                TiXmlElement * typeElem = new TiXmlElement( "FileType" );
+                stringstream ss;
+                ss << (int)fileid->GetFileType();
+                typeElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(typeElem);
+            }
+
+            if (fileid->GetManufacturer() != FIT_FILE_ID_MANUFACTURER_INVALID) {
+                TiXmlElement * manElem = new TiXmlElement( "Manufacturer" );
+                stringstream ss;
+                ss << fileid->GetManufacturer();
+                manElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(manElem);
+            }
+
+            if (fileid->GetProduct() != FIT_FILE_ID_GARMIN_PRODUCT_INVALID) {
+                TiXmlElement * prodElem = new TiXmlElement( "Product" );
+                stringstream ss;
+                ss << fileid->GetProduct();
+                prodElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(prodElem);
+            }
+
+            if (fileid->GetSerialNumber() != FIT_FILE_ID_SERIAL_NUMBER_INVALID) {
+                TiXmlElement * serElem = new TiXmlElement( "SerialNumber" );
+                stringstream ss;
+                ss << (fileid->GetSerialNumber() & 0xFFFFFFFF);
+                serElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(serElem);
+            }
+         } else {
+             // Should not happen... internal error msgtype does not fit to class type
+         }
+    } else {
+        // received a message we are not interested in
+    }
+}
+
 
 void Edge800Device::setPathesFromConfiguration() {
     GarminFilebasedDevice::setPathesFromConfiguration();
@@ -220,10 +222,6 @@ void Edge800Device::readFITDirectoryFromDevice() {
     dirList->SetAttribute("VolumePrefix","");
     output->LinkEndChild( dirList );
 
-    // For decoding of fit files
-    Listener fitListener;
-    fstream file;
-
     for (list<FitDirectory>::iterator it = fitDirectoryList.begin(); it != fitDirectoryList.end(); it++) {
         FitDirectory currentFitDir = (*it);
 
@@ -241,39 +239,32 @@ void Edge800Device::readFITDirectoryFromDevice() {
                     string lastFilePart = fileName.substr(fileName.length() - currentFitDir.extension.length());
                     if (strncasecmp(lastFilePart.c_str(), currentFitDir.extension.c_str(), currentFitDir.extension.length()) == 0) {
                         if (Log::enabledDbg()) { Log::dbg("Found file with correct extension: "+fileName);}
-                        TiXmlElement * fileElem = new TiXmlElement( "File" );
-                        fileElem->SetAttribute("IsDirectory","false");
-                        fileElem->SetAttribute("Path",currentFitDir.path+'/'+fileName);
-
+                        this->fitFileElement = new TiXmlElement( "File" );
+                        this->fitFileElement->SetAttribute("IsDirectory","false");
+                        this->fitFileElement->SetAttribute("Path",currentFitDir.path+'/'+fileName);
 
                         // Opening and parsing of fit file:
                         string fullFileName = this->baseDirectory + "/" + currentFitDir.path+'/'+fileName;
-                        file.open(fullFileName.c_str(), ios::in|ios::binary);
-                        if (file.is_open())
-                        {
-                            fitListener.setXmlElement(fileElem);
-                            fit::Decode decode;
-                            fit::MesgBroadcaster mesgBroadcaster;
-                            mesgBroadcaster.AddListener((fit::FileIdMesgListener &)fitListener);
 
-                            if (decode.CheckIntegrity(file))
-                            {
-                                try {
-                                    mesgBroadcaster.Run(file);
-                                    dirList->LinkEndChild( fileElem );
-                                } catch (const fit::RuntimeException& e) {
-                                    Log::err("Exception decoding file: "+fullFileName+" : "+e.what());
-                                    delete(fileElem);
+                        FitReader fit(fullFileName);
+                        fit.registerFitMsgFkt(this);
+                        try {
+                            if (Log::enabledInfo()) { Log::info("Reading fit file: "+fullFileName); }
+                            if (fit.isFitFile()) {
+                                while (fit.readNextRecord()) {
+                                    // processing of records is done in fitMsgReceived()
                                 }
+                                fit.closeFitFile();
+                                dirList->LinkEndChild( this->fitFileElement );
                             } else {
-                                Log::err("FIT file integrity failed: "+fullFileName);
-                                delete(fileElem);
+                                Log::err("Invalid fit file: "+fullFileName);
+                                delete(this->fitFileElement);
                             }
-                            file.close();
-                        } else {
-                            Log::err("Unable to open file "+fullFileName);
-                            delete(fileElem);
+                        } catch (FitFileException &e) {
+                            Log::err("Decoding error: "+e.getError());
+                            delete(this->fitFileElement);
                         }
+
                     } else {
                         if (Log::enabledDbg()) { Log::dbg("Wrong file extension of "+fileName);}
                     }

@@ -8,11 +8,15 @@
 #include "messageBox.h"
 #include "garminFilebasedDevice.h"
 
+
+#include "fit/fitReader.hpp"
+#include "fit/fitMsg.hpp"
+
 using namespace std;
 
 class MessageBox;
 
-class Edge800Device : public GarminFilebasedDevice
+class Edge800Device : public GarminFilebasedDevice, FitMsg_Listener
 {
 public:
     Edge800Device();
@@ -90,6 +94,11 @@ public:
      */
     virtual string getBinaryFile(string relativeFilePath);
 
+    /**
+     * Receives all decoded messages stored in the fit file
+     */
+    virtual void fitMsgReceived(FitMsg *msg);
+
 protected:
     virtual void doWork();
     void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);
@@ -133,6 +142,12 @@ private:
      * Stores the id of the track that should be read
      */
     string readFitnessDetailId;
+
+    /**
+     * Stores the current xml element where the Fit Message Listener (fitMsgReceived())
+     * should write the file information data to
+     */
+    TiXmlElement * fitFileElement;
 
 };
 
