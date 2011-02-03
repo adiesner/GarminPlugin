@@ -246,6 +246,8 @@ AC_ARG_WITH([garmintools-incdir],
 
 if test "x$garmintools_incdir" != "x" ; then
   GARMINTOOLS_CPPFLAGS="-I$garmintools_incdir"
+elif test -f "/usr/include/garmin.h" ; then
+  GARMINTOOLS_CPPFLAGS="-I/usr/include/"
 elif test -f "../garmintools/src/garmin.h" ; then
   GARMINTOOLS_CPPFLAGS="-I../garmintools/src/"
 elif test -f "../garmintools-read-only/src/garmin.h" ; then
@@ -262,6 +264,8 @@ fi
 if test "x$garmintools_libdir" != "x" ; then
   if test -f "$garmintools_libdir/libgarmintools.a" ; then
     GARMINTOOLS_LDFLAGS="$garmintools_libdir/libgarmintools.a"
+  elif test -f "$garmintools_libdir/libgarmintools.so" ; then
+    GARMINTOOLS_LDFLAGS="$garmintools_libdir/libgarmintools.so"
   else
     AC_MSG_RESULT([no])
     AC_MSG_ERROR([Unable to find libgarmintools.a in $garmintools_libdir. Is garmintools compiled?])
@@ -282,6 +286,10 @@ elif test -f "garmintools/libgarmintools.a" ; then
   GARMINTOOLS_LDFLAGS="garmintools/libgarmintools.a"
 elif test -f "../garmintools/libgarmintools.a" ; then
   GARMINTOOLS_LDFLAGS="../garmintools/libgarmintools.a"
+elif test -f "/usr/lib/libgarmintools.so" ; then
+  GARMINTOOLS_LDFLAGS="/usr/lib/libgarmintools.so"
+elif test -f "/usr/lib64/libgarmintools.so" ; then
+  GARMINTOOLS_LDFLAGS="/usr/lib64/libgarmintools.so"
 else
   AC_MSG_RESULT([no])
   AC_MSG_ERROR([Unable to find libgarmintools.a. Try 'svn export http://garmintools.googlecode.com/svn/trunk/ garmintools' and compile source or use --with-garmintools-libdir=DIR])
