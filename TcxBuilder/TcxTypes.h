@@ -19,6 +19,9 @@
 #ifndef TCXTYPES_H_INCLUDED
 #define TCXTYPES_H_INCLUDED
 
+#include <sstream>
+#include <string>
+
 using namespace std;
 
 class TrainingCenterDatabase {

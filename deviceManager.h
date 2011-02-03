@@ -23,12 +23,11 @@
 
 #include <iostream>
 #include <string>
-
-#define TIXML_USE_TICPP
-
-#include "ticpp.h"
+#include <vector>
 
 #include "gpsDevice.h"
+
+#include "tinyxml.h"
 
 using namespace std;
 

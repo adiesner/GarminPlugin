@@ -21,8 +21,6 @@
 #ifndef GPSDEVICE_H_INCLUDED
 #define GPSDEVICE_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include <string>
 #include "messageBox.h"
 

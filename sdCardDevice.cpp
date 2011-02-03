@@ -21,6 +21,8 @@
 #include "gpsDevice.h"
 #include <iostream>
 #include <fstream>
+#include <vector>
+
 #include "log.h"
 #include <unistd.h>
 #include <sys/stat.h>

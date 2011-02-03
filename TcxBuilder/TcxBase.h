@@ -19,8 +19,6 @@
 #ifndef TCXBASE_H_INCLUDED
 #define TCXBASE_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 
 #include <vector>
 #include "TcxActivities.h"

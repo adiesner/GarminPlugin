@@ -37,31 +37,17 @@ void ConfigManager::readConfiguration() {
     string homeDir = getenv ("HOME");
     this->configurationFile = homeDir + "/.config/garminplugin/garminplugin.xml";
 
-    try
+    this->configuration = new TiXmlDocument(this->configurationFile );
+    if (this->configuration->LoadFile())
     {
-        this->configuration = new TiXmlDocument(this->configurationFile );
-        if (this->configuration->LoadFile())
-        {
-            return;
-        }
-    }
-    catch(ticpp::Exception& ex)
-    {
-        if (Log::enabledInfo()) Log::info("Failed reading configuration from "+this->configurationFile);
+        return;
     }
 
     this->configurationFile = homeDir + "/.garminplugin.xml";
-    try
+    this->configuration = new TiXmlDocument(this->configurationFile );
+    if (this->configuration->LoadFile())
     {
-        this->configuration = new TiXmlDocument(this->configurationFile );
-        if (this->configuration->LoadFile())
-        {
-            return;
-        }
-    }
-    catch(ticpp::Exception& ex)
-    {
-        if (Log::enabledInfo()) Log::info("Failed reading configuration from "+this->configurationFile);
+        return;
     }
 
     configuration = createNewConfiguration();
@@ -153,14 +139,8 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 
 	forerunnertools->SetAttribute("enabled", "true");
 
-    try {
-        doc->SaveFile(configFile);
-        configurationFile = configFile;
-    }
-    catch(ticpp::Exception& ex)
-    {
-        if (Log::enabledErr()) Log::err("Failed storing initial configuration to "+configFile);
-    }
+    doc->SaveFile(configFile);
+    configurationFile = configFile;
 
     return doc;
 }

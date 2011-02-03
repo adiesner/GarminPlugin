@@ -19,8 +19,8 @@
 #ifndef TCXTRACKPOINT_H_INCLUDED
 #define TCXTRACKPOINT_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
+#include "tinyxml.h"
+
 #include <string>
 #include "TcxTypes.h"
 

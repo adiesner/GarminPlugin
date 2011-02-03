@@ -23,9 +23,10 @@
 
 #include <stdarg.h>
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include <string>
+
+#include "tinyxml.h"
+
 using namespace std;
 
 /**

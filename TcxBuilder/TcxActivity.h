@@ -19,9 +19,6 @@
 #ifndef TCXACTIVITY_H_INCLUDED
 #define TCXACTIVITY_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
-
 #include "TcxLap.h"
 #include "TcxCreator.h"
 #include "TcxTypes.h"

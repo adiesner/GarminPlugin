@@ -19,8 +19,6 @@
 #ifndef GARMINFILEBASEDDEVICE_H_INCLUDED
 #define GARMINFILEBASEDDEVICE_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include <string>
 #include <list>
 #include <iostream>

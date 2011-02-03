@@ -19,8 +19,6 @@
 #ifndef OREGONDEVICE_H_INCLUDED
 #define OREGONDEVICE_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include <string>
 #include "messageBox.h"
 #include "garminFilebasedDevice.h"

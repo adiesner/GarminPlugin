@@ -5,7 +5,7 @@ AC_MSG_WARN([Warnung])
 AC_MSG_ERROR([Fehler])
 
 AC_PREREQ([2.64])
-AC_INIT(GarminPlugin, 0.2, andreas.diesner@gmx.de)
+AC_INIT(GarminPlugin, 0.2, garminplugin@andreas-diesner.de)
 AC_CONFIG_SRCDIR(main.cpp)
 
 # Checks for programs.
@@ -172,60 +172,56 @@ fi
 
 
 #
-# Check for ticpp
+# Check for tinyxml
 #
 
-AC_MSG_CHECKING([for ticpp])
+AC_MSG_CHECKING([for tinyxml])
 
-AC_ARG_WITH([ticpp-libdir],
-	    AS_HELP_STRING([--with-ticpp-libdir=DIR],
-		[specify where to find ticpp library (libticpp.a)]),
-	    [ticpp_libdir=$withval],
-	    [ticpp_libdir=""])
+AC_ARG_WITH([tinyxml-libdir],
+	    AS_HELP_STRING([--with-tinyxml-libdir=DIR],
+		[specify where to find tinyxml library (libtinyxml.so)]),
+	    [tinyxml_libdir=$withval],
+	    [tinyxml_libdir=""])
 
-AC_ARG_WITH([ticpp-incdir],
-	    AS_HELP_STRING([--with-ticpp-incdir=DIR],
-		[specify where to find ticpp header files (ticpp.h)]),
-	    [ticpp_incdir=$withval],
-	    [ticpp_incdir=""])
+AC_ARG_WITH([tinyxml-incdir],
+	    AS_HELP_STRING([--with-tinyxml-incdir=DIR],
+		[specify where to find tinyxml header files (tinyxml.h)]),
+	    [tinyxml_incdir=$withval],
+	    [tinyxml_incdir=""])
 
-if test "x$ticpp_incdir" != "x" ; then
-  TICPP_CPPFLAGS="-I$ticpp_incdir"
-elif test -f "../ticpp/ticpp.h" ; then
-  TICPP_CPPFLAGS="-I../ticpp/"
-elif test -f "../ticpp-read-only/ticpp.h" ; then
-  TICPP_CPPFLAGS="-I../ticpp-read-only"
-elif test -f "ticpp-read-only/ticpp.h" ; then
-  TICPP_CPPFLAGS="-Iticpp-read-only"
-elif test -f "ticpp/ticpp.h" ; then
-  TICPP_CPPFLAGS="-Iticpp"
+if test "x$tinyxml_incdir" != "x" ; then
+  TINYXML_CPPFLAGS="-I$tinyxml_incdir"
+elif test -f "../tinyxml/tinyxml.h" ; then
+  TINYXML_CPPFLAGS="-I../tinyxml/"
+elif test -f "/usr/include/tinyxml.h" ; then
+  TINYXML_CPPFLAGS="-I/usr/include"
+elif test -f "tinyxml/tinyxml.h" ; then
+  TINYXML_CPPFLAGS="-Itinyxml"
 else
   AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Unable to find ticpp header files. Try 'svn export http://ticpp.googlecode.com/svn/trunk/ ticpp' or use --with-ticpp-incdir=DIR])
+  AC_MSG_ERROR([Unable to find tinyxml header file (tinyxml.h). Try 'apt-get install tinyxml-dev' or use --with-tinyxml-incdir=DIR])
 fi
 
-if test "x$ticpp_libdir" != "x" ; then
-  if test -f "$ticpp_libdir/libticpp.a" ; then
-    TICPP_LDFLAGS="$ticpp_libdir/libticpp.a"
+if test "x$tinyxml_libdir" != "x" ; then
+  if test -f "$tinyxml_libdir/libtinyxml.so" ; then
+    TINYXML_LDFLAGS="$tinyxml_libdir/libtinyxml.so"
   else
     AC_MSG_RESULT([no])
-    AC_MSG_ERROR([Unable to find libticpp.a in $ticpp_libdir. Is ticpp compiled?])
+    AC_MSG_ERROR([Unable to find libtinyxml.so in $tinyxml_libdir. Is tinyxml compiled?])
   fi
-elif test -f "../ticpp/lib/libticpp.a" ; then
-  TICPP_LDFLAGS="../ticpp/lib/libticpp.a"
-elif test -f "../ticpp-read-only/lib/libticpp.a" ; then
-  TICPP_LDFLAGS="../ticpp-read-only/lib/libticpp.a"
-elif test -f "ticpp-read-only/lib/libticpp.a" ; then
-  TICPP_LDFLAGS="ticpp-read-only/lib/libticpp.a"
-elif test -f "ticpp/lib/libticpp.a" ; then
-  TICPP_LDFLAGS="ticpp/lib/libticpp.a"
+elif test -f "/usr/lib64/libtinyxml.so" ; then
+  TINYXML_LDFLAGS="/usr/lib64/libtinyxml.so"
+elif test -f "/usr/lib/libtinyxml.so" ; then
+  TINYXML_LDFLAGS="/usr/lib/libtinyxml.so"
+elif test -f "../tinyxml/libtinyxml.so" ; then
+  TINYXML_LDFLAGS="../tinyxml/libtinyxml.so"
 else
   AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Unable to find libticpp.a. Try 'svn export http://ticpp.googlecode.com/svn/trunk/ ticpp' and compile source or use --with-ticpp-libdir=DIR])
+  AC_MSG_ERROR([Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR])
 fi
 
-AC_SUBST(TICPP_CPPFLAGS)
-AC_SUBST(TICPP_LDFLAGS)
+AC_SUBST(TINYXML_CPPFLAGS)
+AC_SUBST(TINYXML_LDFLAGS)
 
 AC_MSG_RESULT([yes])
 

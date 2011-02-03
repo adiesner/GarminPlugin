@@ -21,9 +21,6 @@
 #define TCXACTIVITIES_H_INCLUDED
 #include <string>
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
-
 #include "TcxActivity.h"
 
 using namespace std;

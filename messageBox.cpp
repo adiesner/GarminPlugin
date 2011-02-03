@@ -20,8 +20,6 @@
 
 #include "messageBox.h"
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include "log.h"
 
 using namespace std;

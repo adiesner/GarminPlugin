@@ -19,8 +19,6 @@
 #ifndef EDGE800DEVICE_H_INCLUDED
 #define EDGE800DEVICE_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include <string>
 #include <list>
 #include "messageBox.h"

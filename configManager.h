@@ -21,10 +21,10 @@
 #ifndef CONFIGMANAGER_H_INCLUDED
 #define CONFIGMANAGER_H_INCLUDED
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
 #include <string>
 #include "messageBox.h"
+
+#include "tinyxml.h"
 
 using namespace std;
 

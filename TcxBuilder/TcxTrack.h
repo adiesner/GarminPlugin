@@ -21,9 +21,6 @@
 #include "TcxTrackpoint.h"
 #include <vector>
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
-
 using namespace std;
 
 class TcxTrack

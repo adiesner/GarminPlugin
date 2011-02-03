@@ -21,8 +21,7 @@
 
 #include <string>
 
-#define TIXML_USE_TICPP
-#include "ticpp.h"
+#include "tinyxml.h"
 
 using namespace std;
 
