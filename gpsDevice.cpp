@@ -26,7 +26,7 @@ pthread_mutex_t shareVariables_mtx= PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t      waitThreadCond  = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t     waitThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 
-GpsDevice::GpsDevice() : threadId (0) {
+GpsDevice::GpsDevice() : threadId (0), progressState(0) {
 }
 
 GpsDevice::~GpsDevice() {
@@ -35,6 +35,7 @@ GpsDevice::~GpsDevice() {
 }
 
 bool GpsDevice::startThread() {
+    progressState = 0;
     int code = pthread_create(&(this->threadId), NULL, GpsDevice::workerThread, (void*)this);
 
     if (code != 0) {
@@ -89,4 +90,17 @@ void * GpsDevice::workerThread(void * pthis) {
     Log::dbg("Thread finished");
     obj->threadId = 0;
     return NULL;
+}
+
+/**
+ * Default implementation simply increments the counter
+ * with each call to simulate a progress bar
+ */
+int GpsDevice::getProgress() {
+    if (progressState < 100) {
+        progressState++;
+    } else {
+        progressState=0;
+    }
+    return progressState;
 }

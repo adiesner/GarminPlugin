@@ -255,6 +255,14 @@ public:
      */
     virtual int bytesAvailable(string path) = 0;
 
+  /**
+   * Returns the progress of the current read/write state in percentage
+   * Default implementation simply increments the counter with each call
+   * Overwrite to get a real progress bar
+   * @return int with the progress
+   */
+    virtual int getProgress();
+
 protected:
     enum WorkType
     {
@@ -299,6 +307,10 @@ protected:
 
     virtual void doWork() = 0;
 
+  /**
+   * Is used for the progress bar and should be a value between 0 and 100%
+   */
+    int progressState;
 
 private:
   /**

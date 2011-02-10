@@ -365,6 +365,23 @@ void printFinishState(string text, int state) {
 }
 
 /**
+ * Updates the property indicating the progress state
+ * @param title Contains the title of the progress message
+ * @param state Contains the percentage stage (0-100) of the progress
+ */
+void updateProgressBar(string title, int state) {
+    stringstream ss;
+    ss << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>";
+    ss << title;
+    ss << "</Title>\n<Text></Text>\n<Text></Text>\n<Text>";
+    ss << state;
+    ss << "% complete</Text><ProgressBar Type=\"Percentage\" Value=\"";
+    ss << state;
+    ss << "\"/></ProgressWidget>\n";
+	propertyList["ProgressXml"].stringValue = ss.str();
+}
+
+/**
  * Method to unlock the plugin.
  * This method gets called from the outside.
  * Example Parameter: "http://wwwdev.garmin.com","3e2bab85cbc4e17d3ce5b55c8f2aa652"
@@ -475,6 +492,7 @@ bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
  */
 bool methodStartWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
+    updateProgressBar("Write to GPS", 0);
     if (argCount == 1) {
         int deviceId = getIntParameter(args, 0, -1);
 
@@ -546,6 +564,9 @@ bool methodFinishWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argC
                 }
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["GpsTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                updateProgressBar("Write to GPS", 100);
+            } else {
+                updateProgressBar("Write to GPS", currentWorkingDevice->getProgress());
             }
 
             return true;
@@ -651,6 +672,7 @@ bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t a
 
 bool methodStartReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
+    updateProgressBar("Read from GPS", 0);
     if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
         int deviceId = getIntParameter(args, 0, -1);
 
@@ -710,8 +732,10 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
                 propertyList["TcdXml"].stringValue = tcdData;
                 propertyList["TcdXmlz"].stringValue = compressStringData(tcdData, "data.xml.gz");
                 debugOutputPropertyToFile("TcdXml");
+                updateProgressBar("Read from GPS", 100);
+            } else {
+                updateProgressBar("Read from GPS", currentWorkingDevice->getProgress());
             }
-
             return true;
         } else {
             if (Log::enabledInfo()) Log::info("FinishReadFitnessData: No working device specified");
@@ -721,6 +745,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
 }
 
 bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    updateProgressBar("Read FITDIR from GPS", 0);
     if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
         int deviceId = getIntParameter(args, 0, -1);
 
@@ -801,6 +826,9 @@ bool methodFinishReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
                 propertyList["DirectoryListingXml"].stringValue = currentWorkingDevice->getFITData();
                 debugOutputPropertyToFile("DirectoryListingXml");
+                updateProgressBar("Read FITDIR from GPS", 100);
+            } else {
+                updateProgressBar("Read FITDIR from GPS", currentWorkingDevice->getProgress());
             }
 
             return true;
@@ -820,7 +848,7 @@ bool methodCancelReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_
 
 bool methodStartReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
     //  StartReadFitnessDetail(0,"FitnessHistory","2010-02-27T14:23:46Z")
-
+    updateProgressBar("Read fitness detail from GPS", 0);
     if (argCount >= 2) { // What is the second parameter for ? "FitnessHistory"
         int deviceId = getIntParameter(args, 0, -1);
         string id = "";
@@ -887,6 +915,9 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
                 propertyList["TcdXml"].stringValue = tcdData;
                 propertyList["TcdXmlz"].stringValue = compressStringData(tcdData, "data.xml.gz");
                 debugOutputPropertyToFile("TcdXml");
+                updateProgressBar("Read fitness detail from GPS", 100);
+            } else {
+                updateProgressBar("Read fitness detail from GPS", currentWorkingDevice->getProgress());
             }
 
             return true;
@@ -898,6 +929,7 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
 }
 
 bool methodStartReadFromGps(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    updateProgressBar("Read from GPS", 0);
     if (argCount >= 1) {
         int deviceId = getIntParameter(args, 0, -1);
 
@@ -955,6 +987,9 @@ bool methodFinishReadFromGps(NPObject *obj, const NPVariant args[], uint32_t arg
                 string gpxdata = currentWorkingDevice->getGpxData();
                 propertyList["GpsXml"].stringValue = gpxdata;
                 debugOutputPropertyToFile("GpsXml");
+                updateProgressBar("Read from GPS", 100);
+            } else {
+                updateProgressBar("Read from GPS", currentWorkingDevice->getProgress());
             }
 
             return true;
@@ -1030,6 +1065,7 @@ bool methodStartDownloadData(NPObject *obj, const NPVariant args[], uint32_t arg
         return false;
     }
 
+    updateProgressBar("Download to GPS", 0);
     int deviceId = getIntParameter(args, 1, -1);
     if (deviceId != -1) {
         currentWorkingDevice = devManager->getGpsDevice(deviceId);
@@ -1090,7 +1126,11 @@ bool methodFinishDownloadData(NPObject *obj, const NPVariant args[], uint32_t ar
                 }
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["DownloadDataSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                updateProgressBar("Download to GPS", 100);
+            } else {
+                updateProgressBar("Download to GPS", currentWorkingDevice->getProgress());
             }
+
             return true;
         } else {
             if (Log::enabledInfo()) Log::info("FinishDownloadData: No working device specified");
@@ -1135,6 +1175,9 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
                 propertyList["TcdXml"].stringValue = tcdData;
                 propertyList["TcdXmlz"].stringValue = compressStringData(tcdData, "data.xml.gz");
                 debugOutputPropertyToFile("TcdXml");
+                updateProgressBar("Read Fitness Directory from GPS", 100);
+            } else {
+                updateProgressBar("Read Fitness Directory from GPS", currentWorkingDevice->getProgress());
             }
 
             return true;
@@ -1161,6 +1204,7 @@ bool methodStartWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_t
         return false;
     }
 
+    updateProgressBar("Write fitness data to GPS", 0);
     int deviceId = getIntParameter(args, 0, -1);
     if (deviceId != -1) {
         currentWorkingDevice = devManager->getGpsDevice(deviceId);
@@ -1210,6 +1254,9 @@ bool methodFinishWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_
             } else if (result->value.intValue == 3) { // transfer finished
                 //TODO: Is this the correct property?
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                updateProgressBar("Write fitness data to GPS", 100);
+            } else {
+                updateProgressBar("Write fitness data to GPS", currentWorkingDevice->getProgress());
             }
 
             return true;
@@ -1264,7 +1311,7 @@ void initializePropertyList() {
 	value.type = NPVariantType_String;
 	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>2</VersionMajor>\n<VersionMinor>9</VersionMinor>\n<BuildMajor>3</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
 	propertyList["VersionXml"] = value;
-	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>GarminPlugin Status not yet implemented</Title>\n<Text></Text>\n<Text></Text>\n<Text>90% complete</Text><ProgressBar Type=\"Percentage\" Value=\"90\"/></ProgressWidget>\n";
+	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>GarminPlugin Status not yet implemented</Title>\n<Text></Text>\n<Text></Text>\n<Text>0% complete</Text><ProgressBar Type=\"Percentage\" Value=\"0\"/></ProgressWidget>\n";
 	propertyList["ProgressXml"] = value;
 	value.stringValue = "";
 	propertyList["MessageBoxXml"] = value;
