@@ -22,9 +22,13 @@
 #include "log.h"
 #include <mntent.h>
 #include <dirent.h>
+/*
 #include "edge705Device.h"
 #include "edge800Device.h"
 #include "oregonDevice.h"
+*/
+#include "garminFilebasedDevice.h"
+
 #include "edge305Device.h"
 #include "sdCardDevice.h"
 
@@ -137,40 +141,11 @@ void DeviceManager::startFindDevices() {
                         string deviceName = node->GetText();
 
                         GpsDevice * device = NULL;
-                        string::size_type position = deviceName.find( "Oregon", 0 );
-                        if (position == string::npos) {
-                            // Treat the Dakota Model the same as an Oregon Model
-                            position = deviceName.find( "Dakota", 0 );
-                        }
-                        if ((device == NULL) && (position != string::npos)) { // Found Oregon in deviceName
-                            OregonDevice * oregon = new OregonDevice();
-                            oregon->setBaseDirectory(mountPath);
-                            oregon->setDeviceDescription(&doc);
-                            oregon->setDisplayName(deviceName);
-                            device = oregon;
-                        }
-
-                        position = deviceName.find( "Edge 800", 0 );
-                        if ((device == NULL) && (position == string::npos)) {
-                            // Edge 800 and Edge 500 behave the same
-                            position = deviceName.find( "Edge 500", 0 );
-                        }
-                        if ((device == NULL) && (position != string::npos)) {
-                            Edge800Device * edge = new Edge800Device();
-                            edge->setBaseDirectory(mountPath);
-                            edge->setDeviceDescription(&doc);
-                            edge->setDisplayName(deviceName);
-                            device = edge;
-                        }
-
-                        position = deviceName.find( "EDGE", 0 );
-                        if ((device == NULL) && (position != string::npos)) {
-                            Edge705Device * edge = new Edge705Device();
-                            edge->setBaseDirectory(mountPath);
-                            edge->setDeviceDescription(&doc);
-                            edge->setDisplayName(deviceName);
-                            device = edge;
-                        }
+                        GarminFilebasedDevice *fileDev = new GarminFilebasedDevice();
+                        fileDev->setBaseDirectory(mountPath);
+                        fileDev->setDeviceDescription(&doc);
+                        fileDev->setDisplayName(deviceName);
+                        device = fileDev;
 
                         if (device != NULL) {
                             Log::dbg("Found "+deviceName+" at "+mountPath);
@@ -178,7 +153,6 @@ void DeviceManager::startFindDevices() {
                         } else {
                             Log::err("Unknown device "+deviceName+" at "+mountPath);
                         }
-
                     } else {
                         Log::err("GarminDevice.xml has unexpected format!");
                     }

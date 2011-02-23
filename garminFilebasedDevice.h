@@ -27,13 +27,18 @@
 #include "gpsDevice.h"
 #include "log.h"
 
+#include "fit/fitReader.hpp"
+#include "fit/fitMsg.hpp"
+#include "fit/fitMsg_File_ID.hpp"
+#include "fit/fitFileException.hpp"
+
 using namespace std;
 
 class MessageBox;
 
 
 
-class GarminFilebasedDevice : public GpsDevice
+class GarminFilebasedDevice : public GpsDevice, FitMsg_Listener
 {
 public:
     GarminFilebasedDevice();
@@ -200,7 +205,40 @@ public:
      */
     virtual int bytesAvailable(string path);
 
+  /**
+   * Starts a thread that tries to read the fitness data from a garmin device
+   * @return int returns 1 if successful otherwise 0
+   */
+    virtual int startReadFitnessData();
+
+  /**
+   * Returns the status of reading fitness data from the device
+   * @return int     0 = idle    1 = working    2 = waiting    3 = finished
+   */
+    virtual int finishReadFitnessData();
+
+  /**
+   * Gets the fitness data xml
+   * @return xml containing fitness data read from garmin device
+   */
+    virtual string getFitnessData();
+
+    /**
+     * Receives all decoded messages stored in the fit file
+     */
+    virtual void fitMsgReceived(FitMsg *msg);
+
 protected:
+
+    /**
+     * Reads tcx files in the fit directory.
+     */
+    void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);
+
+    /**
+     * Reads file structure of fit directories for ReadFITDirectory
+     */
+    void readFITDirectoryFromDevice();
 
   /**
    * Returns a message for the user. Should be called if finishWriteToGps returns 2 (waiting)
@@ -320,9 +358,21 @@ protected:
      */
    int downloadDataErrorCount;
 
+    enum DirDataType
+    {
+      FITDIR,
+      TCXDIR,
+      GPXDIR,
+      CRSDIR,
+      UNKNOWN
+    };
+
     typedef struct _MassStorageDirectoryType {
+        DirDataType dirType;
         string path;
         string name;
+        string extension;
+        string basename;
         bool writeable;
         bool readable;
     } MassStorageDirectoryType;
@@ -332,6 +382,29 @@ protected:
      */
    list <MassStorageDirectoryType> deviceDirectories;
 
+
+  /**
+   * Stores the fitnessData which was read from the device
+   */
+    string fitnessDataTcdXml;
+
+
+    /**
+     * Stores the id of the track that should be read
+     */
+    string readFitnessDetailId;
+
+    /**
+     * Stores the current xml element where the Fit Message Listener (fitMsgReceived())
+     * should write the file information data to
+     * Needed for the Fit-File Reader
+     */
+    TiXmlElement * fitFileElement;
+
+  /**
+   * Stores the FIT Directory Data which was read from the device
+   */
+    string fitDirectoryXml;
 
 };
 

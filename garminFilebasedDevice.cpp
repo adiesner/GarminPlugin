@@ -22,9 +22,14 @@
 #include <fstream>
 #include "sys/statfs.h"
 #include <limits.h>
+#include <dirent.h>
+#include <vector>
+
+#include "gpsFunctions.h"
 
 GarminFilebasedDevice::GarminFilebasedDevice() {
     this->deviceDescription = NULL;
+    this->fitFileElement = NULL;
 }
 
 GarminFilebasedDevice::~GarminFilebasedDevice() {
@@ -34,6 +39,71 @@ GarminFilebasedDevice::~GarminFilebasedDevice() {
     }
 }
 
+void GarminFilebasedDevice::fitMsgReceived(FitMsg *msg) {
+    if (this->fitFileElement == NULL) { return; }
+
+    if (msg->GetType() == FIT_MESSAGE_FILE_ID) {
+        FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (msg);
+         if (fileid != NULL) {
+
+            if (fileid->GetTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
+                TiXmlElement * timeElem = new TiXmlElement( "CreationTime" );
+                timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(fileid->GetTimeCreated())));
+                this->fitFileElement->LinkEndChild(timeElem);
+            }
+
+            TiXmlElement * fitId = this->fitFileElement->FirstChildElement("FitId");
+                if (fitId == NULL) {
+                fitId = new TiXmlElement( "FitId" );
+                this->fitFileElement->LinkEndChild( fitId );
+            }
+
+            if (fileid->GetTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
+                TiXmlElement * typeElem = new TiXmlElement( "Id" );
+                stringstream ss;
+                ss << (unsigned int)fileid->GetTimeCreated();
+                typeElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(typeElem);
+            }
+
+            if (fileid->GetFileType() != FIT_FILE_ID_TYPE_INVALID) {
+                TiXmlElement * typeElem = new TiXmlElement( "FileType" );
+                stringstream ss;
+                ss << (int)fileid->GetFileType();
+                typeElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(typeElem);
+            }
+
+            if (fileid->GetManufacturer() != FIT_FILE_ID_MANUFACTURER_INVALID) {
+                TiXmlElement * manElem = new TiXmlElement( "Manufacturer" );
+                stringstream ss;
+                ss << fileid->GetManufacturer();
+                manElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(manElem);
+            }
+
+            if (fileid->GetProduct() != FIT_FILE_ID_GARMIN_PRODUCT_INVALID) {
+                TiXmlElement * prodElem = new TiXmlElement( "Product" );
+                stringstream ss;
+                ss << fileid->GetProduct();
+                prodElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(prodElem);
+            }
+
+            if (fileid->GetSerialNumber() != FIT_FILE_ID_SERIAL_NUMBER_INVALID) {
+                TiXmlElement * serElem = new TiXmlElement( "SerialNumber" );
+                stringstream ss;
+                ss << (fileid->GetSerialNumber() & 0xFFFFFFFF);
+                serElem->LinkEndChild(new TiXmlText(ss.str()));
+                fitId->LinkEndChild(serElem);
+            }
+         } else {
+             // Should not happen... internal error msgtype does not fit to class type
+         }
+    } else {
+        // received a message we are not interested in
+    }
+}
 
 string GarminFilebasedDevice::getDeviceDescription() const
 {
@@ -171,12 +241,241 @@ void GarminFilebasedDevice::writeGpxFile() {
 }
 
 void GarminFilebasedDevice::doWork() {
+
     if ((this->workType == WRITEGPX) ||
         (this->workType == WRITEFITNESSDATA)) {
         this->writeGpxFile();
+    } else if (this->workType == READFITNESS) {
+        this->readFitnessDataFromDevice(true, "");
+    } else if (this->workType == READFITNESSDIR) {
+        this->readFitnessDataFromDevice(false, "");
+    } else if (this->workType == READFITNESSDETAIL) {
+        this->readFitnessDataFromDevice(false, this->readFitnessDetailId);
+    } else if (this->workType == READFITDIRECTORY) {
+        this->readFITDirectoryFromDevice();
     } else {
         Log::err("Work Type not implemented!");
     }
+}
+
+/**
+ * Reads TCX directories
+ */
+void GarminFilebasedDevice::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
+    Log::dbg("Thread readFitnessData started");
+/*
+Thread-Status
+    0 = idle
+    1 = working
+    2 = waiting
+    3 = finished
+*/
+    string workDir="";
+    string extension="";
+    lockVariables();
+    this->threadState = 1; // Working
+
+    for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); it++) {
+        MassStorageDirectoryType currentDir = (*it);
+        if ((currentDir.dirType == TCXDIR) &&  (currentDir.name.compare("FitnessHistory") == 0)) {
+            workDir = this->baseDirectory + "/" + currentDir.path;
+            extension = currentDir.extension;
+        }
+    }
+    unlockVariables();
+
+    // Check if the device supports reading tcx files
+    if (workDir.length() == 0) {
+        Log::err("Device does not support reading TCX Files. Element FitnessHistory not found in xml!");
+        lockVariables();
+        this->fitnessDataTcdXml = "";
+        this->threadState = 3; // Finished
+        this->transferSuccessful = false; // Failed;
+        unlockVariables();
+        return;
+    }
+
+    DIR *dp;
+    struct dirent *dirp;
+    vector<string> files = vector<string>();
+
+    if((dp = opendir(workDir.c_str())) == NULL) {
+        Log::err("Error opening fitness directory! "+ workDir);
+
+        lockVariables();
+        this->fitnessDataTcdXml = "";
+        this->threadState = 3; // Finished
+        this->transferSuccessful = false; // Failed;
+        unlockVariables();
+        return;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+        files.push_back(string(dirp->d_name));
+    }
+    closedir(dp);
+
+    TiXmlDocument * output = new TiXmlDocument();
+    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
+    output->LinkEndChild( decl );
+
+    TiXmlElement * train = new TiXmlElement( "TrainingCenterDatabase" );
+    train->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2");
+    train->SetAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance");
+    train->SetAttribute("xsi:schemaLocation","http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd");
+
+    output->LinkEndChild( train );
+
+    TiXmlElement * activities = new TiXmlElement( "Activities" );
+    train->LinkEndChild( activities );
+
+    // Loop over all files in Fitnessdirectory:
+    for (unsigned int i = 0;i < files.size();i++) {
+        if (files[i].find("."+extension)!=string::npos) {
+            TiXmlDocument doc(workDir + "/" + files[i]);
+            if (doc.LoadFile()) {
+                TiXmlElement * train = doc.FirstChildElement("TrainingCenterDatabase");
+                TiXmlElement * inputActivities = train->FirstChildElement("Activities");
+                while ( inputActivities != NULL) {
+                    TiXmlElement * inputActivity =inputActivities->FirstChildElement("Activity");
+                    while ( inputActivity != NULL) {
+
+                        string currentLapId="";
+                        TiXmlElement * idNode = inputActivity->FirstChildElement("Id");
+                        if (idNode != NULL) { currentLapId = idNode->GetText(); }
+
+                        if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
+                            TiXmlNode * newAct = inputActivity->Clone();
+
+                            if (readTrackData) {
+                                // Track data must be deleted
+                                TiXmlNode * node = newAct->FirstChildElement("Lap");
+                                if ((node != NULL) && (node->FirstChildElement("Track") != NULL)) { node->RemoveChild( node->FirstChildElement("Track") );}
+                            }
+
+                            activities->LinkEndChild( newAct );
+
+                            if (Log::enabledDbg()) { Log::dbg("Adding activity "+currentLapId+" from file "+files[i]); }
+                        }
+                        inputActivity = inputActivity->NextSiblingElement( "Activity" );
+                    }
+                    inputActivities = inputActivities->NextSiblingElement( "Activities" );
+                }
+            } else {
+                Log::err("Unable to load fitness file "+files[i]);
+            }
+        }
+    }
+
+    TiXmlPrinter printer;
+    printer.SetIndent( "  " );
+    output->Accept( &printer );
+    string fitnessXml = printer.Str();
+    delete(output);
+
+    lockVariables();
+    this->fitnessDataTcdXml = fitnessXml;
+    this->threadState = 3; // Finished
+    this->transferSuccessful = true; // Successfull;
+    unlockVariables();
+
+    if (Log::enabledDbg()) { Log::dbg("Thread readFitnessData finished"); }
+    return;
+}
+
+void GarminFilebasedDevice::readFITDirectoryFromDevice() {
+    if (Log::enabledDbg()) { Log::dbg("Thread readFITDirectory started");}
+
+    lockVariables();
+    this->threadState = 1; // Working
+    unlockVariables();
+
+
+    TiXmlDocument * output = new TiXmlDocument();
+    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
+    output->LinkEndChild( decl );
+
+    TiXmlElement * dirList = new TiXmlElement( "DirectoryListing" );
+    dirList->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/DirectoryListing/v1");
+    dirList->SetAttribute("RequestedPath","");
+    dirList->SetAttribute("UnitId",deviceId);
+    dirList->SetAttribute("VolumePrefix","");
+    output->LinkEndChild( dirList );
+
+
+    for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); it++) {
+        MassStorageDirectoryType currentFitDir = (*it);
+        if ((currentFitDir.dirType != FITDIR)) {
+            continue;
+        }
+
+        DIR *dp;
+        struct dirent *dirp;
+        string fullPath = this->baseDirectory + "/" + currentFitDir.path;
+
+        if((dp = opendir(fullPath.c_str())) != NULL) {
+
+            if (Log::enabledDbg()) { Log::dbg("Searching for files in "+fullPath);}
+            while ((dirp = readdir(dp)) != NULL) {
+                string fileName = string(dirp->d_name);
+
+                if (fileName.length() > currentFitDir.extension.length()) {
+                    string lastFilePart = fileName.substr(fileName.length() - currentFitDir.extension.length());
+                    if (strncasecmp(lastFilePart.c_str(), currentFitDir.extension.c_str(), currentFitDir.extension.length()) == 0) {
+                        if (Log::enabledDbg()) { Log::dbg("Found file with correct extension: "+fileName);}
+                        this->fitFileElement = new TiXmlElement( "File" );
+                        this->fitFileElement->SetAttribute("IsDirectory","false");
+                        this->fitFileElement->SetAttribute("Path",currentFitDir.path+'/'+fileName);
+
+                        // Opening and parsing of fit file:
+                        string fullFileName = this->baseDirectory + "/" + currentFitDir.path+'/'+fileName;
+
+                        FitReader fit(fullFileName);
+                        fit.registerFitMsgFkt(this);
+                        try {
+                            if (Log::enabledInfo()) { Log::info("Reading fit file: "+fullFileName); }
+                            if (fit.isFitFile()) {
+                                while (fit.readNextRecord()) {
+                                    // processing of records is done in fitMsgReceived()
+                                }
+                                fit.closeFitFile();
+                                dirList->LinkEndChild( this->fitFileElement );
+                            } else {
+                                Log::err("Invalid fit file: "+fullFileName);
+                                delete(this->fitFileElement);
+                            }
+                        } catch (FitFileException &e) {
+                            Log::err("Decoding error: "+e.getError());
+                            delete(this->fitFileElement);
+                        }
+
+                    } else {
+                        if (Log::enabledDbg()) { Log::dbg("Wrong file extension of "+fileName);}
+                    }
+                }
+            }
+            closedir(dp);
+
+        } else {
+            Log::err("Failed to open FitnessDirectory: "+currentFitDir.path);
+        }
+    }
+
+    TiXmlPrinter printer;
+    printer.SetIndent( "  " );
+    output->Accept( &printer );
+    string outputXml = printer.Str();
+    delete(output);
+
+    lockVariables();
+    this->fitDirectoryXml = outputXml;
+    this->threadState = 3; // Finished
+    this->transferSuccessful = true; // Successfull;
+    unlockVariables();
+
+    if (Log::enabledDbg()) { Log::dbg("Thread readFITDirectory finished"); }
+    return;
+
 }
 
 MessageBox * GarminFilebasedDevice::getMessage() {
@@ -276,18 +575,19 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
                     TiXmlElement * transferDirection = node2->FirstChildElement("TransferDirection");
                     string transDir = transferDirection->GetText();
 
-                    MassStorageDirectoryType dirType;
-                    dirType.name = nameText;
+                    MassStorageDirectoryType devDir;
+                    devDir.dirType = UNKNOWN;
+                    devDir.name = nameText;
 
                     if (transDir.compare("InputToUnit") == 0) {
-                        dirType.writeable = true;
-                        dirType.readable  = false;
+                        devDir.writeable = true;
+                        devDir.readable  = false;
                     } else if (transDir.compare("InputOutput") == 0) {
-                        dirType.writeable = true;
-                        dirType.readable  = true;
+                        devDir.writeable = true;
+                        devDir.readable  = true;
                     } else if (transDir.compare("OutputFromUnit") == 0) {
-                        dirType.writeable = false;
-                        dirType.readable  = true;
+                        devDir.writeable = false;
+                        devDir.readable  = true;
                     }
 
                     TiXmlElement * ti_loc = NULL;
@@ -300,23 +600,49 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
                     if (ti_loc!=NULL) { ti_ext      = ti_loc->FirstChildElement("FileExtension"); }
 
                     if (ti_path != NULL) {
-                        dirType.path = ti_path->GetText();
+                        devDir.path = ti_path->GetText();
+                    }
+                    if (ti_basename != NULL) {
+                        devDir.basename = ti_basename->GetText();
                     }
 
-                    if ((nameText.compare("GPSData") == 0) && (dirType.writeable) && (ti_path != NULL) && (ti_ext != NULL)) {
-                        string path = ti_path->GetText();
+                    // Determine Type of directory
+                    string::size_type position = nameText.find( "FIT_TYPE_", 0 );
+                    if ((position != string::npos) || (nameText.compare("FITBinary")==0)) {
+                        devDir.dirType = FITDIR;
+                    } else if ((nameText.compare("FitnessWorkouts")==0) ||
+                        (nameText.compare("FitnessHistory")==0) ||
+                        (nameText.compare("FitnessCourses")==0) ||
+                        (nameText.compare("FitnessUserProfile")==0)) {
+                        devDir.dirType = TCXDIR;
+                    } else if (nameText.compare("GPSData")==0) {
+                        devDir.dirType = GPXDIR;
+                    }
+
+                    if (ti_ext != NULL) {
                         string ext  = ti_ext->GetText();
-                        Log::dbg("Found path: "+ path + " for GPSData");
-                        this->gpxDirectory = this->baseDirectory + "/" + path;
-                        this->gpxFileExtension  = ext;
+                        devDir.extension = ext;
                     }
 
-                    if ((nameText.compare("GPSData") == 0) && (dirType.readable) && (ti_path != NULL) && (ti_basename != NULL) && (ti_ext != NULL)) {
-                        this->fitnessFile = this->baseDirectory + "/" + ti_path->GetText() +"/"+ti_basename->GetText()+"."+ti_ext->GetText();
-                        Log::dbg("Fitness file is: "+this->fitnessFile);
+                    // Debug print
+                    if (Log::enabledDbg()) {
+                        stringstream ss;
+                        if (devDir.dirType == FITDIR) {
+                            ss << "FIT: ";
+                        } else if (devDir.dirType == TCXDIR) {
+                            ss << "TCX: ";
+                        } else if (devDir.dirType == GPXDIR) {
+                            ss << "GPX: ";
+                        } else {
+                            ss << "???: ";
+                        }
+                        ss << "Path: " << devDir.path;
+                        ss << " Ext: " << devDir.extension;
+                        ss << " Name: " << devDir.name;
+                        Log::dbg("Found Feature: "+ss.str());
                     }
 
-                    deviceDirectories.push_back(dirType);
+                    deviceDirectories.push_back(devDir);
 
                     node2 = node2->NextSiblingElement("File");
                 }
@@ -327,35 +653,52 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
 }
 
 int GarminFilebasedDevice::startReadFITDirectory() {
-    Log::err("startReadFITDirectory is not implemented for this device "+this->displayName);
-    return 1;
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device");
+
+    this->workType = READFITDIRECTORY;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
 }
 
 int GarminFilebasedDevice::finishReadFITDirectory() {
-    Log::err("finishReadFITDirectory is not implemented for this device "+this->displayName);
-    return 3; // transfer finished
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
 }
 
 void GarminFilebasedDevice::cancelReadFITDirectory() {
-    Log::err("cancelReadFITDirectory is not implemented for this device "+this->displayName);
+    if (Log::enabledDbg()) { Log::dbg("cancelReadFITDirectory called for "+this->displayName); }
+    cancelThread();
 }
 
 string GarminFilebasedDevice::getFITData() {
-    Log::err("getFITData is not implemented for this device "+this->displayName);
-
-    // Return empty listing
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\
-            <DirectoryListing xmlns=\"http://www.garmin.com/xmlschemas/DirectoryListing/v1\" RequestedPath=\"\" UnitId=\"3815526107\" VolumePrefix=\"\">\
-            </DirectoryListing>";
+    return  fitDirectoryXml;
 }
 
 int GarminFilebasedDevice::startReadFitnessDirectory() {
-    Log::err("Reading fitness directory is not implemented for this device "+this->displayName);
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device");
+
+    this->workType = READFITNESSDIR;
+
+    if (startThread()) {
+        return 1;
+    }
+
     return 0;
 }
 
 int GarminFilebasedDevice::finishReadFitnessDirectory() {
-    return 3; // Finished
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
 }
 
 void GarminFilebasedDevice::cancelReadFitnessData() {
@@ -363,17 +706,28 @@ void GarminFilebasedDevice::cancelReadFitnessData() {
 }
 
 int GarminFilebasedDevice::startReadFitnessDetail(string id) {
-    Log::err("Please implement me GarminFilebasedDevice::startReadFitnessDetail");
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read fitness detail from garmin device: "+this->displayName+ " Searching for "+id);
+
+    this->workType = READFITNESSDETAIL;
+    this->readFitnessDetailId = id;
+
+    if (startThread()) {
+        return 1;
+    }
+
     return 0;
 }
 
 int GarminFilebasedDevice::finishReadFitnessDetail() {
-    Log::err("Please implement me GarminFilebasedDevice::finishReadFitnessDetail");
-    return 0;
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
 }
 
 void GarminFilebasedDevice::cancelReadFitnessDetail() {
-    Log::err("Please implement me GarminFilebasedDevice::cancelReadFitnessDetail");
+    cancelThread();
 }
 
 int GarminFilebasedDevice::startReadFromGps() {
@@ -430,8 +784,20 @@ void GarminFilebasedDevice::cancelReadFromGps() {
 }
 
 string GarminFilebasedDevice::getBinaryFile(string relativeFilePath) {
-    Log::err("getBinaryFile is not yet implemented for "+this->displayName);
-    return "";
+    //TODO: Check for .. in file path. No website should be able to access files outside the garmin device!
+    // Check if site is allowed to read from that directory
+
+    if (Log::enabledDbg()) { Log::dbg("getBinaryFile called for "+this->displayName); }
+    if (Log::enabledDbg()) { Log::dbg("Opening file "+relativeFilePath); }
+    string fullFilePath = this->baseDirectory + '/' + relativeFilePath;
+    std::ifstream in(fullFilePath.c_str());
+    if(!in) {
+        Log::dbg("getBinaryFile unable to open file: "+fullFilePath);
+        return "";
+    }
+    std::stringstream buffer;
+    buffer << in.rdbuf();
+    return buffer.str();
 }
 
 int GarminFilebasedDevice::startDownloadData(string gpsDataString) {
@@ -687,4 +1053,35 @@ int GarminFilebasedDevice::bytesAvailable(string path) {
         Log::err("Error getting bytes available for path: "+fullPath);
         return -1;
     }
+}
+
+int GarminFilebasedDevice::startReadFitnessData() {
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device");
+
+    this->workType = READFITNESS;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int GarminFilebasedDevice::finishReadFitnessData() {
+/*
+    0 = idle
+    1 = working
+    2 = waiting
+    3 = finished
+*/
+
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+string GarminFilebasedDevice::getFitnessData() {
+    return this->fitnessDataTcdXml;
 }
