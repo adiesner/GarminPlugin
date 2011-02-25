@@ -104,3 +104,46 @@ int GpsDevice::getProgress() {
     }
     return progressState;
 }
+
+
+/**
+* Starts an asynchronous file listing operation for a Mass Storage mode device.
+* Only files that are output from the device are listed. </br>
+* The result can be retrieved with getDirectoryXml().
+* Minimum plugin version 2.8.1.0 <br/>
+*
+* @param {String} dataTypeName a DataType from GarminDevice.xml retrieved with DeviceDescription
+* @param {String} fileTypeName a Specification Identifier for a File in dataTypeName from GarminDevice.xml
+* @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
+*/
+int GpsDevice::startReadableFileListing(string dataTypeName, string fileTypeName, bool computeMd5) {
+    Log::err("startReadableFileListing is not implemented for device "+this->displayName);
+    return 0;
+}
+
+/**
+ * Returns the status of the asynchronous file listing operation for the mass storage mode device
+ * @return 0 = idle 1 = working 2 = waiting 3 = finished
+ */
+int GpsDevice::finishReadableFileListing() {
+    Log::err("finishReadableFileListing is not implemented for device "+this->displayName);
+    return 3;
+}
+
+/**
+ * Cancels the asynchronous file listing operation for the mass storage mode device
+ */
+void GpsDevice::cancelReadableFileListing() {
+    Log::err("cancelReadableFileListing is not implemented for device "+this->displayName);
+}
+
+/**
+ * Returns the status of the asynchronous file listing operation
+ * @return string with directory listing
+ */
+string GpsDevice::getDirectoryListingXml() {
+    Log::err("getDirectoryListingXml is not implemented for device "+this->displayName);
+    // Since this is the default implementation, return empty result
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n\
+           <DirectoryListing xmlns=\"http://www.garmin.com/xmlschemas/DirectoryListing/v1\" RequestedPath=\"\" UnitId=\"1234567890\" VolumePrefix=\"\"/>";
+}

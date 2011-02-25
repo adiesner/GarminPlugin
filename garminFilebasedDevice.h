@@ -228,6 +228,37 @@ public:
      */
     virtual void fitMsgReceived(FitMsg *msg);
 
+
+   /**
+    * Starts an asynchronous file listing operation for a Mass Storage mode device.
+    * Only files that are output from the device are listed. </br>
+    * The result can be retrieved with getDirectoryXml().
+    * Minimum plugin version 2.8.1.0 <br/>
+    *
+    * @param {String} dataTypeName a DataType from GarminDevice.xml retrieved with DeviceDescription
+    * @param {String} fileTypeName a Specification Identifier for a File in dataTypeName from GarminDevice.xml
+    * @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
+    * @return int returns 1 if successful otherwise 0
+    */
+    virtual int startReadableFileListing(string dataTypeName, string fileTypeName, bool computeMd5);
+
+    /**
+     * Returns the status of the asynchronous file listing operation for the mass storage mode device
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishReadableFileListing();
+
+    /**
+     * Cancels the asynchronous file listing operation for the mass storage mode device
+     */
+    virtual void cancelReadableFileListing();
+
+    /**
+     * Returns the status of the asynchronous file listing operation
+     * @return string with directory listing
+     */
+    virtual string getDirectoryListingXml();
+
 protected:
 
     /**
@@ -239,6 +270,11 @@ protected:
      * Reads file structure of fit directories for ReadFITDirectory
      */
     void readFITDirectoryFromDevice();
+
+    /**
+     * Reads the file listening from the device
+     */
+    void readFileListingFromDevice();
 
   /**
    * Returns a message for the user. Should be called if finishWriteToGps returns 2 (waiting)
@@ -406,6 +442,26 @@ protected:
    */
     string fitDirectoryXml;
 
+
+   /**
+    * Variable containing the dataTypeName to be read by the asynchronous task READABLEFILELISTING
+    */
+    string readableFileListingDataTypeName;
+
+   /**
+    * Variable containing the FileTypeName to be read by the asynchronous task READABLEFILELISTING
+    */
+    string readableFileListingFileTypeName;
+
+   /**
+    * Variable containing boolean computeMD5 to be read by the asynchronous task READABLEFILELISTING
+    */
+    bool readableFileListingComputeMD5;
+
+  /**
+   * Stores the file listing Data which was read from the device
+   */
+    string readableFileListingXml;
 };
 
 #endif // GARMINFILEBASEDDEVICE_H_INCLUDED

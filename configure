@@ -564,6 +564,8 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+LIBSSL_LDFLAGS
+LIBSSL_CPPFLAGS
 EGREP
 GREP
 CPP
@@ -634,6 +636,7 @@ with_tinyxml_libdir
 with_tinyxml_incdir
 with_garmintools_libdir
 with_garmintools_incdir
+with_ssl_libdir
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1274,6 +1277,9 @@ Optional Packages:
   --with-garmintools-incdir=DIR
                           specify where to find garmintools header files
                           (garmin.h)
+  --with-ssl-libdir=DIR   specify where to find ssl library (libssl.so)
+  --with-ssl-incdir=DIR   specify where to find ssl header files
+                          (openssl/md5.h)
 
 Some influential environment variables:
   CXX         C++ compiler command
@@ -6580,6 +6586,57 @@ fi
 done
 
 CPPFLAGS="$xulrunner_save_CPPFLAGS"
+
+
+# Checks for library ssl.
+#
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ssl" >&5
+$as_echo_n "checking for ssl... " >&6; }
+
+
+# Check whether --with-ssl-libdir was given.
+if test "${with_ssl_libdir+set}" = set; then :
+  withval=$with_ssl_libdir; ssl_libdir=$withval
+else
+  ssl_libdir=""
+fi
+
+
+
+# Check whether --with-garmintools-incdir was given.
+if test "${with_garmintools_incdir+set}" = set; then :
+  withval=$with_garmintools_incdir; ssl_incdir=$withval
+else
+  ssl_incdir=""
+fi
+
+
+if test "x$ssl_incdir" != "x" ; then
+  LIBSSL_CPPFLAGS="-I$ssl_incdir"
+elif test -f "/usr/include/openssl/md5.h" ; then
+  LIBSSL_CPPFLAGS="-I/usr/include/"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+  as_fn_error $? "Unable to find ssl header files. Try 'apt-get install libssl-dev' or use --with-ssl-incdir=DIR" "$LINENO" 5
+fi
+
+if test "x$ssl_libdir" != "x" ; then
+    LIBSSL_LDFLAGS="$ssl_libdir/libssl.so"
+elif test -f "/usr/lib64/libssl.so" ; then
+  LIBSSL_LDFLAGS="/usr/lib64/libssl.so"
+elif test -f "/usr/lib/libssl.so" ; then
+  LIBSSL_LDFLAGS="/usr/lib/libssl.so"
+else
+    LIBSSL_LDFLAGS="-lssl"
+fi
+
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5

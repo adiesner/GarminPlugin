@@ -263,6 +263,37 @@ public:
    */
     virtual int getProgress();
 
+
+   /**
+    * Starts an asynchronous file listing operation for a Mass Storage mode device.
+    * Only files that are output from the device are listed. </br>
+    * The result can be retrieved with getDirectoryXml().
+    * Minimum plugin version 2.8.1.0 <br/>
+    *
+    * @param {String} dataTypeName a DataType from GarminDevice.xml retrieved with DeviceDescription
+    * @param {String} fileTypeName a Specification Identifier for a File in dataTypeName from GarminDevice.xml
+    * @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
+    * @return int returns 1 if successful otherwise 0
+    */
+    virtual int startReadableFileListing(string dataTypeName, string fileTypeName, bool computeMd5);
+
+    /**
+     * Returns the status of the asynchronous file listing operation for the mass storage mode device
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishReadableFileListing();
+
+    /**
+     * Cancels the asynchronous file listing operation for the mass storage mode device
+     */
+    virtual void cancelReadableFileListing();
+
+    /**
+     * Returns the status of the asynchronous file listing operation
+     * @return string with directory listing
+     */
+    virtual string getDirectoryListingXml();
+
 protected:
     enum WorkType
     {
@@ -272,7 +303,8 @@ protected:
       READFITNESSDETAIL,
       READFROMGPS,
       READFITDIRECTORY,
-      WRITEFITNESSDATA
+      WRITEFITNESSDATA,
+      READABLEFILELISTING
     };
     WorkType workType;
 

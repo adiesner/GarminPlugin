@@ -27,6 +27,9 @@
 
 #include "gpsFunctions.h"
 
+#include <openssl/md5.h>
+
+
 GarminFilebasedDevice::GarminFilebasedDevice() {
     this->deviceDescription = NULL;
     this->fitFileElement = NULL;
@@ -253,9 +256,151 @@ void GarminFilebasedDevice::doWork() {
         this->readFitnessDataFromDevice(false, this->readFitnessDetailId);
     } else if (this->workType == READFITDIRECTORY) {
         this->readFITDirectoryFromDevice();
+    } else if (this->workType == READABLEFILELISTING) {
+        this->readFileListingFromDevice();
     } else {
         Log::err("Work Type not implemented!");
     }
+}
+
+#define MD5READBUFFERSIZE 1024*16
+
+void GarminFilebasedDevice::readFileListingFromDevice() {
+    if (Log::enabledDbg()) { Log::dbg("Thread readFileListing started"); }
+
+    string workDir="";
+    string extensionToRead="";
+    string pathOnDevice = "";
+    string basename = "";
+
+    lockVariables();
+    this->threadState = 1; // Working
+    bool doCalculateMd5 = this->readableFileListingComputeMD5;
+
+    for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); it++) {
+        MassStorageDirectoryType currentDir = (*it);
+        if ((currentDir.extension.compare(this->readableFileListingFileTypeName) == 0) &&  (currentDir.name.compare(this->readableFileListingDataTypeName) == 0) && (currentDir.readable)) {
+            workDir = this->baseDirectory + "/" + currentDir.path;
+            extensionToRead = currentDir.extension;
+            pathOnDevice = currentDir.path;
+            basename = currentDir.basename;
+        }
+    }
+    unlockVariables();
+
+
+    TiXmlDocument * output = new TiXmlDocument();
+    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
+    output->LinkEndChild( decl );
+
+    TiXmlElement * dirList = new TiXmlElement( "DirectoryListing" );
+    dirList->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/DirectoryListing/v1");
+    dirList->SetAttribute("RequestedPath","");
+    dirList->SetAttribute("UnitId",this->deviceId);
+    dirList->SetAttribute("VolumePrefix","");
+    output->LinkEndChild( dirList );
+
+    if (workDir.length() > 0) {
+        DIR *dp;
+        struct dirent *dirp;
+
+        if (Log::enabledDbg()) { Log::dbg("Found directory to read: "+workDir); }
+
+        if((dp = opendir(workDir.c_str())) != NULL) {
+            while ((dirp = readdir(dp)) != NULL) {
+                string fileName = string(dirp->d_name);
+                string fullFileName = workDir+'/'+fileName;
+                bool isDirectory = (dirp->d_type == 4) ? true : false;
+
+                if (Log::enabledDbg()) { Log::dbg("Found file: "+fileName); }
+                if ((fileName == ".") || (fileName == "..")) { continue; }
+
+                // Check file extension
+                string lastFilePart = fileName.substr(fileName.length() - extensionToRead.length());
+                if (strncasecmp(lastFilePart.c_str(), extensionToRead.c_str(), extensionToRead.length()) != 0) {
+                    if (Log::enabledDbg()) { Log::dbg("Found file with incorrect extension: "+fileName);}
+                    continue;
+                }
+
+                // Check basename if set
+                if (basename.length()>0) {
+                    string firstFilePart = fileName.substr(0, basename.length());
+                    if (strncasecmp(firstFilePart.c_str(), basename.c_str(), basename.length()) != 0) {
+                        if (Log::enabledDbg()) { Log::dbg("Found file with incorrect basename: "+fileName);}
+                        continue;
+                    }
+                }
+
+                TiXmlElement * curFile = new TiXmlElement( "File" );
+                if (isDirectory) {
+                    curFile->SetAttribute("IsDirectory","true");
+                } else {
+                    curFile->SetAttribute("IsDirectory","false");
+                }
+                curFile->SetAttribute("Path",pathOnDevice+'/'+fileName);
+
+                // Get File Size
+                struct stat filestatus;
+                stat( fullFileName.c_str(), &filestatus );
+                stringstream ss;
+                ss << filestatus.st_size;
+                curFile->SetAttribute("Size",ss.str());
+
+                // Get the timestamp
+                TiXmlElement * timeElem = new TiXmlElement( "CreationTime" );
+                timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(filestatus.st_mtime-TIME_OFFSET)));
+                curFile->LinkEndChild(timeElem);
+
+
+                if ((!isDirectory) && (doCalculateMd5)) {
+                    if (Log::enabledDbg()) { Log::dbg("Calculating MD5 sum of " + fullFileName);}
+                    MD5_CTX c;
+                    unsigned char md[MD5_DIGEST_LENGTH];
+                    unsigned char buf[MD5READBUFFERSIZE];
+                    FILE *f = fopen(fullFileName.c_str(),"r");
+                    int fd=fileno(f);
+                    MD5_Init(&c);
+                    for (;;) {
+                        int i=read(fd,buf,MD5READBUFFERSIZE);
+                        if (i <= 0) break;
+                        MD5_Update(&c,buf,(unsigned long)i);
+                    }
+                    MD5_Final(&(md[0]),&c);
+                    string md5="";
+                    for (int i=0; i<MD5_DIGEST_LENGTH; i++) {
+                        char temp[16];
+                        sprintf(temp, "%02x",md[i]);
+                        md5 += temp;
+
+                    }
+                    curFile->SetAttribute("MD5Sum",md5);
+                }
+
+                dirList->LinkEndChild( curFile );
+            }
+            closedir(dp);
+        } else {
+            Log::err("Error opening directory! "+ workDir);
+        }
+    } else {
+        if (Log::enabledDbg()) { Log::dbg("No directory found to read"); }
+    }
+
+
+    TiXmlPrinter printer;
+    printer.SetIndent( "  " );
+    output->Accept( &printer );
+    string outputXml = printer.Str();
+    delete(output);
+
+    lockVariables();
+    this->threadState = 3; // Finished
+    this->readableFileListingXml = outputXml;
+    this->transferSuccessful = true; // Successfull;
+    unlockVariables();
+
+    if (Log::enabledDbg()) { Log::dbg("Thread readFileListing finished"); }
+    return;
 }
 
 /**
@@ -418,6 +563,9 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
             if (Log::enabledDbg()) { Log::dbg("Searching for files in "+fullPath);}
             while ((dirp = readdir(dp)) != NULL) {
                 string fileName = string(dirp->d_name);
+                bool isDirectory = (dirp->d_type == 4) ? true : false;
+
+                if (isDirectory) { continue; } // Ignore directories
 
                 if (fileName.length() > currentFitDir.extension.length()) {
                     string lastFilePart = fileName.substr(fileName.length() - currentFitDir.extension.length());
@@ -448,7 +596,6 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
                             Log::err("Decoding error: "+e.getError());
                             delete(this->fitFileElement);
                         }
-
                     } else {
                         if (Log::enabledDbg()) { Log::dbg("Wrong file extension of "+fileName);}
                     }
@@ -1084,4 +1231,65 @@ int GarminFilebasedDevice::finishReadFitnessData() {
 
 string GarminFilebasedDevice::getFitnessData() {
     return this->fitnessDataTcdXml;
+}
+
+
+
+/**
+* Starts an asynchronous file listing operation for a Mass Storage mode device.
+* Only files that are output from the device are listed. </br>
+* The result can be retrieved with getDirectoryXml().
+* Minimum plugin version 2.8.1.0 <br/>
+*
+* @param {String} dataTypeName a DataType from GarminDevice.xml retrieved with DeviceDescription
+* @param {String} fileTypeName a Specification Identifier for a File in dataTypeName from GarminDevice.xml
+* @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
+*/
+int GarminFilebasedDevice::startReadableFileListing(string dataTypeName, string fileTypeName, bool computeMd5) {
+
+    lockVariables();
+    this->threadState = 1;
+    this->readableFileListingDataTypeName = dataTypeName;
+    this->readableFileListingFileTypeName = fileTypeName;
+    this->readableFileListingComputeMD5   = computeMd5;
+    this->readableFileListingXml = "";
+    unlockVariables();
+
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read file listing from garmin device "+this->displayName);
+
+    this->workType = READABLEFILELISTING;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+/**
+ * Returns the status of the asynchronous file listing operation for the mass storage mode device
+ * @return 0 = idle 1 = working 2 = waiting 3 = finished
+ */
+int GarminFilebasedDevice::finishReadableFileListing() {
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+/**
+ * Cancels the asynchronous file listing operation for the mass storage mode device
+ */
+void GarminFilebasedDevice::cancelReadableFileListing() {
+    if (Log::enabledDbg()) { Log::dbg("cancelReadableFileListing for device "+this->displayName); }
+    cancelThread();
+}
+
+/**
+ * Returns the status of the asynchronous file listing operation
+ * @return string with directory listing
+ */
+string GarminFilebasedDevice::getDirectoryListingXml() {
+    return this->readableFileListingXml;
 }
