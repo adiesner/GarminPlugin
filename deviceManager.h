@@ -80,6 +80,13 @@ private:
     vector<GpsDevice *> gpsDeviceList;
 
     TiXmlDocument * configuration;
+
+    /**
+     * Searches for an attribute with the name attrName in xmlElement
+     * If attribute is found, it is checked for true/false values
+     * If not exists or unknown value, defaultValue will be returned
+     */
+    bool getXmlBoolAttribute(TiXmlElement * xmlElement, string attrName, bool defaultValue);
 };
 
 #endif // DEVICEMANAGER_H_INCLUDED

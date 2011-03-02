@@ -91,7 +91,7 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 
 /*  <GarminPlugin logfile="" level="ERROR">
       <Devices>
-        <Device>
+        <Device enabled="false">
           <Name>My Oregon 300</Name>
           <StoragePath>/tmp</StoragePath>
           <StorageCommand></StorageCommand>
@@ -108,6 +108,7 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 	plugin->LinkEndChild( devices );
 
 	TiXmlElement * device = new TiXmlElement( "Device" );
+	device->SetAttribute("enabled", "false");
 	devices->LinkEndChild( device );
 
 	TiXmlElement * name = new TiXmlElement( "Name" );

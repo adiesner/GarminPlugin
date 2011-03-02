@@ -22,16 +22,13 @@
 #include "log.h"
 #include <mntent.h>
 #include <dirent.h>
-/*
-#include "edge705Device.h"
-#include "edge800Device.h"
-#include "oregonDevice.h"
-*/
 #include "garminFilebasedDevice.h"
 
 #include "edge305Device.h"
 #include "sdCardDevice.h"
 
+#include <algorithm>
+#include <string>
 
 DeviceManager::DeviceManager()
 {
@@ -174,20 +171,9 @@ void DeviceManager::startFindDevices() {
         if (pRoot != NULL) { settings = pRoot->FirstChildElement("Settings"); }
         if (settings != NULL) { ftools = settings->FirstChildElement("ForerunnerTools"); } else { Log::dbg("settings is null!"); }
         if (ftools != NULL) {
-            const char * ftoolsEnabled = ftools->Attribute("enabled");
-
-            if (ftoolsEnabled != NULL) {
-                string enabledStr = ftoolsEnabled;
-                if ((enabledStr == "yes") || (enabledStr == "YES") || (enabledStr == "true") || (enabledStr == "TRUE") || (enabledStr == "1")) {
-                    searchGarmin = true;
-                } else {
-                    searchGarmin = false;
-                }
-            } else {
-				Log::dbg("ftoolsEnabled is null!");
-			}
+            searchGarmin = getXmlBoolAttribute(ftools, "enabled", true);
         } else {
-			Log::dbg("ftools is null!");
+			Log::dbg("Xml Element ForerunnerTools is null!");
 		}
     }
 
@@ -213,6 +199,7 @@ void DeviceManager::startFindDevices() {
             TiXmlElement * device = devices->FirstChildElement("Device");
             while ( device != NULL )
             {
+                bool deviceEnabled = getXmlBoolAttribute(device, "enabled", true);;
                 string storagePath = "";
                 string storageCmd = "";
                 string fitnessPath = "";
@@ -231,7 +218,17 @@ void DeviceManager::startFindDevices() {
 
                 GpsDevice * currentDevice = NULL;
                 TiXmlElement * name = device->FirstChildElement("Name");
-                if (name!=NULL) {
+
+                if ((!deviceEnabled) && (Log::enabledDbg())) {
+                    if ((name!=NULL) && (name->GetText() != NULL)) {
+                        string outputName = name->GetText();
+                        Log::dbg("Found disabled device "+outputName+" in configuration.");
+                    } else {
+                        Log::dbg("Found disabled device with no name in configuration.");
+                    }
+                }
+
+                if ((deviceEnabled) && (name!=NULL)) {
                     if (name->GetText() != NULL) {
                         for(unsigned int i=0; i < gpsDeviceList.size(); i++)
                         {
@@ -294,4 +291,26 @@ GpsDevice * DeviceManager::getGpsDevice(int number)
         return gpsDeviceList[number];
     }
     return NULL;
+}
+
+
+bool DeviceManager::getXmlBoolAttribute(TiXmlElement *xmlElement, string attrName, bool defaultValue) {
+    if (xmlElement == NULL) {
+        return defaultValue;
+    }
+    const char * boolStringValue = xmlElement->Attribute(attrName.c_str());
+
+    if (boolStringValue != NULL) {
+        string trueFalseStr = boolStringValue;
+        transform(trueFalseStr.begin(), trueFalseStr.end(), trueFalseStr.begin(), ::tolower );
+        if ((trueFalseStr == "yes") || (trueFalseStr == "true") || (trueFalseStr == "1")) {
+            return true;
+        } else if ((trueFalseStr == "no") || (trueFalseStr == "false") || (trueFalseStr == "0")) {
+            return false;
+        } else {
+            return defaultValue;
+        }
+    } else {
+        return defaultValue;
+    }
 }
