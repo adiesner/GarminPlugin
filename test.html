@@ -1,196 +1,478 @@
 <!DOCTYPE html>
 <html>
 	<head>
-	<title>Aplix Foo Plugin Test</title>
-	</head>
-	<body>
-	<script type="text/javascript">
-		function VersionXml() {
-			try {
-				alert(document.getElementById("pluginobj").VersionXml());
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
+	<title>Test Garmin Device Output</title>
+	<script type="text/javascript" src="http://developer.garmin.com/web/communicator-api/prototype/prototype.js">&#160;</script>
+	<script type="text/javascript" src="http://developer.garmin.com/web/communicator-api/garmin/device/GarminDeviceDisplay.js">&#160;</script> 
+	<!--<script type="text/javascript" src="http://developer.garmin.com/web/communicator-api/garmin/device/GarminDeviceControl.js">&#160;</script> -->
 
-		function PropertyVersionXml() {
-			try {
-				document.getElementById("debug1").value = document.getElementById("pluginobj").VersionXml;
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
+<style type="text/css">
+.resultBox {
+	font-size: 14px;
+	border-style: solid;
+	border-color: black;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-width: 1px;
+	border-bottom-width: 1px;   
+    overflow:auto;
+}
 
-		function PropertyGpsTransferSucceeded() {
-			try {
-				alert(document.getElementById("pluginobj").GpsTransferSucceeded);
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
+.tab { 
+	font-family: verdana,sans-serif; 
+	font-size: 14px;
+	width: 120px;
+	white-space: nowrap;
+	text-align: center;
+	border-style: solid;
+	border-color: black;
+	border-left-width: 1px;
+	border-right-width: 1px;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	cursor: pointer;
+	}
+.tabhold { 
+	background-color: white;
+	color: black;
+	}
+.tabfocus { 
+	background-color: black;
+	color: white;
+	}
+.tabcontent { 
+	font-family: sans-serif; 
+	font-size: 14px;
+	width: 800px;
+	height: 600px;
+	border-style: solid;
+	border-color: black;
+	border-width: 1px;
+	padding-top: 15px;
+	padding-left: 10px;
+	padding-right: 10px;
+	}
+</style>
 
-		function PropertyLocked() {
-			try {
-				alert(document.getElementById("pluginobj").Locked);
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-		function StartFindDevices() {
-			try {
-				document.getElementById("pluginobj").StartFindDevices();
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function DeviceDescription() {
-			var number = document.getElementById("deviceid").value;
-			number = number * 1;
-			try {
-				document.getElementById("debug1").value= document.getElementById("pluginobj").DeviceDescription(number);
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function Unlock() {
-			var number = document.getElementById("deviceid").value;
-			number = number * 1;
-			try {
-				document.getElementById("debug1").value= document.getElementById("pluginobj").Unlock("http://wwwdev.garmin.com","3e2bab85cbc4e17d3ce5b55c8f2aa652");
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function StartReadFitnessData() {
-			var number = document.getElementById("deviceid").value;
-			number = number * 1;
-			try {
-				document.getElementById("pluginobj").StartReadFitnessData(number);
-                document.getElementById("debug1").value= "Done";
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function ReadTcdXml() {
-			try {
-				document.getElementById("debug1").value = document.getElementById("pluginobj").TcdXml;
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function FinishReadFitnessData() {
-			try {
-				document.getElementById("debug2").value = document.getElementById("pluginobj").FinishReadFitnessData();
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function WriteToDevice() {
-			var number = document.getElementById("deviceid").value;
-			number = number * 1;
-			var filename = document.getElementById("filename").value;
-			var content = document.getElementById("filecontent").value;
 
-			try {
-				document.getElementById("pluginobj").GpsXml = content;
-				document.getElementById("pluginobj").FileName = filename;
-				document.getElementById("debug2").value = document.getElementById("pluginobj").StartWriteToGps(number);
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function DevicesXmlString() {
-			try {
-				document.getElementById("debug2").value = document.getElementById("pluginobj").DevicesXmlString();
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function CancelReadFitnessData() {
-			try {
-				document.getElementById("debug2").value = document.getElementById("pluginobj").CancelReadFitnessData();
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function StartReadFITDirectory() {
-			try {
-				var number = document.getElementById("deviceid").value;
-				number = number * 1;
-				document.getElementById("debug2").value = document.getElementById("pluginobj").StartReadFITDirectory(number);
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function StartReadFitnessDirectory() {
-			try {
-				var number = document.getElementById("deviceid").value;
-				number = number * 1;
-				document.getElementById("debug2").value = document.getElementById("pluginobj").StartReadFitnessDirectory(number,"FitnessHistory");
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
-        function FinishReadFitnessDirectory() {
-			try {
-				document.getElementById("debug2").value = document.getElementById("pluginobj").FinishReadFitnessDirectory();
-			}
-			catch(e) {
-				alert(e);
-			}
-		}
+	<script type="text/javascript">	
+
+        function showDiv(id) {
+            var box = new Array();
+            box[0] = 'readDataFromDeviceDiv';
+            box[1] = 'getDeviceInfoDiv';
+            box[2] = 'onFinishReadFromDeviceDiv';           
+            box[3] = 'writeDataToDeviceDiv';
+
+            var tabId = new Array();
+            tabId[0] = 'readDataFromDeviceDivTab';
+            tabId[1] = 'getDeviceInfoDivTab';
+            tabId[2] = 'onFinishReadFromDeviceDivTab';
+            tabId[3] = 'writeDataToDeviceDivTab';
+
+            for(i=0;i<box.length;i++) {
+                document.getElementById(tabId[i]).setAttribute("class", "tab tabhold"); 
+                document.getElementById(box[i]).style.display="none";
+            }
+            document.getElementById(id).style.display="block";
+            document.getElementById(id+"Tab").setAttribute("class", "tab tabfocus"); 
+        }
+
+        function xml2html(xmlText) {
+            xmlText = xmlText.replace(/</g, "&#60;");
+            xmlText = xmlText.replace(/>/g, "&#62;");
+            xmlText = xmlText.replace(/\n/g, "<br>");
+            return xmlText;
+        }
+
+        function getSupportedString(type,internaltype) {
+            var supStr=type + " = ";
+            if (globalGarminController.checkDeviceReadSupport(internaltype)) {
+                supStr = "<font color=\"#00AA00\">" + supStr + "Supported </font>| "; 
+            } else {
+                supStr = "<font color=\"#FF0000\">" + supStr + "NOT Supported </font>| "; 
+            }
+            return supStr;
+        }
+
+        function updateSupportedDiv(first,second) {
+            var supportedTypes = "";
+
+            supportedTypes = supportedTypes + getSupportedString("Gpx","GPSData");
+            supportedTypes = supportedTypes + getSupportedString("gpxDetail","GPSDataDetail");
+            supportedTypes = supportedTypes + getSupportedString("gpxDir","GPSDataDirectory");
+            supportedTypes = supportedTypes + getSupportedString("tcxDir","FitnessHistoryDirectory");
+            supportedTypes = supportedTypes + getSupportedString("crsDir","FitnessCoursesDirectory");
+            supportedTypes = supportedTypes + getSupportedString("fit","FITBinary");
+            supportedTypes = supportedTypes + getSupportedString("fitDir","FitDirectory");
+            supportedTypes = supportedTypes + getSupportedString("Tcx","FitnessHistory");
+            supportedTypes = supportedTypes + getSupportedString("Crs","FitnessCourses");
+            supportedTypes = supportedTypes + getSupportedString("Wkt","FitnessWorkouts");
+            supportedTypes = supportedTypes + getSupportedString("Goals","FitnessActivityGoals");
+            supportedTypes = supportedTypes + getSupportedString("TcxProfile","FitnessUserProfile");
+
+            document.getElementById("deviceSupportDiv").innerHTML = supportedTypes;
+        }
+
+        GarminPluginListener = Class.create();
+        GarminPluginListener.prototype = {
+
+            initialize: function() {
+            },
+    
+            onFinishFindDevices: function(json) {
+                if(json.controller.numDevices > 0) {
+                    var devices = json.controller.getDevices();
+
+                    var selectHtml = "Devices found: <select name=\"garminDeviceId\" id=\"garminDeviceId\" onchange=\"globalGarminController.setDeviceNumber(this.value);updateSupportedDiv();\">";
+
+                    for(i=0;i<json.controller.numDevices;i++) {
+                        selectHtml = selectHtml + "<option value=\"" + devices[i].getNumber() + "\">" + devices[i].getDisplayName() +"</option>";
+                    }
+                    selectHtml = selectHtml + "</select>";
+                    document.getElementById("garminDisplay").innerHTML = selectHtml;
+                    updateSupportedDiv();
+                } else {
+                    document.getElementById("garminDisplay").innerHTML = "<b>No devices found!</b>";
+                }
+            },
+
+            onProgressReadFromDevice: function(json) {
+            	document.getElementById("pluginProgressState").innerHTML = "Progress: "+ json.progress.getPercentage();
+            },
+
+            onProgressWriteToDevice: function(json) {
+            	document.getElementById("pluginProgressState").innerHTML = "Progress: "+ json.progress.getPercentage();
+            },
+
+            onFinishReadFromDevice: function(json) {
+                document.getElementById("pluginProgressState").innerHTML = "";
+                if (json.success) {                    
+                    document.getElementById("statusOnFinishReadFromDevice").innerHTML = "<font color=\"#00AA00\">Status: Success</font>";
+                } else {
+                    document.getElementById("statusOnFinishReadFromDevice").innerHTML = "<font color=\"#FF0000\">Status: Failed</font>";
+                }
+                document.getElementById("onFinishReadFromDeviceGpsXml").innerHTML = "";
+                document.getElementById("onFinishReadFromDeviceGpsXml").innerHTML = xml2html(json.controller.gpsDataString);
+                showDiv("onFinishReadFromDeviceDiv");
+            },
+
+            onFinishWriteToDevice: function(json) {
+                document.getElementById("pluginProgressState").innerHTML = "";
+                if (json.success) {
+                    document.getElementById("statusWriteDataToDevice").innerHTML = "<font color=\"#00AA00\">Successfully written!</font>";
+                } else {
+                    document.getElementById("statusWriteDataToDevice").innerHTML = "<font color=\"#FF0000\">Failed to write!</font>";                
+                }
+            },
+
+            onWaitingWriteToDevice: function(json) {
+                if(confirm(json.message.getText())) {
+                    json.controller.respondToMessageBox(true);
+                } else {
+                    json.controller.respondToMessageBox(false);
+                }
+            },
+
+            onWaitingReadFromDevice: function(json) {
+                if(confirm(json.message.getText())) {
+                    json.controller.respondToMessageBox(true);
+                } else {
+                    json.controller.respondToMessageBox(false);
+                }
+                
+            },
+
+        }
+
+	    var globalGarminController;
+
+        function detectGarminDevice() {
+            try {
+	            var pluginRequiredVersion  = [2,2,0,1];
+            	var pluginLatestVersion    = [2,5,2,0];
+                globalGarminController = new Garmin.DeviceControl();
+                var listener = new GarminPluginListener();
+		        globalGarminController.register(listener);
+		        globalGarminController.setPluginRequiredVersion(pluginRequiredVersion);
+		        globalGarminController.setPluginLatestVersion(pluginLatestVersion);
+		        globalGarminController.validatePlugin();
+
+                var unlockKeyPair = ["file:///","cb1492ae040612408d87cc53e3f7ff3c"];
+			    if(!globalGarminController.unlock(unlockKeyPair)) {
+                    document.getElementById("garminDisplay").innerHTML = "<b>Unable to unlock device!</b>";
+                    return;
+                }
+
+                if (!globalGarminController.isUnlocked()) {                    
+                    document.getElementById("garminDisplay").innerHTML = "<b>Device was not unlocked!</b>";
+                    return;
+                }
+
+                document.getElementById("garminDisplay").innerHTML = "Searching for devices...";
+                globalGarminController.findDevices();
+	        } catch (e) {
+	            alert(e);
+	        }
+        }
+
+
+        function callGetDevicesXmlString()  {
+            try {
+				document.getElementById("callGetDevicesXmlStringResult").innerHTML = xml2html(document.getElementById("GarminNetscapePlugin").DevicesXmlString());
+	        } catch (e) {
+	            alert(e);
+	        }
+        }
+
+        function callGetDeviceDescription()  {
+            try {
+                var number = globalGarminController.getDeviceNumber();
+				document.getElementById("callGetDeviceDescriptionResult").innerHTML = xml2html(document.getElementById("GarminNetscapePlugin").DeviceDescription(number));
+	        } catch (e) {
+	            alert(e);
+	        }
+        }
+
+
+        function callReadDataFromDevice() {
+            try {
+                var fileType = document.getElementById("readDataFromDeviceDataType").value;
+                var fileListingOptions = [{dataTypeName: 'UserDataSync',
+                        dataTypeID: 'http://www.topografix.com/GPX/1/1',
+                        computeMD5: false}];
+                fileListingOptions[0].dataTypeName = document.getElementById("readDataFromDeviceDir").value;
+                fileListingOptions[0].dataTypeID = document.getElementById("readDataFromDeviceExtension").value;
+
+                if (document.getElementById("readDataFromDeviceCalcMd5").checked) {
+                    fileListingOptions[0].computeMD5 = true;
+                }
+				globalGarminController.readDataFromDevice(fileType, fileListingOptions);
+	        } catch (e) {
+	            alert(e);
+	        }
+        }
+
+        function callReadDetailFromDevice() {
+            try {
+                var fileType = document.getElementById("readDetailFromDeviceDataType").value;
+                var id = document.getElementById("readDetailFromDeviceId").value;
+				globalGarminController.readDetailFromDevice(fileType, id);
+	        } catch (e) {
+	            alert(e);
+	        }
+        }
+
+        function readDataFromDeviceDataTypeOnClick() {
+            if (document.getElementById("readDataFromDeviceDataType").value == "ReadableFilesDirectory") {
+                document.getElementById("readDataFromDeviceExtension").disabled = false;
+                document.getElementById("readDataFromDeviceDir").disabled = false;
+                document.getElementById("readDataFromDeviceCalcMd5").disabled = false;
+            } else {
+                document.getElementById("readDataFromDeviceExtension").disabled = true;
+                document.getElementById("readDataFromDeviceDir").disabled = true;
+                document.getElementById("readDataFromDeviceCalcMd5").disabled = true;
+            }
+        }
+
+        function callWriteDataToDevice() {
+            try {
+                var fileType = document.getElementById("writeDataToDeviceFileType").value;
+                var fileName = document.getElementById("writeDataToDeviceFileName").value;
+                var fileContent = document.getElementById("writeDataToDeviceFileContent").value;
+				globalGarminController.writeDataToDevice(fileType, fileContent, fileName);
+	        } catch (e) {
+	            alert(e);
+	        }            
+        }
+
+        function callDownloadDataToDevice() {
+            try {
+                var fileUrl = document.getElementById("downloadDataToDeviceURL").value;
+                var fileDestination = document.getElementById("downloadDataToDeviceDestination").value;
+                var xml =
+					'<?xml version="1.0" encoding="UTF-8"?>\n' +
+					'<DeviceDownload xmlns="http://www.garmin.com/xmlschemas/PluginAPI/v1"\n' +
+					' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n' +
+					' xsi:schemaLocation="http://www.garmin.com/xmlschemas/PluginAPI/v1 http://www.garmin.com/xmlschemas/GarminPluginAPIV1.xsd">\n';
+				xml += ' <File Source="'+fileUrl+'" Destination="'+fileDestination+'" RegionId="46" />\n';
+				xml += '</DeviceDownload>';
+				globalGarminController.downloadToDevice(xml);
+	        } catch (e) {
+	            alert(e);
+	        }            
+        }
+
+        function callGetBinaryFile() {
+            try {
+                var fileName = document.getElementById("getBinaryFilePath").value;
+                var number = globalGarminController.getDeviceNumber();
+                globalGarminController.getBinaryFile(number, fileName);
+	        } catch (e) {
+	            alert(e);
+	        }                   
+        }
+
+        function callBytesAvailable() {
+            try {
+                var path = document.getElementById("bytesAvailablePath").value;
+                document.getElementById("resultBytesAvailable").innerHTML = globalGarminController.bytesAvailable(path) + " Bytes";
+	        } catch (e) {
+	            alert(e);
+	        }                   
+        }
 
 	</script>
-	<p>
-<h>Plugin Specific</h>
-        <button onclick='PropertyVersionXml()'>Get Property VersionXml</button>
-        <button onclick='Unlock()'>Unlock</button>
-        <button onclick='PropertyLocked()'>Get Int Property Locked</button>
-<hr>
-<h>Search devices</h>
-        <button onclick='StartFindDevices()'>1. StartFindDevices</button>
-        <button onclick='DevicesXmlString()'>2. DevicesXmlString</button>
-        <button onclick='DeviceDescription()'>3. DeviceDescription</button>
-	Device: <input name="deviceid"  id="deviceid" type="text" size="5" maxlength="5" value="0">
-<hr>
-<h>Read Fitnessdata like cyclogz.com</h>
-        <button onclick='StartReadFitnessData()'>1. StartReadFitnessData</button>
-        <button onclick='FinishReadFitnessData()'>2. FinishReadFitnessData</button>
-        <button onclick='ReadTcdXml()'>3. ReadTcdXml</button>
-        <button onclick='CancelReadFitnessData()'>X. CancelReadFitnessData</button>
-<hr>
-<h>Read Fitnessdata like connect.garmin.com</h>
-        <button onclick='StartReadFITDirectory()'>1. StartReadFITDirectory</button>
-        <button onclick='StartReadFitnessDirectory()'>2. StartReadFitnessDirectory</button>
-        <button onclick='FinishReadFitnessDirectory()'>3. FinishReadFitnessDirectory</button>
-        <button onclick='ReadTcdXml()'>4. ReadTcdXml</button>
-        <button onclick='CancelReadFitnessData()'>X. CancelReadFitnessData</button>
-<hr>
-<h>Write GPX File to device</h>
-	Device: <input name="filename"  id="filename" type="text" size="15" maxlength="30" value="dummy.gpx">
-	Device: <input name="filecontent"  id="filecontent" type="text" size="50" maxlength="600" value="This is dummy data for the file">
-        <br><button onclick='WriteToDevice()'>1. WriteToDevice</button>
-        <button onclick='PropertyGpsTransferSucceeded()'>2. GpsTransferSucceeded</button>
-<hr>
-		<object id="pluginobj" type="application/vnd-garmin.mygarmin">Plugin FAILED to load</object>
-	</p>
+</head>
 
-    <textarea id="debug1" style="width:400px;height:400px">Empty</textarea>
-    <textarea id="debug2" style="width:400px;height:400px">Empty</textarea>
+<body>
+
+<!-- <object id="pluginobj" type="application/vnd-garmin.mygarmin">Plugin FAILED to load</object>-->
+<h>Initialize Plugin</h>
+<button onclick='detectGarminDevice()'>Detect Garmin Device</button>
+<div id="garminDisplay"></div><div id="pluginProgressState"></div>
+<div id="deviceSupportDiv" style="font-family:verdana,sans-serif;font-size: 8px;"></div>
+<hr>
+<table border="0" cellpadding="0" cellspacing="0">
+<tr>
+<td><div id="getDeviceInfoDivTab" class="tab tabfocus" onclick="showDiv('getDeviceInfoDiv')">DeviceInfo</div></td>
+<td><div id="readDataFromDeviceDivTab" class="tab tabhold" onclick="showDiv('readDataFromDeviceDiv')">ReadFromDev.</div></td>
+<td><div id="onFinishReadFromDeviceDivTab" class="tab tabhold" onclick="showDiv('onFinishReadFromDeviceDiv')">OnFinishRead</div></td>
+<td><div id="writeDataToDeviceDivTab" class="tab tabhold" onclick="showDiv('writeDataToDeviceDiv')">WriteToDev.</div></td>
+</table>
+
+
+<div id="onFinishReadFromDeviceDiv" class="tabcontent" style="display:none">	
+    <div id="statusOnFinishReadFromDevice">Status: ?</div><br>
+    <div id="onFinishReadFromDeviceGpsXml" class="resultBox" style="width:750px;height:400px">Empty</div><br>
+</div>
+
+
+<div id="getDeviceInfoDiv" class="tabcontent" style="display:block">	
+    <button onclick='callGetDevicesXmlString()'>Get DevicesXmlString</button><br>
+    <div id="callGetDevicesXmlStringResult" class="resultBox" style="width:750px;height:200px">Empty</div><br><br>
+    <button onclick='callGetDeviceDescription()'>Get DeviceDescription</button><br>
+    <div id="callGetDeviceDescriptionResult" class="resultBox" style="width:750px;height:300px">Empty</div>
+</div>
+
+
+<div id="writeDataToDeviceDiv" class="tabcontent" style="display:none">	
+<div id="statusWriteDataToDevice"></div>
+File Type: 
+<select name="writeDataToDeviceFileType" id="writeDataToDeviceFileType" >
+                      <option value="GPSData">Gpx</option>
+                      <option value="FitnessCourses">Crs</option>
+                      <option value="FitnessWorkouts">Wkt</option>
+                      <option value="FitnessActivityGoals">Goals</option>
+                      <option value="FitnessUserProfile">TcxProfile</option>
+                      <option value="GPSDataDetail">gpxDetail</option>
+                      <option value="FITBinary">fit</option>
+                      <option value="FitDirectory">fitDir</option>
+                      <option value="FitnessNewLeaf">nlf</option>
+                    </select>
+Filename: <input type="text" length="20" name="writeDataToDeviceFileName" id="writeDataToDeviceFileName" value="filename.ext"><br>
+<textarea name="writeDataToDeviceFileContent" id="writeDataToDeviceFileContent" style="width:750px;height:200px">Content</textarea><br>
+
+<button onclick='callWriteDataToDevice()'>WriteDataToDevice</button><br><br>
+    
+<hr>
+URL: <input type="text" name="downloadDataToDeviceURL" id="downloadDataToDeviceURL" value="http://www.domain.org/file.fit" length="40">
+Destination: <input type="text" length="20" name="downloadDataToDeviceDestination" id="downloadDataToDeviceDestination" value="Garmin/filename.fit">
+<button onclick='callDownloadDataToDevice()'>DownloadDataToDevice</button><br><br>
+
+<hr>
+Path: <input type="text" length="20" name="bytesAvailablePath" id="bytesAvailablePath" value="Garmin/">
+<button onclick='callBytesAvailable()'>BytesAvailable</button><div id="resultBytesAvailable"></div><br><br>
+
+</div>
+
+
+<div id="readDataFromDeviceDiv" class="tabcontent" style="display:none">
+
+	Type:   <select name="readDataFromDeviceDataType" id="readDataFromDeviceDataType" onclick="readDataFromDeviceDataTypeOnClick()">
+                      <option value="GPSData">Gpx</option>
+                      <option value="GPSDataDetail">gpxDetail</option>
+                      <option value="GPSDataDirectory">gpxDir</option>
+                      <option value="FitnessHistoryDirectory">tcxDir</option>
+                      <option value="FitnessCoursesDirectory">crsDir</option>
+                      <option value="FITBinary">fit</option>
+                      <option value="FitDirectory">fitDir</option>
+                      <option value="FitnessHistory">Tcx</option>
+                      <option value="FitnessCourses">Crs</option>
+                      <option value="FitnessWorkouts">Wkt</option>
+                      <option value="FitnessActivityGoals">Goals</option>
+                      <option value="FitnessUserProfile">TcxProfile</option>
+                      <option value="ReadableFilesDirectory">ReadableDir</option>
+                    </select>
+
+Ext:     <select name="readDataFromDeviceExtension" id="readDataFromDeviceExtension" disabled="disabled">
+                      <option value="GPX">GPX</option>
+                      <option value="TCX">TCX</option>
+                      <option value="tcx">tcx</option>
+                      <option value="FIT">FIT</option>
+                      <option value="GCD">GCD</option>
+                      <option value="IMG">IMG</option>
+                      <option value="img">img</option>
+                      <option value="ver">ver</option>
+                      <option value="JNX">JNX</option>
+                      <option value="NLF">NLF</option>
+                      <option value="gtt">gtt</option>
+                    </select>
+Dir: <select name="readDataFromDeviceDir" id="readDataFromDeviceDir" disabled="disabled">
+                      <option value="FitnessHistory">FitnessHistory</option>
+                      <option value="GPSData">GPSData</option>
+                      <option value="FITBinary">FITBinary</option>
+                      <option value="FIT_TYPE_2">FIT_TYPE_2</option>
+                      <option value="FIT_TYPE_3">FIT_TYPE_3</option>
+                      <option value="FIT_TYPE_4">FIT_TYPE_4</option>
+                      <option value="FIT_TYPE_5">FIT_TYPE_5</option>
+                      <option value="FIT_TYPE_6">FIT_TYPE_6</option>
+                      <option value="FIT_TYPE_7">FIT_TYPE_7</option>
+                      <option value="FIT_TYPE_8">FIT_TYPE_8</option>
+                      <option value="FIT_TYPE_9">FIT_TYPE_9</option>
+                      <option value="FIT_TYPE_10">FIT_TYPE_10</option>
+                      <option value="FIT_TYPE_MET_ZONES">FIT_TYPE_MET_ZONES</option>
+                      <option value="FitnessWorkouts">FitnessWorkouts</option>
+                      <option value="FitnessCourses">FitnessCourses</option>
+                      <option value="FitnessNewLeaf">FitnessNewLeaf</option>
+                      <option value="NMaps">NMaps</option>
+                      <option value="BaseMaps">BaseMaps</option>
+                      <option value="PreProgrammedMaps">PreProgrammedMaps</option>
+                      <option value="SupplementalMaps">SupplementalMaps</option>
+                      <option value="TimeZoneMaps">TimeZoneMaps</option>
+                      <option value="TranslatedText">TranslatedText</option>
+                      <option value="FTLImageVersion">FTLImageVersion</option>
+                      <option value="CustomPOI">CustomPOI</option>
+                      <option value="geocache_visits">geocache_visits</option>
+                      <option value="FitnessUserProfile">FitnessUserProfile</option>
+                      <option value="UnitSoftwareUpdate">UnitSoftwareUpdate</option>
+                      <option value="UserDataSync">UserDataSync</option>
+                      <option value="CustomMaps">CustomMaps</option>
+                      <option value="BirdsEye">BirdsEye</option>
+                    </select>
+
+    <input type="checkbox" id="readDataFromDeviceCalcMd5" name="readDataFromDeviceCalcMd5" value="1" disabled="disabled"> Calc MD5
+
+<button onclick='callReadDataFromDevice()'>ReadDataFromDevice</button><br><br>
+<hr>
+
+	Type:   <select name="readDetailFromDeviceDataType" id="readDetailFromDeviceDataType">
+                      <option value="FitnessHistoryDetail">TcxDetail</option>
+                      <option value="FitnessCoursesDetail">CrsDetail</option>
+                    </select>
+    ID: <input name="readDetailFromDeviceId" id="readDetailFromDeviceId" type="text" length="15" value="2009-06-24T14:17:39Z">
+        <button onclick='callReadDetailFromDevice()'>ReadDetailFromDevice</button><br><br>
+
+<hr>
+Relative File Path: <input name="getBinaryFilePath" id="getBinaryFilePath" type="text" length="30" value="Garmin/GPX/Current/current.gpx">
+        <button onclick='callGetBinaryFile()'>GetBinaryFile</button><br><br>
+
+
+</div>
+
+
+
 	</body>
 </html>
