@@ -142,10 +142,39 @@ int GarminFilebasedDevice::startWriteToGps(const string filename, const string x
         return 0;
     }
 
+
+    // Get File extension of file to write:
+    string::size_type idx;
+    idx = filename.rfind('.');
+    string fileToWriteExtension = "";
+    if(idx != std::string::npos) {
+        fileToWriteExtension = filename.substr(idx+1);
+    }
+
+    // Determine Directory to write to
+    string targetDirectory = "";
+    for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); it++) {
+        MassStorageDirectoryType currentDir = (*it);
+        if (currentDir.writeable) {
+            // Compare file extension
+            if (strncasecmp(fileToWriteExtension.c_str(), currentDir.extension.c_str(), currentDir.extension.length()) == 0) {
+                targetDirectory = this->baseDirectory + "/" + currentDir.path;
+                break;
+            } else if (Log::enabledDbg()) {
+                Log::dbg("Wrong file extension for target directory: "+currentDir.name);
+            }
+        }
+    }
+    if (targetDirectory.length() == 0) {
+        Log::err("Unable to find a valid target directory to write file "+filename);
+        this->transferSuccessful = false;
+        return 0;
+    }
+
     // There shouldn't be a thread running... but who knows...
     lockVariables();
     this->xmlToWrite = xml;
-    this->filenameToWrite = gpxDirectory + "/" + filename;
+    this->filenameToWrite = targetDirectory + "/" + filename;
     this->overwriteFile = 2; // not yet asked
     this->workType = WRITEGPX;
     unlockVariables();
@@ -492,10 +521,18 @@ Thread-Status
                         if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
                             TiXmlNode * newAct = inputActivity->Clone();
 
-                            if (readTrackData) {
+                            if (!readTrackData) {
                                 // Track data must be deleted
                                 TiXmlNode * node = newAct->FirstChildElement("Lap");
-                                if ((node != NULL) && (node->FirstChildElement("Track") != NULL)) { node->RemoveChild( node->FirstChildElement("Track") );}
+                                while (node != NULL) {
+                                    TiXmlNode * trackNode = node->FirstChildElement("Track");
+                                    while (trackNode != NULL) {
+                                        node->RemoveChild( node->FirstChildElement("Track") );
+                                        trackNode = node->FirstChildElement("Track");
+                                    }
+                                    //node = newAct->FirstChildElement("Lap");
+                                    node = node->NextSibling();
+                                }
                             }
 
                             activities->LinkEndChild( newAct );
@@ -702,7 +739,6 @@ bool GarminFilebasedDevice::isDeviceAvailable() {
 
 void GarminFilebasedDevice::setPathesFromConfiguration() {
     if (!deviceDirectories.empty()) { deviceDirectories.clear(); }
-    this->gpxDirectory = this->baseDirectory; // Fallback
     this->fitnessFile = this->baseDirectory+"/Garmin/gpx/current/Current.gpx"; // Fallback
 
     if (this->deviceDescription != NULL) {
@@ -880,6 +916,23 @@ void GarminFilebasedDevice::cancelReadFitnessDetail() {
 int GarminFilebasedDevice::startReadFromGps() {
     struct stat stFileInfo;
     int intStat;
+
+    // Search for GPSData in Configuration
+    this->fitnessFile = "";
+    for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); it++) {
+        MassStorageDirectoryType currentDir = (*it);
+        if ((currentDir.dirType == GPXDIR) &&  (currentDir.name.compare("GPSData") == 0) && (currentDir.readable)) {
+            this->fitnessFile = this->baseDirectory + "/" + currentDir.path;
+            if (currentDir.basename.length() > 0) {
+                this->fitnessFile += '/' + currentDir.basename + '.' + currentDir.extension;
+            }
+        }
+    }
+
+    if (this->fitnessFile.length() == 0) {
+        Log::err("Unable to determine fitness file, does the device support GPSData?");
+        return 0;
+    }
 
     // Attempt to get the file attributes
     intStat = stat(this->fitnessFile.c_str(),&stFileInfo);

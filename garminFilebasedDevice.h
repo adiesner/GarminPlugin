@@ -321,13 +321,6 @@ protected:
    */
     string baseDirectory;
 
-    /**
-     * Directory where the device stores it's gpx files
-     */
-    string gpxDirectory;
-
-    string gpxFileExtension;
-
   /**
    * Command that should be executed after file was written. Leave empty if no command should be executed
    */
