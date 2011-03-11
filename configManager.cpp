@@ -37,6 +37,11 @@ void ConfigManager::readConfiguration() {
     string homeDir = getenv ("HOME");
     this->configurationFile = homeDir + "/.config/garminplugin/garminplugin.xml";
 
+    if (this->configuration != NULL) {
+        delete (this->configuration);
+        this->configuration = NULL;
+    }
+
     this->configuration = new TiXmlDocument(this->configurationFile );
     if (this->configuration->LoadFile())
     {
@@ -95,7 +100,8 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
           <Name>My Oregon 300</Name>
           <StoragePath>/tmp</StoragePath>
           <StorageCommand></StorageCommand>
-          <FitnessDataPath useDriver="false"></FitnessDataPath>
+          <FitnessDataPath></FitnessDataPath>
+          <GpxDataPath></GpxDataPath>
         </Device>
       </Devices>
     </GarminPlugin> */
@@ -126,6 +132,10 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 	TiXmlElement * fitnessPath = new TiXmlElement( "FitnessDataPath" );
 	fitnessPath->LinkEndChild(new TiXmlText(""));
 	device->LinkEndChild( fitnessPath );
+
+	TiXmlElement * gpxPath = new TiXmlElement( "GpxDataPath" );
+	gpxPath->LinkEndChild(new TiXmlText(""));
+	device->LinkEndChild( gpxPath );
 
 /*
     <Settings>

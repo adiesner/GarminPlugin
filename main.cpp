@@ -73,7 +73,7 @@ const char
 #else
 char
 #endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.8";
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.2.9-devel";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -452,6 +452,11 @@ bool methodDevicesXmlString(NPObject *obj, const NPVariant args[], uint32_t argC
 bool methodStartFindDevices(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
     currentWorkingDevice = NULL;
+
+    //Reread current configuration in case it has changed on disk
+    confManager->readConfiguration();
+    devManager->setConfiguration(confManager->getConfiguration());
+
     devManager->startFindDevices();
     return true;
 }
