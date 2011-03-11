@@ -25,7 +25,6 @@
 #include "garminFilebasedDevice.h"
 
 #include "edge305Device.h"
-#include "sdCardDevice.h"
 
 #include <algorithm>
 #include <string>
@@ -109,55 +108,10 @@ void DeviceManager::startFindDevices() {
         string filesystype = ent->mnt_type;
         if (filesystype.compare("vfat") == 0) {
             string mountPath = ent->mnt_dir;
-            DIR *dp;
-            struct dirent *dirp;
-            if((dp = opendir(mountPath.c_str())) == NULL) {
-                Log::err("Error opening directory: "+mountPath);
-                break;
-            }
 
-            bool garminDirFound = false;
-            while ((dirp = readdir(dp)) != NULL) {
-                string dir = string(dirp->d_name);
-                if (dir.compare("Garmin") == 0) {
-                    garminDirFound = true;
-                    break;
-                }
-            }
-            closedir(dp);
-
-            if (garminDirFound) {
-                string fullPath = mountPath + "/Garmin/GarminDevice.xml";
-                TiXmlDocument doc(fullPath);
-                if (doc.LoadFile()) {
-                    // Perfect, seems to be a Garmin Device
-                    TiXmlElement * node = doc.FirstChildElement("Device");
-                    if (node!=NULL) { node = node->FirstChildElement("Model"); }
-                    if (node!=NULL) { node = node->FirstChildElement("Description"); }
-                    if (node!=NULL) {
-                        string deviceName = node->GetText();
-
-                        GpsDevice * device = NULL;
-                        GarminFilebasedDevice *fileDev = new GarminFilebasedDevice();
-                        fileDev->setBaseDirectory(mountPath);
-                        fileDev->setDeviceDescription(&doc);
-                        fileDev->setDisplayName(deviceName);
-                        device = fileDev;
-
-                        if (device != NULL) {
-                            Log::dbg("Found "+deviceName+" at "+mountPath);
-                            gpsDeviceList.push_back(device);
-                        } else {
-                            Log::err("Unknown device "+deviceName+" at "+mountPath);
-                        }
-                    } else {
-                        Log::err("GarminDevice.xml has unexpected format!");
-                    }
-                } else {
-                    Log::err("Not yet implemented new SD-Card"); //@TODO
-                }
-            } else {
-                Log::dbg("Garmin directory not found at "+mountPath);
+            GpsDevice *dev = createGarminDeviceFromPath(mountPath, NULL);
+            if (dev != NULL) {
+                gpsDeviceList.push_back(dev);
             }
         }
     }
@@ -190,7 +144,7 @@ void DeviceManager::startFindDevices() {
         Log::dbg("Search via garmintools is disabled!");
     }
 
-    // Now create virtual SD Card devices from configuration
+    // Now create virtual devices devices from configuration
 
     if (this->configuration != NULL) {
         TiXmlElement * pRoot = this->configuration->FirstChildElement( "GarminPlugin" );
@@ -203,6 +157,7 @@ void DeviceManager::startFindDevices() {
                 string storagePath = "";
                 string storageCmd = "";
                 string fitnessPath = "";
+                string gpxPath = "";
                 TiXmlElement * dir = device->FirstChildElement("StoragePath");
                 if ((dir) && (dir->GetText() != NULL)) {
                     storagePath = dir->GetText();
@@ -214,6 +169,10 @@ void DeviceManager::startFindDevices() {
                 TiXmlElement * fitness = device->FirstChildElement("FitnessDataPath");
                 if ((fitness) && (fitness->GetText() != NULL)) {
                     fitnessPath = fitness->GetText();
+                }
+                TiXmlElement * gpxData = device->FirstChildElement("GpxDataPath");
+                if ((gpxData) && (gpxData->GetText() != NULL)) {
+                    gpxPath = gpxData->GetText();
                 }
 
                 GpsDevice * currentDevice = NULL;
@@ -238,19 +197,26 @@ void DeviceManager::startFindDevices() {
                             }
                         }
                         if (currentDevice == NULL) { // no device found
-                            deviceName = name->GetText();
-                            Log::info("Creating new SD Card Device from configuration: "+deviceName);
-                            SDCardDevice * sdcard = new SDCardDevice();
-                            sdcard->setDisplayName(name->GetText());
-                            sdcard->setBaseDirectory("");
-                            sdcard->setDeviceDescription(SDCardDevice::getDefaultConfiguration(deviceName, storagePath, fitnessPath));
-                            if (sdcard->isDeviceAvailable()) {
-                                currentDevice = sdcard;
+
+                            currentDevice = createGarminDeviceFromPath(storagePath, NULL);
+                            if (currentDevice == NULL) {
+                                string devName = name->GetText();
+                                if (Log::enabledDbg()) { Log::dbg("Device from configuration - no XML found for "+devName); }
+
+                                //TODO: Create a pseudo configuration file for this device
+                                TiXmlDocument *doc = createMinimalGarminConfig(devName);
+                                if (fitnessPath.length() > 0) {
+                                    doc = addTcxProfile(doc, fitnessPath);
+                                }
+                                if (gpxPath.length() > 0) {
+                                    doc = addGpxProfile(doc, gpxPath);
+                                }
+                                currentDevice = createGarminDeviceFromPath(storagePath, doc);
+                                delete(doc);
+                            }
+
+                            if (currentDevice != NULL) {
                                 gpsDeviceList.push_back(currentDevice);
-                            } else {
-                                delete(sdcard);
-                                currentDevice = NULL;
-                                Log::dbg("Device "+deviceName+" is not available.");
                             }
                         }
                     }
@@ -313,4 +279,230 @@ bool DeviceManager::getXmlBoolAttribute(TiXmlElement *xmlElement, string attrNam
     } else {
         return defaultValue;
     }
+}
+
+
+GpsDevice * DeviceManager::createGarminDeviceFromPath(string devicepath, TiXmlDocument *doc) {
+
+    bool deleteXmlDoc = false;
+    GpsDevice * device = NULL;
+
+    if (doc == NULL) {
+        DIR *dp;
+        struct dirent *dirp;
+        if((dp = opendir(devicepath.c_str())) == NULL) {
+            Log::err("Error opening directory: "+devicepath);
+            return NULL;
+        }
+
+        bool garminDirFound = false;
+        while ((dirp = readdir(dp)) != NULL) {
+            string dir = string(dirp->d_name);
+            if (dir.compare("Garmin") == 0) {
+                garminDirFound = true;
+                break;
+            }
+        }
+        closedir(dp);
+
+        if (garminDirFound) {
+            string fullPath = devicepath + "/Garmin/GarminDevice.xml";
+            doc = new TiXmlDocument(fullPath);
+            deleteXmlDoc = true;
+            if (!doc->LoadFile()) {
+                deleteXmlDoc = false;
+                delete(doc);
+                doc = NULL;
+                Log::info("Unable to load xml file "+fullPath);
+            }
+        } else {
+            Log::dbg("Garmin directory not found at "+devicepath);
+        }
+    }
+
+    if (doc != NULL) {
+        TiXmlElement * node = doc->FirstChildElement("Device");
+        if (node!=NULL) { node = node->FirstChildElement("Model"); }
+        if (node!=NULL) { node = node->FirstChildElement("Description"); }
+        if (node!=NULL) {
+            // Perfect, seems to be a Garmin Device
+            string deviceName = node->GetText();
+
+            GarminFilebasedDevice *fileDev = new GarminFilebasedDevice();
+            fileDev->setBaseDirectory(devicepath);
+            fileDev->setDeviceDescription(doc);
+            fileDev->setDisplayName(deviceName);
+            device = fileDev;
+
+            Log::dbg("Found "+deviceName+" at "+devicepath);
+        } else {
+            Log::err("GarminDevice.xml has unexpected format!");
+        }
+    }
+
+    if (deleteXmlDoc) {
+        delete(doc);
+        doc = NULL;
+    }
+    return device;
+}
+
+
+TiXmlDocument * DeviceManager::createMinimalGarminConfig(string name) {
+
+    TiXmlDocument *doc = new TiXmlDocument();
+    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no" );
+    doc->LinkEndChild( decl );
+
+    /*<Device xmlns="http://www.garmin.com/xmlschemas/GarminDevice/v2"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.garmin.com/xmlschemas/GarminDevice/v2 http://www.garmin.com/xmlschemas/GarminDevicev2.xsd">*/
+
+	TiXmlElement * device = new TiXmlElement( "Device" );
+    device->SetAttribute("xmlns", "http://www.garmin.com/xmlschemas/GarminDevice/v2");
+    device->SetAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    device->SetAttribute("xsi:schemaLocation", "http://www.garmin.com/xmlschemas/GarminDevice/v2 http://www.garmin.com/xmlschemas/GarminDevicev2.xsd");
+    doc->LinkEndChild( device );
+
+/*  <Model>
+    <PartNumber>006-B0000-00</PartNumber>
+    <SoftwareVersion>0</SoftwareVersion>
+    <Description>An SD Card</Description>
+  </Model> */
+	TiXmlElement * model = new TiXmlElement( "Model" );
+	TiXmlElement * partnumber = new TiXmlElement( "PartNumber" );
+	partnumber->LinkEndChild(new TiXmlText("006-B0000-00"));
+	TiXmlElement * version = new TiXmlElement( "SoftwareVersion" );
+	version->LinkEndChild(new TiXmlText("0"));
+	TiXmlElement * descr = new TiXmlElement( "Description" );
+	descr->LinkEndChild(new TiXmlText(name));
+	model->LinkEndChild(partnumber);
+	model->LinkEndChild(version);
+	model->LinkEndChild(descr);
+    device->LinkEndChild( model );
+
+/*  <Id>4294967295</Id> */
+	TiXmlElement * id = new TiXmlElement( "Id" );
+	id->LinkEndChild(new TiXmlText("4294967295"));
+	device->LinkEndChild(id);
+/*  <DisplayName>Removable Disk (F:\\)</DisplayName>*/
+	TiXmlElement * dispName = new TiXmlElement( "DisplayName" );
+	dispName->LinkEndChild(new TiXmlText(name));
+	device->LinkEndChild(dispName);
+
+    TiXmlElement * massStorage = new TiXmlElement( "MassStorageMode" );
+    device->LinkEndChild(massStorage);
+
+    return doc;
+}
+
+TiXmlDocument * DeviceManager::addTcxProfile(TiXmlDocument * doc, string tcxpath) {
+    /*
+    <DataType>
+      <Name>FitnessHistory</Name>
+      <File>
+        <Location>
+          <Path>Garmin</Path>
+          <FileExtension>tcx</FileExtension>
+        </Location>
+        <TransferDirection>InputOutput</TransferDirection>
+      </File>
+    </DataType>
+    */
+
+    if (doc == NULL) { return NULL; }
+
+    TiXmlElement * massStorage=NULL;
+    TiXmlElement * node = doc->FirstChildElement("Device");
+    if (node!=NULL) { massStorage = node->FirstChildElement("MassStorageMode"); }
+    if (massStorage == NULL) { return doc; }
+
+    TiXmlElement * dataTypes = new TiXmlElement( "DataType" );
+    massStorage->LinkEndChild(dataTypes);
+    TiXmlElement * name = new TiXmlElement( "Name" );
+    name->LinkEndChild(new TiXmlText("FitnessHistory"));
+    dataTypes->LinkEndChild(name);
+
+    TiXmlElement * file = new TiXmlElement( "File" );
+    dataTypes->LinkEndChild(file);
+
+    TiXmlElement * loc = new TiXmlElement( "Location" );
+    file->LinkEndChild(loc);
+
+    TiXmlElement * filePath = new TiXmlElement( "Path" );
+    filePath->LinkEndChild(new TiXmlText(tcxpath));
+    loc->LinkEndChild(filePath);
+
+    TiXmlElement * fileEx = new TiXmlElement( "FileExtension" );
+    fileEx->LinkEndChild(new TiXmlText("tcx"));
+    loc->LinkEndChild(fileEx);
+
+    TiXmlElement * transferDir = new TiXmlElement( "TransferDirection" );
+    transferDir->LinkEndChild(new TiXmlText("InputOutput"));
+    file->LinkEndChild(transferDir);
+
+    return doc;
+}
+
+TiXmlDocument * DeviceManager::addGpxProfile(TiXmlDocument * doc, string gpxpath) {
+/*
+    <DataType>
+      <Name>GPSData</Name>
+      <File>
+        <Specification>
+          <Identifier>
+          http://www.topografix.com/GPX/1/1</Identifier>
+          <Documentation>
+          http://www.topografix.com/GPX/1/1/gpx.xsd</Documentation>
+        </Specification>
+        <Location>
+          <Path>Garmin</Path>
+          <FileExtension>gpx</FileExtension>
+        </Location>
+        <TransferDirection>InputToUnit</TransferDirection>
+      </File>
+    </DataType>
+*/
+    if (doc == NULL) { return NULL; }
+
+    TiXmlElement * massStorage=NULL;
+    TiXmlElement * node = doc->FirstChildElement("Device");
+    if (node!=NULL) { massStorage = node->FirstChildElement("MassStorageMode"); }
+    if (massStorage == NULL) { return doc; }
+
+    TiXmlElement * dataTypes = new TiXmlElement( "DataType" );
+    massStorage->LinkEndChild(dataTypes);
+    TiXmlElement * name = new TiXmlElement( "Name" );
+   	name->LinkEndChild(new TiXmlText("GPSData"));
+    dataTypes->LinkEndChild(name);
+
+    TiXmlElement * file = new TiXmlElement( "File" );
+    dataTypes->LinkEndChild(file);
+    TiXmlElement * spec = new TiXmlElement( "Specification" );
+    file->LinkEndChild(spec);
+
+    TiXmlElement * identifier = new TiXmlElement( "Identifier" );
+    identifier->LinkEndChild(new TiXmlText("http://www.topografix.com/GPX/1/1"));
+    spec->LinkEndChild(identifier);
+
+    TiXmlElement * docu = new TiXmlElement( "Documentation" );
+   	docu->LinkEndChild(new TiXmlText("http://www.topografix.com/GPX/1/1/gpx.xsd"));
+    spec->LinkEndChild(docu);
+
+    TiXmlElement * loc = new TiXmlElement( "Location" );
+    file->LinkEndChild(loc);
+
+    TiXmlElement * filePath = new TiXmlElement( "Path" );
+   	filePath->LinkEndChild(new TiXmlText(gpxpath));
+    loc->LinkEndChild(filePath);
+
+    TiXmlElement * fileEx = new TiXmlElement( "FileExtension" );
+   	fileEx->LinkEndChild(new TiXmlText("gpx"));
+    loc->LinkEndChild(fileEx);
+
+    TiXmlElement * transferDir = new TiXmlElement( "TransferDirection" );
+    transferDir->LinkEndChild(new TiXmlText("InputToUnit"));
+    file->LinkEndChild(transferDir);
+
+    return doc;
 }

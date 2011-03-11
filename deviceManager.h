@@ -87,6 +87,38 @@ private:
      * If not exists or unknown value, defaultValue will be returned
      */
     bool getXmlBoolAttribute(TiXmlElement * xmlElement, string attrName, bool defaultValue);
+
+    /**
+     * Creates a device if configuration is given or Garmin/GarminDevice.xml exists
+     * @param path - Path on disk
+     * @param doc - if null a Garmin/GarminDevice.xml must exist on the given path.
+     * @return Returns the created device
+     */
+    GpsDevice * createGarminDeviceFromPath(string path, TiXmlDocument *doc);
+
+    /**
+     * Creates a minimalistic garmin device configuration
+     * @param name - device name
+     * @return Xml document (in the format of GarminDevice.xml)
+     */
+    TiXmlDocument * createMinimalGarminConfig(string name);
+
+    /**
+     * Adds a tcx profile for read and write to a configuration
+     * @param doc - must contain an already valid GarminDevice.xml format
+     * @param tcxpath - relative path to tcx data
+     * @return Xml document (in the format of GarminDevice.xml)
+     */
+    TiXmlDocument * addTcxProfile(TiXmlDocument * doc, string tcxpath);
+
+    /**
+     * Adds a gpx profile for read and write to a configuration
+     * @param doc - must contain an already valid GarminDevice.xml format
+     * @param gpxpath - relative path to gpx data
+     * @return Xml document (in the format of GarminDevice.xml)
+     */
+    TiXmlDocument * addGpxProfile(TiXmlDocument * doc, string gpxpath);
+
 };
 
 #endif // DEVICEMANAGER_H_INCLUDED
