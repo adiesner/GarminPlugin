@@ -51,9 +51,10 @@ public:
 
   /**
    * Starts a thread that tries to read the fitness data from a garmin device
+   * @param dataTypeName - which type of data should be read from the device
    * @return int returns 1 if successful otherwise 0
    */
-    virtual int startReadFitnessData() = 0;
+    virtual int startReadFitnessData(string dataTypeName) = 0;
 
   /**
    * Returns the status if writing to device is finished
@@ -146,9 +147,10 @@ public:
 
   /**
    * Starts reading the fitness data without points
+   * @param dataTypeName - which type of data should be read from the device
    * @return int returns 1 if successful otherwise 0
    */
-    virtual int startReadFitnessDirectory() = 0;
+    virtual int startReadFitnessDirectory(string dataTypeName) = 0;
 
   /**
    * Checks if the read of the fitness directory finished
@@ -299,6 +301,10 @@ protected:
     {
       WRITEGPX,
       READFITNESS,
+      READFITNESSUSERPROFILE,
+      READFITNESSWORKOUTS,
+      READFITNESSCOURSES,
+      READFITNESSCOURSESDIR,
       READFITNESSDIR,
       READFITNESSDETAIL,
       READFROMGPS,

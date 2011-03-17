@@ -104,8 +104,10 @@ public:
 
   /**
    * Starts reading the fitness data without points
+   * @param dataTypeName - which type of data should be read from the device
+   * @return int returns 1 if successful otherwise 0
    */
-    virtual int startReadFitnessDirectory();
+    virtual int startReadFitnessDirectory(string dataTypeName);
 
   /**
    * Checks if the read of the fitness directory finished
@@ -207,9 +209,10 @@ public:
 
   /**
    * Starts a thread that tries to read the fitness data from a garmin device
+   * @param dataTypeName - which type of data should be read from the device
    * @return int returns 1 if successful otherwise 0
    */
-    virtual int startReadFitnessData();
+    virtual int startReadFitnessData(string dataTypeName);
 
   /**
    * Returns the status of reading fitness data from the device
@@ -262,9 +265,24 @@ public:
 protected:
 
     /**
-     * Reads tcx files in the fit directory.
+     * Reads tcx files in the fit directory. (called by thread)
      */
     void readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId);
+
+    /**
+     * Reads the fitness profile from the device (called by thread)
+     */
+    void readFitnessUserProfile();
+
+    /**
+     * Reads the fitness courses from the device (called by thread)
+     */
+    void readFitnessCourses(bool readTrackData);
+
+    /**
+     * Reads the fitness workout from the device (called by thread)
+     */
+    void readFitnessWorkouts();
 
     /**
      * Reads file structure of fit directories for ReadFITDirectory
@@ -311,6 +329,10 @@ protected:
     virtual int finishWriteToGps();
 
 
+    /**
+     * Adds the author element to a given node
+     */
+    void addAuthorXmlElement(TiXmlElement * parentNode);
 
     virtual void doWork();
 

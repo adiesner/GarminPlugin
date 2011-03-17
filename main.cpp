@@ -692,14 +692,15 @@ bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t a
 bool methodStartReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
     updateProgressBar("Read from GPS", 0);
-    if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
+    if (argCount >= 2) {
         int deviceId = getIntParameter(args, 0, -1);
+        string dataToRead = getStringParameter(args, 1, "");
 
         if (deviceId != -1) {
             currentWorkingDevice = devManager->getGpsDevice(deviceId);
             if (currentWorkingDevice != NULL) {
                 result->type = NPVariantType_Int32;
-                result->value.intValue = currentWorkingDevice->startReadFitnessData();
+                result->value.intValue = currentWorkingDevice->startReadFitnessData(dataToRead);
                 return true;
             } else {
                 if (Log::enabledInfo()) Log::info("StartReadFitnessData: Device not found");
@@ -765,14 +766,15 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
 
 bool methodStartReadFitnessDirectory(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
     updateProgressBar("Read FITDIR from GPS", 0);
-    if (argCount >= 1) { // What is the second parameter for ? "FitnessHistory"
+    if (argCount >= 2) { // What is the second parameter for ? "FitnessHistory"
         int deviceId = getIntParameter(args, 0, -1);
+        string dataTypeName = getStringParameter(args, 1, "");
 
         if (deviceId != -1) {
             currentWorkingDevice = devManager->getGpsDevice(deviceId);
             if (currentWorkingDevice != NULL) {
                 result->type = NPVariantType_Int32;
-                result->value.intValue = currentWorkingDevice->startReadFitnessDirectory();
+                result->value.intValue = currentWorkingDevice->startReadFitnessDirectory(dataTypeName);
                 return true;
             } else {
                 if (Log::enabledInfo()) Log::info("StartReadFitnessDirectory: Device not found");

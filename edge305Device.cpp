@@ -43,7 +43,7 @@ Edge305Device::~Edge305Device() {
 }
 
 
-int Edge305Device::startReadFitnessData()
+int Edge305Device::startReadFitnessData(string dataTypeName)
 {
     if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device: "+this->displayName);
 
@@ -904,7 +904,7 @@ string Edge305Device::getFITData() {
             </DirectoryListing>";
 }
 
-int Edge305Device::startReadFitnessDirectory() {
+int Edge305Device::startReadFitnessDirectory(string dataTypeName) {
     if (Log::enabledDbg()) Log::dbg("Starting thread to read fitness dir from garmin device: "+this->displayName);
 
     this->workType = READFITNESSDIR;
