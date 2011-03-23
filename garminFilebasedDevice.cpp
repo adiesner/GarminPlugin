@@ -29,6 +29,8 @@
 
 #include <openssl/md5.h>
 
+// needed for sort
+#include <algorithm>
 
 GarminFilebasedDevice::GarminFilebasedDevice() {
     this->deviceDescription = NULL;
@@ -441,6 +443,36 @@ void GarminFilebasedDevice::readFileListingFromDevice() {
 }
 
 /**
+ * Sort two activities
+ */
+bool activitySorter (TiXmlNode * a,TiXmlNode * b) {
+    string aId="";
+    string bId="";
+
+    TiXmlElement * idNode = a->FirstChildElement("Id");
+    if (idNode != NULL) { aId = idNode->GetText(); }
+    idNode = b->FirstChildElement("Id");
+    if (idNode != NULL) { bId = idNode->GetText(); }
+
+    return (aId.compare(bId) > 0);
+}
+
+/**
+ * Sort two fit files
+ */
+bool fitFileSorter (TiXmlNode * a,TiXmlNode * b) {
+    string aId="";
+    string bId="";
+
+    TiXmlElement * cTimeNode = a->FirstChildElement("CreationTime");
+    if (cTimeNode != NULL) { aId = cTimeNode->GetText(); }
+    cTimeNode = b->FirstChildElement("CreationTime");
+    if (cTimeNode != NULL) { bId = cTimeNode->GetText(); }
+
+    return (aId.compare(bId) > 0);
+}
+
+/**
  * Reads TCX directories
  */
 void GarminFilebasedDevice::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
@@ -511,6 +543,9 @@ Thread-Status
     TiXmlElement * activities = new TiXmlElement( "Activities" );
     train->LinkEndChild( activities );
 
+    // We need to sort the activities, that's why they are first stored in a list
+    vector <TiXmlNode *> activitiesList;
+
     // Loop over all files in Fitnessdirectory:
     for (unsigned int i = 0;i < files.size();i++) {
         if (files[i].find("."+extension)!=string::npos) {
@@ -545,7 +580,8 @@ Thread-Status
                                     }
                                 }
 
-                                activities->LinkEndChild( newAct );
+                                //activities->LinkEndChild( newAct );
+                                activitiesList.push_back(newAct);
 
                                 if (Log::enabledDbg()) { Log::dbg("Adding activity "+currentLapId+" from file "+files[i]); }
                             }
@@ -559,6 +595,16 @@ Thread-Status
             }
         }
     }
+
+    // Sort list, newest activity must be on top
+    sort(activitiesList.begin(), activitiesList.end(), activitySorter);
+    vector<TiXmlNode *>::iterator it;
+    for ( it=activitiesList.begin() ; it < activitiesList.end(); it++ )
+    {
+        TiXmlNode * curAct = *it;
+        activities->LinkEndChild( curAct );
+    }
+
 
     TiXmlPrinter printer;
     printer.SetIndent( "  " );
@@ -595,6 +641,8 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
     dirList->SetAttribute("VolumePrefix","");
     output->LinkEndChild( dirList );
 
+    // We need to sort the fit files, that's why they are first stored in a list
+    vector <TiXmlNode *> fitFileList;
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); it++) {
         MassStorageDirectoryType currentFitDir = (*it);
@@ -635,7 +683,8 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
                                     // processing of records is done in fitMsgReceived()
                                 }
                                 fit.closeFitFile();
-                                dirList->LinkEndChild( this->fitFileElement );
+                                //dirList->LinkEndChild( this->fitFileElement );
+                                fitFileList.push_back(this->fitFileElement);
                             } else {
                                 Log::err("Invalid fit file: "+fullFileName);
                                 delete(this->fitFileElement);
@@ -654,6 +703,15 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
         } else {
             Log::err("Failed to open FitnessDirectory: "+currentFitDir.path);
         }
+    }
+
+    // Sort list, newest fit file must be on top
+    sort(fitFileList.begin(), fitFileList.end(), fitFileSorter);
+    vector<TiXmlNode *>::iterator it;
+    for ( it=fitFileList.begin() ; it < fitFileList.end(); it++ )
+    {
+        TiXmlNode * curFitFile = *it;
+        dirList->LinkEndChild( curFitFile );
     }
 
     TiXmlPrinter printer;
