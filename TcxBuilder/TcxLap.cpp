@@ -291,3 +291,10 @@ bool TcxLap::isEmpty() {
     }
     return true;
 }
+
+string TcxLap::getDistance() {
+    if (this->distanceMeters.length() == 0) {
+        calculateDistanceMeters();
+    }
+    return this->distanceMeters;
+}

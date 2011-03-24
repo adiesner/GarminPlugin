@@ -128,3 +128,22 @@ bool TcxActivity::isEmpty() {
     }
     return true;
 }
+
+string TcxActivity::getOverview() {
+    stringstream ss;
+    ss << this->id;
+
+    ss << " Laps: " << lapList.size() << "(";
+
+    vector<TcxLap*>::iterator it;
+    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    {
+        TcxLap* lap = *it;
+        ss << lap->getDistance();
+        if ((it+1) < lapList.end()) {
+            ss << ",";
+        }
+    }
+    ss << ")";
+    return ss.str();
+}

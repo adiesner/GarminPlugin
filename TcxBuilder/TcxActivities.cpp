@@ -18,6 +18,9 @@
  */
 #include "TcxActivities.h"
 
+// needed for sort
+#include <algorithm>
+
 TcxActivities::TcxActivities() {
 }
 
@@ -35,8 +38,21 @@ void TcxActivities::addActivity(TcxActivity* activity) {
     this->activityList.push_back(activity);
 }
 
+/**
+ * Sort two TcxActivity
+ */
+bool activitySorter (TcxActivity * a,TcxActivity * b) {
+    string aId=a->getId();
+    string bId=b->getId();
+
+    return (aId.compare(bId) > 0);
+}
+
 TiXmlElement * TcxActivities::getTiXml(bool readTrackData, string fitnessDetailId) {
     TiXmlElement * xmlActivities = new TiXmlElement("Activities");
+
+    // sort activities, newest on top
+    sort (activityList.begin(), activityList.end(), activitySorter);
 
     vector<TcxActivity*>::iterator it;
     for ( it=activityList.begin() ; it < activityList.end(); it++ )

@@ -42,6 +42,11 @@ public:
 
     bool isEmpty();
 
+    /**
+     * Returns a string with information about this activity (debug purpose)
+     */
+    string getOverview();
+
     friend TcxActivity& operator<<(TcxActivity& activity, TcxLap* lap);
     friend TcxActivity& operator<<(TcxActivity& activity, TcxCreator* creator);
 

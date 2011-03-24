@@ -51,6 +51,12 @@ public:
     void setNotes(string note);
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
 
+    /**
+     * Returns the distance of this lap - used for debug output
+     * Do not call before all tracks and trackpoints are added to the lap
+     */
+    string getDistance();
+
     bool isEmpty();
 
     friend TcxLap& operator<<(TcxLap& base, TcxTrack* track);

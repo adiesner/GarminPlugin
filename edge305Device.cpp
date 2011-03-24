@@ -347,6 +347,9 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                         Log::dbg("Unknown Lap Type found in data");
                     }
                 }
+                if (Log::enabledDbg()) {
+                    Log::dbg("Added Lap: " + singleActivity->getOverview());
+                }
             }
         } else {
             Log::dbg("Not a run :-(");
