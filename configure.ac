@@ -215,6 +215,8 @@ elif test -f "/usr/lib/libtinyxml.so" ; then
   TINYXML_LDFLAGS="/usr/lib/libtinyxml.so"
 elif test -f "../tinyxml/libtinyxml.so" ; then
   TINYXML_LDFLAGS="../tinyxml/libtinyxml.so"
+elif test -f "../tinyxml/tinyxml.o" ; then
+  TINYXML_LDFLAGS="../tinyxml/tinyxml.o ../tinyxml/tinystr.o ../tinyxml/tinyxmlerror.o ../tinyxml/tinyxmlparser.o"
 else
   AC_MSG_RESULT([no])
   AC_MSG_ERROR([Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR])
