@@ -75,8 +75,6 @@ while read curline; do
     if [ "a$curline" != "a" ]; then
         FIRSTCHAR=`echo $curline|cut -b1`
         if [ "a$FIRSTCHAR" != "a-" ]; then
-            DATE=`echo $curline | cut -b-10`
-            DATE=`date -R -d $DATE`
             VERSIONNUMBERENTRY=`echo $curline | cut -b22-`
             if [ "a$VERSIONNUMBERENTRY" != "a$VERSION" ]; then
                 if [ "a$DOOUTPUT" != "a0" ]; then
@@ -86,6 +84,8 @@ while read curline; do
                     echo " -- Andreas Diesner <garminplugin@andreas-diesner.de>  $DATE">>$CHANGELOGFILE 
                 fi
             else 
+                DATE=`echo $curline | cut -b-10`
+                DATE=`date -R -d $DATE`
                 DOOUTPUT="1"
                 echo "garminplugin ($VERSION-1~$DEBIANVERSION) $DEBIANVERSION; urgency=low">$CHANGELOGFILE 
                 echo "garminplugin ($VERSION-1~$DEBIANVERSION) $DEBIANVERSION; urgency=low" 
