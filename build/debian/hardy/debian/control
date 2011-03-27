@@ -10,6 +10,6 @@ Package: garminplugin
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Garmin Communicator Plugin for Linux
- This Firefox plugin allows you to access your garmin device using your browser. You can transfer GPX files to your device or read fitnessdata from the device and upload this data to certain websites like http://connect.garmin.com.
+ This Firefox/Chrome plugin allows you to access your garmin device using your browser. You can transfer GPX files to your device or read fitnessdata from the device and upload this data to certain websites like http://connect.garmin.com.
  This plugin is NOT an official product of the company Garmin (http://www.garmin.com). It is a fan product.
- To use this plugin you need to change your firefox identification to "Windows" as the garmin javascript checks what browser you use.
+
