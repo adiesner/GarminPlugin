@@ -9,12 +9,12 @@
 
 
 FEDORAVERSION=$1
-
+VERSION=$2
 GITREPOSITORYDIR=`pwd`
 
 if [ -z $FEDORAVERSION"" ]; then
   echo "Please specify for which fedora version you want to build" 
-  echo "Example: createBuildEnv.sh 14"
+  echo "Example: createBuildEnv.sh 14 0.3.0"
   exit 1
 fi
 
@@ -25,9 +25,15 @@ else
   exit 1
 fi
 
-# Determine last tag
-GITTAG=`git tag -l | tail -1`
-VERSION=`echo $GITTAG|cut -c2-`
+if [ ! -n "$VERSION" ]; then
+  # Determine last tag
+  GITTAG=`git tag -l | tail -1`
+  VERSION=`echo $GITTAG|cut -c2-`
+  echo "Please specify which plugin version you want to build" 
+  echo "Example: createBuildEnv.sh 14 $VERSION"
+  exit 1
+fi
+
 ARCHITECTURE=`uname -i`
 echo "Creating build environment for version $VERSION - architecture $ARCHITECTURE"
 
