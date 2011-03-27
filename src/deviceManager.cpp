@@ -210,6 +210,9 @@ void DeviceManager::startFindDevices() {
                                 }
                                 if (gpxPath.length() > 0) {
                                     doc = addGpxProfile(doc, gpxPath);
+                                } else if ((gpxPath.length() == 0) && (fitnessPath.length() == 0) && (storageCmd.length() > 0)) {
+                                    // Probably an old configuration. Required to add GpxProfile with empty path
+                                    doc = addGpxProfile(doc, ".");
                                 }
                                 currentDevice = createGarminDeviceFromPath(storagePath, doc);
                                 delete(doc);
