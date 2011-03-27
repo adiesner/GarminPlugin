@@ -32,7 +32,7 @@ ARCHITECTURE=`uname -i`
 echo "Creating build environment for version $VERSION - architecture $ARCHITECTURE"
 
 # Checkout last version
-git checkout $GITTAG
+#git checkout $GITTAG
 
 cd
 HOMEDIR=`pwd`
@@ -74,8 +74,8 @@ SPECFILE="$HOMEDIR/rpmbuild/SPECS/GarminPlugin.spec"
 cp "$GITREPOSITORYDIR/$FEDORAVERSION/SPECS/GarminPlugin.spec" "$SPECFILE"
 
 # Replace Version and architecture in file
-sed "s/§§§VERSION§§§/$VERSION/g" "$SPECFILE"
-sed "s/§§§ARCHITECTURE§§§/$ARCHITECTURE/g" "$SPECFILE"
+sed -i "s/§§§VERSION§§§/$VERSION/g" "$SPECFILE"
+sed -i "s/§§§ARCHITECTURE§§§/$ARCHITECTURE/g" "$SPECFILE"
 
 
 INFILE="$GITREPOSITORYDIR/../../HISTORY"
