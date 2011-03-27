@@ -1,3 +1,11 @@
+2011-03-27 - Version 0.3.0
+- Feature: All Filebased Garmin Devices should now be supported (with file GarminDevice.xml)
+- Feature: Reading of TcxProfile, Crs, CrsDir and Workout at filebased devices is now possible
+- Feature: Added progress bar change
+- Feature: Added new function ReadableFileListing
+- Bugfix: Sorting of fit file output
+- Bugfix: Now setting udev rule to access Edge305/Forerunner305 
+
 2011-01-05 - Version 0.2.8
 - Added support for Edge 500
 - Changed official garmin plugin version number to 2.9.3.0
