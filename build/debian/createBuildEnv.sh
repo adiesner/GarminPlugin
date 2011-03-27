@@ -8,12 +8,12 @@
 
 
 DEBIANVERSION=$1
-
+VERSION=$2
 GITREPOSITORYDIR=`pwd`
 
 if [ -z $DEBIANVERSION"" ]; then
   echo "Please specify for which debian version you want to build" 
-  echo "Example: createBuildEnv.sh maverick"
+  echo "Example: createBuildEnv.sh maverick 0.3.0"
   exit 1
 fi
 
@@ -24,9 +24,15 @@ else
   exit 1
 fi
 
-# Determine last tag
-GITTAG=`git tag -l | tail -1`
-VERSION=`echo $GITTAG|cut -c2-`
+if [ ! -n "$VERSION" ]; then
+  # Determine last tag
+  GITTAG=`git tag -l | tail -1`
+  VERSION=`echo $GITTAG|cut -c2-`
+  echo "Please specify which plugin version you want to build" 
+  echo "Example: createBuildEnv.sh maverick $VERSION"
+  exit 1
+fi
+
 ARCHITECTURE=`uname -i`
 echo "Creating build environment for version $VERSION - architecture $ARCHITECTURE"
 

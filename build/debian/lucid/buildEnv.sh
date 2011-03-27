@@ -14,9 +14,15 @@ wget "http://downloads.sourceforge.net/project/tinyxml/tinyxml/2.6.1/tinyxml_2_6
 if [ -f "$TARGETDIR/tinyxml_2_6_1.tar.gz" ]; then
   tar xzf ./tinyxml_2_6_1.tar.gz
   rm ./tinyxml_2_6_1.tar.gz
+
+  sed -i "s/DEBUG_CXXFLAGS   := /DEBUG_CXXFLAGS   := -fPIC /" tinyxml/Makefile
+  sed -i "s/RELEASE_CXXFLAGS := /RELEASE_CXXFLAGS := -fPIC /" tinyxml/Makefile
+  sed -i "s/TINYXML_USE_STL := NO/TINYXML_USE_STL := YES/" tinyxml/Makefile
 else
   echo "************ ERROR ERROR ************"
   echo "Unable to download tinyxml_2_6_1.tar.gz from Sourceforge using wget! Check your internet connection!"
   echo "************ ERROR ERROR ************"
   exit 1
 fi
+
+
