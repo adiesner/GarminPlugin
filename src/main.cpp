@@ -611,7 +611,7 @@ bool methodCancelWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argC
         currentWorkingDevice->cancelWriteToGps();
         return true;
     }
-    return false;
+    return true;
 }
 /**
  * Fetches a detailed device description
@@ -1026,9 +1026,8 @@ bool methodCancelReadFromGps(NPObject *obj, const NPVariant args[], uint32_t arg
         Log::dbg("Calling cancel read from gps");
 
         currentWorkingDevice->cancelReadFromGps();
-        return true;
     }
-    return false;
+    return true;
 }
 
 bool methodCancelReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
@@ -1214,9 +1213,8 @@ bool methodCancelReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
         Log::dbg("Calling cancel read fitness data");
 
         currentWorkingDevice->cancelReadFitnessData();
-        return true;
     }
-    return false;
+    return true;
 }
 
 bool methodStartWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
@@ -1293,9 +1291,8 @@ bool methodCancelWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_
         Log::dbg("Calling CancelWriteFitnessData");
 
         currentWorkingDevice->cancelWriteFitnessData();
-        return true;
     }
-    return false;
+    return true;
 }
 
 bool methodBytesAvailable(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
@@ -1900,7 +1897,7 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
                               garminOverwriteBrowserDetect();";
     memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
     GETSTRING(str) = buf;
-    GETSTRINGLENGTH(str) = javascriptCode.size();
+    GETSTRINGLENGTH(str) = sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf);
     if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
         Log::err("Unable to execute javascript: "+javascriptCode);
     }
