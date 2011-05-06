@@ -73,7 +73,7 @@ const char
 #else
 char
 #endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.0";
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.0devel";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -1408,6 +1408,89 @@ bool methodCancelReadableFileListing(NPObject *obj, const NPVariant args[], uint
 }
 
 
+bool methodStartDirectoryListing(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (argCount >= 3) {
+        int deviceId = getIntParameter(args, 0, -1);
+        string devicePath = getStringParameter(args, 1, "");
+        bool computeMD5 = getBoolParameter(args, 2, false);
+
+        if (deviceId != -1) {
+            currentWorkingDevice = devManager->getGpsDevice(deviceId);
+            if (currentWorkingDevice != NULL) {
+                result->type = NPVariantType_Int32;
+                if (currentWorkingDevice->startDirectoryListing(devicePath,computeMD5) == 1) {
+                    return true;
+                } else {
+                    // Not a file based device!
+                    return false;
+                }
+            } else {
+                if (Log::enabledInfo()) Log::info("StartDirectoryListing: Device not found");
+            }
+        } else {
+            if (Log::enabledErr()) Log::err("StartDirectoryListing: Unable to determine device id");
+        }
+
+    } else {
+        if (Log::enabledErr()) Log::err("StartDirectoryListing: Wrong parameter count");
+    }
+
+    return false;
+}
+
+bool methodFinishDirectoryListing(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+/* Return Values are
+    0 = idle
+    1 = working
+    2 = waiting for user input
+    3 = finished
+*/
+    if (messageList.size() > 0) {
+        // Push messages first
+        MessageBox * msg = messageList.front();
+        if (msg != NULL) {
+            propertyList["MessageBoxXml"].stringValue = msg->getXml();
+            result->type = NPVariantType_Int32;
+            result->value.intValue = 2; /* waiting for user input */
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("A null MessageBox is blocking the messages - fix the code!");
+        }
+    } else {
+        if (currentWorkingDevice != NULL) {
+            result->type = NPVariantType_Int32;
+            result->value.intValue = currentWorkingDevice->finishDirectoryListing();
+            printFinishState("FinishDirectoryListing", result->value.intValue);
+            if (result->value.intValue == 2) { // waiting for user input
+                messageList.push_back(currentWorkingDevice->getMessage());
+                MessageBox * msg = messageList.front();
+                if (msg != NULL) {
+                    propertyList["MessageBoxXml"].stringValue = msg->getXml();
+                }
+            } else if (result->value.intValue == 3) { // transfer finished
+                propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
+                propertyList["DirectoryListingXml"].stringValue = currentWorkingDevice->getDirectoryListingXml();
+                debugOutputPropertyToFile("DirectoryListingXml");
+                updateProgressBar("DirectoryListing from GPS", 100);
+            } else {
+                updateProgressBar("DirectoryListing from GPS", currentWorkingDevice->getProgress());
+            }
+
+            return true;
+        } else {
+            if (Log::enabledInfo()) Log::info("FinishDirectoryListing: No working device specified");
+        }
+    }
+    return false;
+}
+
+bool methodCancelDirectoryListing(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (currentWorkingDevice != NULL) {
+        currentWorkingDevice -> cancelDirectoryListing();
+    }
+    return true;
+}
+
 /**
  * Initializes the Property List and Function List that are accessible from the outside
  */
@@ -1542,6 +1625,15 @@ void initializePropertyList() {
     methodList["FinishReadableFileListing"] = fooPointer;
     fooPointer = &methodCancelReadableFileListing;
     methodList["CancelReadableFileListing"] = fooPointer;
+
+    // Directory File listing of file based devices (is marked as experimental but still used in myGarmin portal
+    fooPointer = &methodStartDirectoryListing;
+    methodList["StartDirectoryListing"] = fooPointer;
+    fooPointer = &methodFinishDirectoryListing;
+    methodList["FinishDirectoryListing"] = fooPointer;
+    fooPointer = &methodCancelDirectoryListing;
+    methodList["CancelDirectoryListing"] = fooPointer;
+
 
 }
 

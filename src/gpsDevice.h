@@ -296,6 +296,29 @@ public:
      */
     virtual string getDirectoryListingXml();
 
+   /**
+    * Starts an asynchronous file listing operation for a Mass Storage mode device.
+    * This function lists all files that are available on the device. </br>
+    * The result can be retrieved with getDirectoryListingXml().
+    * Minimum plugin version 2.8.1.0 <br/>
+    *
+    * @param {String} relativePath specifies the relative path on the device
+    * @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
+    * @return int returns 1 if successful otherwise 0
+    */
+    virtual int startDirectoryListing(string relativePath, bool computeMd5);
+
+    /**
+     * Returns the status of the asynchronous file listing operation for the mass storage mode device
+     * @return 0 = idle 1 = working 2 = waiting 3 = finished
+     */
+    virtual int finishDirectoryListing();
+
+    /**
+     * Cancels the asynchronous file listing operation for the mass storage mode device
+     */
+    virtual void cancelDirectoryListing();
+
 protected:
     enum WorkType
     {
@@ -310,7 +333,8 @@ protected:
       READFROMGPS,
       READFITDIRECTORY,
       WRITEFITNESSDATA,
-      READABLEFILELISTING
+      READABLEFILELISTING,
+      DIRECTORYLISTING
     };
     WorkType workType;
 

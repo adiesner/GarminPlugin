@@ -147,3 +147,34 @@ string GpsDevice::getDirectoryListingXml() {
     return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n\
            <DirectoryListing xmlns=\"http://www.garmin.com/xmlschemas/DirectoryListing/v1\" RequestedPath=\"\" UnitId=\"1234567890\" VolumePrefix=\"\"/>";
 }
+
+/**
+* Starts an asynchronous file listing operation for a Mass Storage mode device.
+* This function lists all files that are available on the device. </br>
+* The result can be retrieved with getDirectoryListingXml().
+* Minimum plugin version 2.8.1.0 <br/>
+*
+* @param {String} relativePath specifies the relative path on the device
+* @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
+* @return int returns 1 if successful otherwise 0
+*/
+int GpsDevice::startDirectoryListing(string relativePath, bool computeMd5) {
+    Log::err("startDirectoryListing is not implemented for device "+this->displayName);
+    return 0;
+}
+
+/**
+ * Returns the status of the asynchronous file listing operation for the mass storage mode device
+ * @return 0 = idle 1 = working 2 = waiting 3 = finished
+ */
+int GpsDevice::finishDirectoryListing() {
+    Log::err("finishDirectoryListing is not implemented for device "+this->displayName);
+    return 3;
+}
+
+/**
+ * Cancels the asynchronous file listing operation for the mass storage mode device
+ */
+void GpsDevice::cancelDirectoryListing() {
+    Log::err("cancelDirectoryListing is not implemented for device "+this->displayName);
+}

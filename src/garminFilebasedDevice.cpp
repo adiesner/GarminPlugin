@@ -24,6 +24,7 @@
 #include <limits.h>
 #include <dirent.h>
 #include <vector>
+#include <stack>
 
 #include "gpsFunctions.h"
 
@@ -297,6 +298,8 @@ void GarminFilebasedDevice::doWork() {
         this->readFitnessCourses(false);
     } else if (this->workType == READFITNESSWORKOUTS) {
         this->readFitnessWorkouts();
+    } else if (this->workType == DIRECTORYLISTING) {
+        this->readDirectoryListing();
     } else {
         Log::err("Work Type not implemented!");
     }
@@ -1104,6 +1107,8 @@ int GarminFilebasedDevice::startDownloadData(string gpsDataString) {
                 string strUrl = url;
                 string strDest = dest;
 
+                if (Log::enabledDbg()) { Log::dbg("Download destination: "+strDest + "  URL: "+strUrl); }
+
                 if ((strUrl.length() > 0) && (strDest.length() > 0)) {
                     // Replace \ with /
                     string::size_type pos = strDest.find("\\", 0);
@@ -1734,27 +1739,21 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
     output->LinkEndChild( train );
 
     TiXmlElement * folders = new TiXmlElement( "Folders" );
-    Log::dbg("****** 1 ****** ");
     train->LinkEndChild( folders );
 
     TiXmlElement * folderWorkouts = new TiXmlElement( "Workouts" );
-    Log::dbg("****** 2 ****** ");
     folders->LinkEndChild( folderWorkouts );
     TiXmlElement * workoutsRunning = new TiXmlElement( "Running" );
     workoutsRunning->SetAttribute("Name","Running");
-    Log::dbg("****** 3 ****** ");
     folderWorkouts->LinkEndChild( workoutsRunning );
     TiXmlElement * workoutsBiking = new TiXmlElement( "Biking" );
     workoutsBiking->SetAttribute("Name","Biking");
-    Log::dbg("****** 4 ****** ");
     folderWorkouts->LinkEndChild( workoutsBiking );
     TiXmlElement * workoutsOther = new TiXmlElement( "Other" );
     workoutsOther->SetAttribute("Name","Other");
-    Log::dbg("****** 5 ****** ");
     folderWorkouts->LinkEndChild( workoutsOther );
 
     TiXmlElement * workouts = new TiXmlElement( "Workouts" );
-    Log::dbg("****** 6 ****** ");
     train->LinkEndChild( workouts );
 
 
@@ -1777,7 +1776,6 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
                         TiXmlElement * inputWorkoutNameRef = NULL;
                         if (inputFoldersWorkoutsType != NULL) { inputWorkoutNameRef = inputFoldersWorkoutsType->FirstChildElement("WorkoutNameRef");}
                         while (inputWorkoutNameRef != NULL) {
-                            Log::dbg("****** 7 ****** ");
                             TiXmlNode * newNode = inputWorkoutNameRef->Clone();
                             workoutsRunning->LinkEndChild(newNode);
                             inputWorkoutNameRef = inputWorkoutNameRef->NextSiblingElement("WorkoutNameRef");
@@ -1786,7 +1784,6 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
                         inputFoldersWorkoutsType = inputFoldersWorkouts->FirstChildElement("Biking");
                         if (inputFoldersWorkoutsType != NULL) { inputWorkoutNameRef = inputFoldersWorkoutsType->FirstChildElement("WorkoutNameRef");}
                         while (inputWorkoutNameRef != NULL) {
-                            Log::dbg("****** 8 ****** ");
                             workoutsBiking->LinkEndChild(inputWorkoutNameRef->Clone());
                             inputWorkoutNameRef = inputWorkoutNameRef->NextSiblingElement("WorkoutNameRef");
                         }
@@ -1794,7 +1791,6 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
                         inputFoldersWorkoutsType = inputFoldersWorkouts->FirstChildElement("Other");
                         if (inputFoldersWorkoutsType != NULL) { inputWorkoutNameRef = inputFoldersWorkoutsType->FirstChildElement("WorkoutNameRef");}
                         while (inputWorkoutNameRef != NULL) {
-                            Log::dbg("****** 9 ****** ");
                             workoutsOther->LinkEndChild(inputWorkoutNameRef->Clone());
                             inputWorkoutNameRef = inputWorkoutNameRef->NextSiblingElement("WorkoutNameRef");
                         }
@@ -1805,7 +1801,6 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
                     if (inputWorkouts != NULL) {
                         TiXmlElement * inputWorkout = inputWorkouts->FirstChildElement("Workout");
                         while (inputWorkout != NULL) {
-                            Log::dbg("****** 10 ****** ");
                             workouts->LinkEndChild(inputWorkout->Clone());
                             inputWorkout = inputWorkout->NextSiblingElement("Workout");
                         }
@@ -1817,7 +1812,6 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
         }
     }
 
-    Log::dbg("****** 11 ****** ");
     addAuthorXmlElement(train);
 
     TiXmlPrinter printer;
@@ -1833,5 +1827,159 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
     unlockVariables();
 
     if (Log::enabledDbg()) { Log::dbg("Thread readFitnessWorkouts finished"); }
+    return;
+}
+
+
+int GarminFilebasedDevice::startDirectoryListing(string relativePath, bool computeMd5) {
+    lockVariables();
+    this->threadState = 1;
+    this->readableFileListingFileTypeName = relativePath;
+    this->readableFileListingComputeMD5   = computeMd5;
+    this->readableFileListingXml = "";
+    unlockVariables();
+
+    if (Log::enabledDbg()) Log::dbg("Starting thread to read directory listing from garmin device "+this->displayName);
+
+    this->workType = DIRECTORYLISTING;
+
+    if (startThread()) {
+        return 1;
+    }
+
+    return 0;
+}
+
+int GarminFilebasedDevice::finishDirectoryListing() {
+    lockVariables();
+    int status = this->threadState;
+    unlockVariables();
+
+    return status;
+}
+
+void GarminFilebasedDevice::cancelDirectoryListing() {
+    if (Log::enabledDbg()) { Log::dbg("cancelDirectoryListing for device "+this->displayName); }
+    cancelThread();
+}
+
+
+void GarminFilebasedDevice::readDirectoryListing() {
+    if (Log::enabledDbg()) { Log::dbg("Thread readDirectoryListing started"); }
+
+
+    lockVariables();
+    string workDir=this->readableFileListingFileTypeName; // contains relative file path
+    this->threadState = 1; // Working
+    bool doCalculateMd5 = this->readableFileListingComputeMD5;
+    unlockVariables();
+
+    TiXmlDocument * output = new TiXmlDocument();
+    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
+    output->LinkEndChild( decl );
+
+    TiXmlElement * dirList = new TiXmlElement( "DirectoryListing" );
+    dirList->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/DirectoryListing/v1");
+    dirList->SetAttribute("RequestedPath",workDir);
+    dirList->SetAttribute("UnitId",this->deviceId);
+    dirList->SetAttribute("VolumePrefix",this->baseDirectory);
+    output->LinkEndChild( dirList );
+
+    stack<string> directoryList;
+
+    string::size_type loc = workDir.find( "..", 0 );
+    if( loc != string::npos ) {
+        Log::err("SECURITY WARNING: work directories with .. are not allowed!");
+    } else {
+        directoryList.push(workDir);
+    }
+
+    while (directoryList.size() > 0) {
+        string relativeWorkDir = directoryList.top();
+        string currentWorkDir = this->baseDirectory + "/" + relativeWorkDir;
+        directoryList.pop(); // get rid of the element
+
+        DIR *dp;
+        struct dirent *dirp;
+        if((dp = opendir(currentWorkDir.c_str())) != NULL) {
+            while ((dirp = readdir(dp)) != NULL) {
+                string fileName = string(dirp->d_name);
+                string fullFileName = currentWorkDir+'/'+fileName;
+                string relativeFileName = relativeWorkDir+'/'+fileName;
+                if (relativeWorkDir.length() == 0) {
+                    relativeFileName = fileName;
+                }
+                bool isDirectory = (dirp->d_type == 4) ? true : false;
+                if (Log::enabledDbg()) { Log::dbg("Found file: "+fileName); }
+                if ((fileName == ".") || (fileName == "..")) { continue; }
+
+                TiXmlElement * curFile = new TiXmlElement( "File" );
+                if (isDirectory) {
+                    curFile->SetAttribute("IsDirectory","true");
+                    directoryList.push(relativeFileName);
+                } else {
+                    curFile->SetAttribute("IsDirectory","false");
+                }
+                curFile->SetAttribute("Path",relativeFileName);
+
+                // Get File Size
+                struct stat filestatus;
+                stat( fullFileName.c_str(), &filestatus );
+                if (!isDirectory) {
+                    stringstream ss;
+                    ss << filestatus.st_size;
+                    curFile->SetAttribute("Size",ss.str());
+                }
+
+                // Get the timestamp
+                TiXmlElement * timeElem = new TiXmlElement( "CreationTime" );
+                timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(filestatus.st_mtime-TIME_OFFSET)));
+                curFile->LinkEndChild(timeElem);
+
+
+                if ((!isDirectory) && (doCalculateMd5)) {
+                    if (Log::enabledDbg()) { Log::dbg("Calculating MD5 sum of " + fullFileName);}
+                    MD5_CTX c;
+                    unsigned char md[MD5_DIGEST_LENGTH];
+                    unsigned char buf[MD5READBUFFERSIZE];
+                    FILE *f = fopen(fullFileName.c_str(),"r");
+                    int fd=fileno(f);
+                    MD5_Init(&c);
+                    for (;;) {
+                        int i=read(fd,buf,MD5READBUFFERSIZE);
+                        if (i <= 0) break;
+                        MD5_Update(&c,buf,(unsigned long)i);
+                    }
+                    MD5_Final(&(md[0]),&c);
+                    string md5="";
+                    for (int i=0; i<MD5_DIGEST_LENGTH; i++) {
+                        char temp[16];
+                        sprintf(temp, "%02x",md[i]);
+                        md5 += temp;
+
+                    }
+                    curFile->SetAttribute("MD5Sum",md5);
+                }
+                dirList->LinkEndChild( curFile );
+            }
+            closedir(dp);
+        } else {
+            Log::err("Error opening directory! "+ currentWorkDir);
+        }
+    }
+
+    TiXmlPrinter printer;
+    printer.SetIndent( "  " );
+    output->Accept( &printer );
+    string outputXml = printer.Str();
+    delete(output);
+
+    lockVariables();
+    this->threadState = 3; // Finished
+    this->readableFileListingXml = outputXml;
+    this->transferSuccessful = true; // Successfull;
+    unlockVariables();
+
+    if (Log::enabledDbg()) { Log::dbg("Thread readDirectoryListing finished"); }
     return;
 }
