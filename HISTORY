@@ -1,3 +1,7 @@
+2011-05-09 - Version 0.3.1
+- Bugfix: Canceling not running jobs is now working without javascript error (needed by write heart rate on connect.garmin.com)
+- Feature: Added plugin functionality DirectoryListing
+
 2011-03-27 - Version 0.3.0
 - Feature: All Filebased Garmin Devices should now be supported (with file GarminDevice.xml)
 - Feature: Reading of TcxProfile, Crs, CrsDir and Workout at filebased devices is now possible
