@@ -1671,7 +1671,7 @@ void printParameter(string name, const NPVariant args[], uint32_t argCount) {
 
     for (uint32_t i = 0; i < argCount; i++) {
         if (args[i].type == NPVariantType_Int32) {
-            ss << args[i].value.intValue;
+            ss << "" << args[i].value.intValue;
         } else if (args[i].type == NPVariantType_String) {
             ss << "\"" << GETSTRING(args[i].value.stringValue) << "\"";
         } else if (args[i].type == NPVariantType_Bool) {
@@ -1680,6 +1680,10 @@ void printParameter(string name, const NPVariant args[], uint32_t argCount) {
             } else {
                 ss << "false";
             }
+        } else if (args[i].type == NPVariantType_Double) {
+            ss << "" << args[i].value.doubleValue;
+        } else if (args[i].type == NPVariantType_Null) {
+            ss << "null";
         } else {
             ss << " ? ";
         }
