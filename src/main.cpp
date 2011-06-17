@@ -1904,6 +1904,27 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
 
     if (Log::enabledDbg()) Log::dbg("End Overwriting Garmin Javascript Browser detection!");
 
+    if (Log::enabledDbg()) {
+        string userAgentStr = npnfuncs->uagent(inst);
+        Log::dbg("User Agent: "+userAgentStr);
+
+        NPIdentifier identifier = npnfuncs->getstringidentifier("location");
+        NPVariant variantValue;
+        bool b1 = npnfuncs->getproperty( inst, windowObject, identifier, &variantValue );
+        if (b1) {
+            NPObject *locationObj = variantValue.value.objectValue;
+            identifier = npnfuncs->getstringidentifier( "href" );
+            bool b2 = npnfuncs->getproperty( inst, locationObj, identifier, &variantValue );
+            if (b2) {
+                if (variantValue.type == NPVariantType_String) {
+                    string href = GETSTRING(variantValue.value.stringValue);
+                    Log::dbg("URL: "+href);
+                }
+            }
+            npnfuncs->releaseobject(locationObj);
+        }
+    }
+
     npnfuncs->releaseobject(windowObject);
 
 	return NPERR_NO_ERROR;
@@ -2024,7 +2045,10 @@ static void nppUrlNotify(NPP instance, const char* url, NPReason reason, void* n
 
 static NPError nppNewStream(NPP instance, NPMIMEType type, NPStream*  stream, NPBool seekable, uint16* stype) {
 	if (*stype == NP_NORMAL) {
-        if (Log::enabledDbg()) Log::dbg("nppNewStream Type: NP_NORMAL");
+        if (Log::enabledDbg()) {
+            string url = stream->url;
+            Log::dbg("nppNewStream Type: NP_NORMAL URL: "+url);
+        }
         return NPERR_NO_ERROR;
 	} else {
 	    Log::err("nppNewStream: Unknown stream type!");
