@@ -285,7 +285,7 @@ void GarminFilebasedDevice::doWork() {
     } else if (this->workType == READFITNESSDIR) {
         this->readFitnessDataFromDevice(false, "");
     } else if (this->workType == READFITNESSDETAIL) {
-        this->readFitnessDataFromDevice(false, this->readFitnessDetailId);
+        this->readFitnessDataFromDevice(true, this->readFitnessDetailId);
     } else if (this->workType == READFITDIRECTORY) {
         this->readFITDirectoryFromDevice();
     } else if (this->workType == READABLEFILELISTING) {
