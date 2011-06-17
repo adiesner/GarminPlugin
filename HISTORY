@@ -1,3 +1,6 @@
+2011-06-17 - Version 0.3.2
+- Bugfix: When uploading a single TCX file, the GPS points were unintentionally stripped from the upload
+
 2011-05-09 - Version 0.3.1
 - Bugfix: Canceling not running jobs is now working without javascript error (needed by write heart rate on connect.garmin.com)
 - Feature: Added plugin functionality DirectoryListing
