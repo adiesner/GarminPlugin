@@ -1,3 +1,6 @@
+2011-06-28 - Version 0.3.3
+- Bugfix: Some sites do not provide a file extension, so saving a file to the device failed. The plugin now tries to detect the extension.
+
 2011-06-17 - Version 0.3.2
 - Bugfix: When uploading a single TCX file, the GPS points were unintentionally stripped from the upload
 
