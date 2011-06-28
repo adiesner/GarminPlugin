@@ -146,12 +146,41 @@ int GarminFilebasedDevice::startWriteToGps(const string filename, const string x
     }
 
 
+    string newFilename = filename;
     // Get File extension of file to write:
     string::size_type idx;
     idx = filename.rfind('.');
     string fileToWriteExtension = "";
     if(idx != std::string::npos) {
         fileToWriteExtension = filename.substr(idx+1);
+    }
+    if (fileToWriteExtension.compare("") == 0) {
+        // File has no file extension.
+        size_t foundPos;
+        foundPos=filename.find("gpxfile");
+        if (foundPos!=string::npos) {
+            // site http://my.garmin.com/locate/savePOI.htm uses this filename "gpxfile11152893811" for gpx files
+            fileToWriteExtension = "gpx";
+            newFilename.append(".gpx");
+            if (Log::enabledDbg()) { Log::dbg("Using file extension gpx [file contains string gpxfile]"); }
+        } else {
+            // search inside xml for keywords
+            foundPos=xml.find("<gpx");
+            if (foundPos!=string::npos) {
+                fileToWriteExtension = "gpx";
+                newFilename.append(".gpx");
+                if (Log::enabledDbg()) { Log::dbg("Using file extension gpx [xml contains string <gpx]"); }
+            } else {
+                foundPos=xml.find("<TrainingCenterDatabase");
+                if (foundPos!=string::npos) {
+                    fileToWriteExtension = "tcx";
+                    newFilename.append(".tcx");
+                    if (Log::enabledDbg()) { Log::dbg("Using file extension tcx [xml contains string <TrainingCenterDatabase]"); }
+                } else {
+                    Log::err("Giving up - unable to determine file type for "+filename);
+                }
+            }
+        }
     }
 
     // Determine Directory to write to
@@ -177,7 +206,7 @@ int GarminFilebasedDevice::startWriteToGps(const string filename, const string x
     // There shouldn't be a thread running... but who knows...
     lockVariables();
     this->xmlToWrite = xml;
-    this->filenameToWrite = targetDirectory + "/" + filename;
+    this->filenameToWrite = targetDirectory + "/" + newFilename;
     this->overwriteFile = 2; // not yet asked
     this->workType = WRITEGPX;
     unlockVariables();
