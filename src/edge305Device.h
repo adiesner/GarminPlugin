@@ -258,6 +258,7 @@ private:
      * @return xml string
      */
     TcxLap * getLapHeader(D1011 * lapData);
+    TcxLap * getLapHeader(D1001 * lapData);
 
     /**
      * Prints a track point
@@ -265,6 +266,7 @@ private:
      * @return xml string
      */
     TcxTrackpoint * getTrackPoint ( D304 * p);
+    TcxTrackpoint * getTrackPoint ( D303 * p);
 
     /**
      * Prints information about the device

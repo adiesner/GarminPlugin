@@ -278,27 +278,50 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                 bool firstLap = true;
                 for ( garmin_list_node * n = lap->head; n != NULL; n = n->next ) {
                     D1011 * lapData = NULL;
+                    D1001 * lapData301 = NULL;
                     if (n->data->type == data_D1011) { // Edge 305 uses this
                         lapData = (D1011*)n->data->data;
                     } else if (n->data->type == data_D1015) { // Forerunner 205 uses this
                         lapData = (D1011*)n->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+                    } else if (n->data->type == data_D1001) { // Forerunner 301 uses this
+                        lapData301 = (D1001*)n->data->data;
+                    } else {
+                        stringstream ss;
+                        ss << "Unknown lap type is: " << n->data->type;
+                        Log::dbg(ss.str());
                     }
 
-                    if (lapData != NULL) {
-                        if ((lapData->index >= first_lap_index) && (lapData->index <= last_lap_index)) {
+                    if ((lapData != NULL) || (lapData301 != NULL)) {
+                        uint32 current_lap_index = 0;
+                        time_type current_start_time = 0;
+                        if (lapData != NULL) {
+                            current_lap_index = lapData->index;
+                            current_start_time = lapData->start_time;
+                        }
+                        if (lapData301 != NULL) {
+                            current_lap_index = lapData301->index;
+                            current_start_time = lapData301->start_time;
+                        }
+
+                        if ((current_lap_index >= first_lap_index) && (current_lap_index <= last_lap_index)) {
 
                             uint32 startTimeNextLap = getNextLapStartTime(n);
 
-                            TcxLap * singleLap = getLapHeader(lapData);
+                            TcxLap * singleLap = NULL;
+                            if (lapData != NULL) {
+                                singleLap = getLapHeader(lapData);
+                            } else {
+                                singleLap = getLapHeader(lapData301);
+                            }
                             int pointCount = 0;
                             if (Log::enabledDbg()) {
                                 stringstream ss;
-                                ss << "Creating new lap: " << lapData->index ;
+                                ss << "Creating new lap: " << current_lap_index ;
                                 Log::dbg(ss.str());
                             }
                             *singleActivity<< singleLap;
                             if (firstLap) {
-                                singleActivity->setId(GpsFunctions::print_dtime(lapData->start_time));
+                                singleActivity->setId(GpsFunctions::print_dtime(current_start_time));
                                 firstLap = false;
                             }
 
@@ -316,7 +339,7 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                                     D304 * trackpointData = (D304 *)t->data->data;
                                     if (currentTrackIndex == track_index) {
                                         if (singleTrack != NULL) {
-                                            if (trackpointData->time >= lapData->start_time) {
+                                            if (trackpointData->time >= current_start_time) {
                                                 if (startTimeNextLap > 0) {
                                                     if (trackpointData->time < startTimeNextLap) {
                                                         (*singleTrack) << getTrackPoint(trackpointData);
@@ -332,8 +355,31 @@ TcxActivities * Edge305Device::printActivities(garmin_list * runList, garmin_lis
                                             Log::err("Current track is null - but track index matches !?");
                                         }
                                     }
+                                } else  if (t->data->type == data_D303) { // Used by forerunner301
+                                    D303 * trackpointData = (D303 *)t->data->data;
+                                    if (currentTrackIndex == track_index) {
+                                        if (singleTrack != NULL) {
+                                            if (trackpointData->time >= current_start_time) {
+                                                if (startTimeNextLap > 0) {
+                                                    if (trackpointData->time < startTimeNextLap) {
+                                                        (*singleTrack) << getTrackPoint(trackpointData);
+                                                        pointCount++;
+                                                    }
+                                                } else {
+                                                    (*singleTrack) << getTrackPoint(trackpointData);
+                                                    pointCount++;
+                                                }
+                                            }
+
+                                        } else {
+                                            Log::err("Current track is null - but track index matches !?");
+                                        }
+                                    }
+
                                 } else {
-                                    Log::dbg("Unknown track type!!!");
+                                    stringstream ss;
+                                    ss << "Unknown track point: " << t->data->type;
+                                    Log::dbg(ss.str());
                                 }
                             }
                             if (Log::enabledDbg()) {
@@ -442,6 +488,51 @@ TcxLap * Edge305Device::getLapHeader(D1011 * lapData) {
     return singleLap;
 }
 
+TcxLap * Edge305Device::getLapHeader(D1001 * lapData) {
+
+    TcxLap * singleLap = new TcxLap();
+
+    //TODO: Think about letting TcxLap calculate that itself
+    uint32 dur = lapData->total_time;
+    stringstream ss;
+    int  hun = dur % 100;
+    dur -= hun;
+    dur /= 100;
+    ss << dur << "." << hun ;
+    singleLap->setTotalTimeSeconds(ss.str());
+
+    ss.str(""); ss << lapData->total_dist;
+    singleLap->setDistanceMeters(ss.str());
+    ss.str(""); ss << lapData->max_speed;
+    singleLap->setMaximumSpeed(ss.str());
+    ss.str(""); ss << lapData->calories;
+    singleLap->setCalories(ss.str());
+
+    if ( lapData->avg_heart_rate != 0 ) {
+        ss.str("");
+        ss << (unsigned int)(lapData->avg_heart_rate);
+        singleLap->setAverageHeartRateBpm(ss.str());
+    }
+    if ( lapData->max_heart_rate != 0 ) {
+        ss.str("");
+        ss << (unsigned int)(lapData->max_heart_rate);
+        singleLap->setMaximumHeartRateBpm(ss.str());
+    }
+
+    if (lapData->intensity == D1001_active) {
+        singleLap->setIntensity(TrainingCenterDatabase::Active);
+    } else {
+        singleLap->setIntensity(TrainingCenterDatabase::Resting);
+    }
+
+    if (this->runType == 1) {
+        singleLap->setCadenceSensorType(TrainingCenterDatabase::Footpod);
+    } else {
+        singleLap->setCadenceSensorType(TrainingCenterDatabase::Bike);
+    }
+
+    return singleLap;
+}
 
 
 TcxTrackpoint * Edge305Device::getTrackPoint ( D304 * p)
@@ -491,6 +582,34 @@ TcxTrackpoint * Edge305Device::getTrackPoint ( D304 * p)
 
     return singlePoint;
 }
+
+TcxTrackpoint * Edge305Device::getTrackPoint ( D303 * p)
+{
+    TcxTrackpoint * singlePoint = new TcxTrackpoint(GpsFunctions::print_dtime(p->time));
+
+    if (( p->posn.lat != 0x7fffffff ) && ( p->posn.lon != 0x7fffffff )) {
+        stringstream lat;
+        lat.precision(10); // default 4 decimal chars which is not enough
+        stringstream lon;
+        lon.precision(10); // default 4 decimal chars which is not enough
+        lat << SEMI2DEG(p->posn.lat);
+        lon << SEMI2DEG(p->posn.lon);
+        singlePoint->setPosition(lat.str(), lon.str());
+    }
+
+    stringstream ss;
+    if (p->alt < 1.0e24 ) {
+        ss << p->alt;
+        singlePoint->setAltitudeMeters(ss.str());
+    }
+    if ( p->heart_rate != 0 ) {
+        ss.str("");
+        ss << (unsigned int)(p->heart_rate);
+        singlePoint->setHeartRateBpm(ss.str());
+    }
+    return singlePoint;
+}
+
 
 /*static*/
 string Edge305Device::getAttachedDeviceName() {
@@ -1051,6 +1170,9 @@ uint32 Edge305Device::getNextLapStartTime(garmin_list_node * node) {
         lapData = (D1011*)nextNode->data->data;
     } else if (nextNode->data->type == data_D1015) { // Forerunner 205 uses this
         lapData = (D1011*)nextNode->data->data; // cast to wrong type - is safe because D1015 is identical, just a little bit longer
+    } else if (nextNode->data->type == data_D1001) { // Forerunner 205 uses this
+        D1001 * lapData301 = (D1001*)nextNode->data->data;
+        return lapData301->start_time;
     } else {
         return 0;
     }
