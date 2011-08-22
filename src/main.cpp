@@ -73,7 +73,7 @@ const char
 #else
 char
 #endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.3";
+ 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.4dev";
 
 /**
  * A variable that stores the mime description of the plugin.
