@@ -1488,6 +1488,31 @@ bool methodCancelDirectoryListing(NPObject *obj, const NPVariant args[], uint32_
     return true;
 }
 
+bool methodParentDevice(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
+    if (argCount >= 1) {
+        int deviceId = getIntParameter(args, 0, -1);
+
+        if (deviceId != -1) {
+            // TODO: Since version 3.0.1.0 it is possible to have parent devices
+            // Currently the plugin does not return any child devices, which is why
+            // this function always returns -1 (no child device)
+            result->type = NPVariantType_Int32;
+            result->value.intValue = -1;
+            if (Log::enabledDbg()) {
+                stringstream ss;
+                ss << "ParentDevice for device " << deviceId << " - returning 'device has no parent device'";
+                Log::dbg(ss.str());
+            }
+            return true;
+        } else {
+            if (Log::enabledErr()) Log::err("ParentDevice: Unable to determine device id (first parameter)");
+        }
+    } else {
+        if (Log::enabledDbg()) { Log::dbg("Wrong argument count for ParentDevice"); }
+    }
+    return false;
+}
+
 /**
  * Initializes the Property List and Function List that are accessible from the outside
  */
@@ -1497,7 +1522,7 @@ void initializePropertyList() {
 	Property value;
 	value.writeable = false;
 	value.type = NPVariantType_String;
-	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>2</VersionMajor>\n<VersionMinor>9</VersionMinor>\n<BuildMajor>3</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
+	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>3</VersionMajor>\n<VersionMinor>0</VersionMinor>\n<BuildMajor>1</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
 	propertyList["VersionXml"] = value;
 	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>GarminPlugin Status not yet implemented</Title>\n<Text></Text>\n<Text></Text>\n<Text>0% complete</Text><ProgressBar Type=\"Percentage\" Value=\"0\"/></ProgressWidget>\n";
 	propertyList["ProgressXml"] = value;
@@ -1631,6 +1656,9 @@ void initializePropertyList() {
     fooPointer = &methodCancelDirectoryListing;
     methodList["CancelDirectoryListing"] = fooPointer;
 
+    // Get Parent Device (new in 3.0.1.0)
+    fooPointer = &methodParentDevice;
+    methodList["ParentDevice"] = fooPointer;
 
 }
 
