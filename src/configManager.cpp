@@ -157,7 +157,11 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 }
 
 MessageBox * ConfigManager::getMessage() {
-    if (!this->createdNew) return NULL;
-
-    return new MessageBox(Question, "A new configuration was created at "+this->configurationFile, BUTTON_OK, BUTTON_OK, NULL);
+    // New configuration created message is unnecessary and created problems with some devices
+    // A message is not always fetched when FinishState = 2 is returned to the javascript so
+    // this message made the plugin not usable until the browser was restarted
+//    if (!this->createdNew) return NULL;
+//
+//    return new MessageBox(Question, "A new configuration was created at "+this->configurationFile, BUTTON_OK, BUTTON_OK, NULL);
+    return NULL;
 }
