@@ -19,18 +19,14 @@
 
 #include "config.h"
 #include <stdio.h>
-#include <npapi.h>
-#if HAVE_NPFUNCTIONS_H
-#include <npfunctions.h>
-#else
-#include <npupp.h>
-#endif
+#include "npapi/npapi.h"
+#include "npapi/npfunctions.h"
+#include "npapi/npruntime.h"
 #if HAVE_PRTYPES_H
 	#include <prtypes.h>
 #elif HAVE_ZIPSTUB_H
 	#include <zipstub.h>
 #endif
-#include <npruntime.h>
 #include <iostream>
 #include <map>
 #include "deviceManager.h"
@@ -45,45 +41,25 @@
 #include <unistd.h>
 
 
-#if HAVE_NEW_XULRUNNER
 #define GETSTRING(_v)          ((_v).UTF8Characters)
 #define GETSTRINGLENGTH(_v)    ((_v).UTF8Length)
-#else
-#define GETSTRING(_v)          ((_v).utf8characters)
-#define GETSTRINGLENGTH(_v)    ((_v).utf8length)
-#endif
 
 using namespace std;
 
 /**
  * A variable that stores the plugin name
  */
-#if HAVE_NPFUNCTIONS_H
-const char
-#else
-char
-#endif
-	 * pluginName = "Garmin Communicator";
+const char * pluginName = "Garmin Communicator";
 
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-#if HAVE_NPFUNCTIONS_H
-const char
-#else
-char
-#endif
- 	* pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.4";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.4";
 
 /**
  * A variable that stores the mime description of the plugin.
  */
-#if HAVE_NPFUNCTIONS_H
-const char
-#else
-char
-#endif
-	 * pluginMimeDescription = "application/vnd-garmin.mygarmin:garmin:Garmin Device Web Control";
+const char * pluginMimeDescription = "application/vnd-garmin.mygarmin:garmin:Garmin Device Web Control";
 
 /**
  * Manages all attached GPS Devices
@@ -153,7 +129,7 @@ GpsDevice * currentWorkingDevice = NULL;
 /**
  * Stores if the browser supports XEmbed - need to report true to Chrome to get the plugin detected
  */
-PRBool supportsXEmbed = PR_FALSE;
+bool supportsXEmbed = false;
 
 
 string getParameterTypeStr(const NPVariant arg) {
@@ -1991,19 +1967,11 @@ static NPError getValue(NPP instance, NPPVariable variable, void *value) {
 		return NPERR_GENERIC_ERROR;
 	case NPPVpluginNameString:
         if (Log::enabledDbg()) Log::dbg("getvalue - name string");
-#if HAVE_NPFUNCTIONS_H
 		*((const char **)value) = pluginName;
-#else
-		*((char **)value) = pluginName;
-#endif
 		break;
 	case NPPVpluginDescriptionString:
         if (Log::enabledDbg()) Log::dbg("getvalue - description string");
-#if HAVE_NPFUNCTIONS_H
 		*((const char **)value) = pluginDescription;
-#else
-		*((char **)value) = pluginDescription;
-#endif
 		break;
 	case NPPVpluginScriptableNPObject:
         if (Log::enabledDbg()) Log::dbg("getvalue - scriptable object");
@@ -2015,7 +1983,7 @@ static NPError getValue(NPP instance, NPPVariable variable, void *value) {
 		break;
 	case NPPVpluginNeedsXEmbed:
         if (Log::enabledDbg()) Log::dbg("getvalue - xembed");
-		*((PRBool *)value) = supportsXEmbed; // Support XEmbed (without Chrome does not work)
+		*((bool *)value) = supportsXEmbed; // Support XEmbed (without Chrome does not work)
 		break;
 	}
 	return NPERR_NO_ERROR;
@@ -2075,7 +2043,7 @@ static void nppUrlNotify(NPP instance, const char* url, NPReason reason, void* n
 	}
 }
 
-static NPError nppNewStream(NPP instance, NPMIMEType type, NPStream*  stream, NPBool seekable, uint16* stype) {
+static NPError nppNewStream(NPP instance, NPMIMEType type, NPStream*  stream, NPBool seekable, uint16_t* stype) {
 	if (*stype == NP_NORMAL) {
         if (Log::enabledDbg()) {
             string url = stream->url;
@@ -2089,12 +2057,12 @@ static NPError nppNewStream(NPP instance, NPMIMEType type, NPStream*  stream, NP
 }
 
 #define NPP_STREAM_BUFFER_SIZE 5120
-static int32 nppWriteReady(NPP instance, NPStream* stream) {
+static int32_t nppWriteReady(NPP instance, NPStream* stream) {
 	if (Log::enabledDbg()) Log::dbg("nppWriteReady");
     return NPP_STREAM_BUFFER_SIZE;
 }
 
-static int32 nppWrite(NPP instance, NPStream* stream, int32 offset, int32 len, void* buf) {
+static int32_t nppWrite(NPP instance, NPStream* stream, int32_t offset, int32_t len, void* buf) {
 	if (Log::enabledDbg()) {
         stringstream ss;
         ss << "nppWrite Parameter: Offset: " << offset << " Length: " << len;
@@ -2187,12 +2155,12 @@ NPError OSCALL NP_Initialize(NPNetscapeFuncs *npnf
     err = npnfuncs->getvalue(NULL, NPNVSupportsXEmbedBool,(void *)&supportsXEmbed);
 
     if (err != NPERR_NO_ERROR) {
-        supportsXEmbed = PR_FALSE;
+        supportsXEmbed = false;
         Log::err("Error while asking for XEmbed support");
     }
 
     if (Log::enabledDbg()) {
-        if (supportsXEmbed == PR_FALSE) {
+        if (supportsXEmbed == false) {
             Log::dbg("Browser does not support XEmbed");
         } else {
             Log::dbg("Browser supports XEmbed");
@@ -2232,10 +2200,7 @@ NPError OSCALL NP_Shutdown() {
 * The browser requests the mime description of the plugin with this function
 * @return Mime description
 */
-#if HAVE_NPFUNCTIONS_H
-const
-#endif
-char * NP_GetMIMEDescription(void) {
+const char * NP_GetMIMEDescription(void) {
 	if (Log::enabledDbg()) Log::dbg("NP_GetMIMEDescription");
 	return pluginMimeDescription;
 }
