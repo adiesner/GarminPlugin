@@ -53,10 +53,6 @@ echo "Copying Sources..."
 
 cp -r "$GITREPOSITORYDIR/../../src" "./garminplugin-$VERSION/GarminPlugin"
 
-echo "Fetching garmintools sources..."
-cd "./garminplugin-$VERSION"
-svn export http://garmintools.googlecode.com/svn/trunk/ garmintools
-
 TARGETDIR=`pwd`
 
 if [ -f "$GITREPOSITORYDIR/$DEBIANVERSION/buildEnv.sh" ]; then
