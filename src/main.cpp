@@ -153,6 +153,18 @@ string getParameterTypeStr(const NPVariant arg) {
     }
 }
 
+string getStringFromNPString(const NPString inputStr) {
+    // Any NPString object returned when communicating with the browser cannot be
+    // assumed to be null-terminated at the appropriate place
+    // That is why I use memcpy here and null-terminate the string
+    char * sTmp = new char[GETSTRINGLENGTH(inputStr)+1];
+    memcpy(sTmp, GETSTRING(inputStr), GETSTRINGLENGTH(inputStr));
+    sTmp[GETSTRINGLENGTH(inputStr)] = 0x00; // Null-terminate the string;
+    string strValue = sTmp;
+    delete sTmp;
+    return strValue;
+}
+
 /**
  * If debug level, it outputs the content of string property variables into files in /tmp
  */
@@ -178,7 +190,7 @@ int getIntParameter(const NPVariant args[], int pos, int defaultVal) {
     if (args[pos].type == NPVariantType_Int32) {
         intValue = args[pos].value.intValue;
     } else if (args[pos].type == NPVariantType_String) {
-        std::string intValueStr = GETSTRING(args[pos].value.stringValue);
+        std::string intValueStr = getStringFromNPString(args[pos].value.stringValue);
         Log::dbg("getIntParameter String: "+intValueStr);
         std::istringstream ss( intValueStr );
         ss >> intValue;
@@ -213,7 +225,7 @@ string getStringParameter(const NPVariant args[], int pos, string defaultVal) {
         ss << args[pos].value.intValue;
         strValue = ss.str();
     } else if (args[pos].type == NPVariantType_String) {
-        strValue = GETSTRING(args[pos].value.stringValue);
+        strValue  = getStringFromNPString(args[pos].value.stringValue);
     } else {
         std::ostringstream errTxt;
         errTxt << "Expected STRING parameter at position " << pos << ". Found: " << getParameterTypeStr(args[pos]);
@@ -227,7 +239,7 @@ bool getBoolParameter(const NPVariant args[], int pos, bool defaultVal) {
     if (args[pos].type == NPVariantType_Int32) {
         boolValue = (args[pos].value.intValue == 1) ? true : false;
     } else if (args[pos].type == NPVariantType_String) {
-        string strValue = GETSTRING(args[pos].value.stringValue);
+        string strValue = getStringFromNPString(args[pos].value.stringValue);
         boolValue = (strValue.compare("1") == 0) ? true : false;
     } else if (args[pos].type == NPVariantType_Bool) {
         boolValue = args[pos].value.boolValue;
@@ -850,14 +862,7 @@ bool methodStartReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32_
         int deviceId = getIntParameter(args, 0, -1);
         string id = "";
 
-        if (args[2].type == NPVariantType_Int32) {
-            id = args[2].value.intValue;
-        } else if (args[2].type == NPVariantType_String) {
-            id = GETSTRING(args[2].value.stringValue);
-        } else {
-            if (Log::enabledErr()) Log::err("StartReadFitnessDirectory: Expected STRING parameter 3");
-        }
-
+        id = getStringParameter(args, 2, "");
         if (deviceId != -1) {
             currentWorkingDevice = devManager->getGpsDevice(deviceId);
             if (currentWorkingDevice != NULL) {
@@ -1677,7 +1682,7 @@ void printParameter(string name, const NPVariant args[], uint32_t argCount) {
         if (args[i].type == NPVariantType_Int32) {
             ss << "" << args[i].value.intValue;
         } else if (args[i].type == NPVariantType_String) {
-            ss << "\"" << GETSTRING(args[i].value.stringValue) << "\"";
+            ss << "\"" << getStringParameter(args, i, "") << "\"";
         } else if (args[i].type == NPVariantType_Bool) {
             if (args[i].value.boolValue) {
                 ss << "true";
@@ -1818,7 +1823,7 @@ static bool setProperty(NPObject *obj, NPIdentifier propertyName, const NPVarian
 		if (storedProperty.writeable) {
 		    storedProperty.type = value->type;
             if (value->type == NPVariantType_String) {
-                storedProperty.stringValue = GETSTRING(value->value.stringValue);
+                storedProperty.stringValue = getStringFromNPString(value->value.stringValue);
                 propertyList[name] = storedProperty; // store
                 return true;
             } else if (value->type == NPVariantType_Int32) {
@@ -1925,7 +1930,7 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
             bool b2 = npnfuncs->getproperty( inst, locationObj, identifier, &variantValue );
             if (b2) {
                 if (variantValue.type == NPVariantType_String) {
-                    string href = GETSTRING(variantValue.value.stringValue);
+                    string href = getStringFromNPString(variantValue.value.stringValue);
                     Log::dbg("URL: "+href);
                 }
             }
