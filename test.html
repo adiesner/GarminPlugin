@@ -156,6 +156,9 @@
                 }
                 document.getElementById("onFinishReadFromDeviceGpsXml").innerHTML = "";
                 document.getElementById("onFinishReadFromDeviceGpsXml").innerHTML = xml2html(json.controller.gpsDataString);
+                document.getElementById("onFinishReadFromDeviceGpsXmlCompressed").innerHTML = "";
+                document.getElementById("onFinishReadFromDeviceGpsXmlCompressed").innerHTML = xml2html(json.controller.gpsDataStringCompressed);
+
                 showDiv("onFinishReadFromDeviceDiv");
             },
 
@@ -324,6 +327,29 @@
 	        }                   
         }
 
+       function callListDirectory() {
+            try {
+                var number = globalGarminController.getDeviceNumber();
+                document.getElementById("GarminNetscapePlugin").StartDirectoryListing(number, "", false);
+	        } catch (e) {
+	            alert(e);
+	        }                   
+       }
+
+       function callGetListDirectory() {
+            try {
+                var number = globalGarminController.getDeviceNumber();
+                var status = document.getElementById("GarminNetscapePlugin").FinishDirectoryListing();
+                if (status == 3) {
+                    var text = document.getElementById("GarminNetscapePlugin").DirectoryListingXml;
+                    document.getElementById("onFinishReadFromDeviceGpsXml").innerHTML = xml2html(text);
+                    alert("Done");
+                }
+	        } catch (e) {
+	            alert(e);
+	        }                   
+       }
+
 	</script>
 </head>
 
@@ -347,6 +373,7 @@
 <div id="onFinishReadFromDeviceDiv" class="tabcontent" style="display:none">	
     <div id="statusOnFinishReadFromDevice">Status: ?</div><br>
     <div id="onFinishReadFromDeviceGpsXml" class="resultBox" style="width:750px;height:400px">Empty</div><br>
+    <div id="onFinishReadFromDeviceGpsXmlCompressed" class="resultBox" style="width:750px;height:400px">Empty</div><br>
 </div>
 
 
@@ -467,8 +494,10 @@ Dir: <select name="readDataFromDeviceDir" id="readDataFromDeviceDir" disabled="d
 
 <hr>
 Relative File Path: <input name="getBinaryFilePath" id="getBinaryFilePath" type="text" length="30" value="Garmin/GPX/Current/current.gpx">
-        <button onclick='callGetBinaryFile()'>GetBinaryFile</button><br><br>
+        <button onclick='callGetBinaryFile()'>GetBinaryFile</button><button onclick='callGetBinaryFile()'>GetBinaryFile Compressed</button><br><br>
 
+        <button onclick='callListDirectory()'>ListDirectory</button><br><br>
+        <button onclick='callGetListDirectory()'>GetListDirectory</button><br><br>
 
 </div>
 
