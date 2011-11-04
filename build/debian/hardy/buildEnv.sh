@@ -25,3 +25,9 @@ else
   echo "************ ERROR ERROR ************"
   exit 1
 fi
+
+
+cd $TARGETDIR
+echo "Fetching garmintools sources..."
+svn export http://garmintools.googlecode.com/svn/trunk/ garmintools
+
