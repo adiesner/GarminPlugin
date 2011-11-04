@@ -27,7 +27,6 @@ build-stamp: configure-stamp
 	# Add here commands to compile the package.
     # Lucid does not have tinyxml package, we need to provide it
 	if test -f tinyxml/Makefile; then cd tinyxml && make; fi
-	cd garmintools && $(MAKE)
 	cd GarminPlugin && ./configure
 	cd GarminPlugin && $(MAKE)
 	#docbook-to-man debian/garminplugin.sgml > garminplugin.1
@@ -39,9 +38,6 @@ clean:
 	dh_testroot
 	rm -f build-stamp configure-stamp
 	if test -f GarminPlugin/Makefile; then cd GarminPlugin && make clean; fi
-	if test -f garmintools/Makefile; then cd garmintools && make clean; fi
-    # Lucid does not have tinyxml package, we need to provide it
-	if test -f tinyxml/Makefile; then cd tinyxml && make clean; fi
 	# Add here commands to clean up after the build process.
 
 	dh_clean 
