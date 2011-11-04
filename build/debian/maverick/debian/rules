@@ -16,7 +16,6 @@ configure: configure-stamp
 configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
-	cd garmintools && ./configure CXXFLAGS="-fPIC -g -O2" CFLAGS="-g -O2 -fPIC"
 	touch configure-stamp
 
 build: build-stamp
