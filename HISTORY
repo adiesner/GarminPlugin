@@ -1,3 +1,6 @@
+2011-11-04 - Version 0.3.5
+- Bugfix: No more empty workouts in newer browsers
+
 2011-08-30 - Version 0.3.4
 - Feature: Added support for Forerunner 301
 - Info: Updated plugin version number to 3.0.1.0 - added new function ParentDevice()
