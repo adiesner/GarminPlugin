@@ -405,6 +405,11 @@ protected:
 
   virtual void setPathesFromConfiguration();
 
+/**
+ * Parses all attributes of a TiXmlElement and adds them to another TiXmlElement if it is missing
+ */
+  void addMissingAttributes(TiXmlElement * in, TiXmlElement * out);
+
   /**
    * File where this device stores its fitness/gpx data
    */

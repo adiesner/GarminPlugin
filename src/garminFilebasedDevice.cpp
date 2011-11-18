@@ -505,6 +505,23 @@ bool fitFileSorter (TiXmlNode * a,TiXmlNode * b) {
 }
 
 /**
+ * Parses all attributes of a TiXmlElement and adds them to another TiXmlElement if it is missing
+ */
+void GarminFilebasedDevice::addMissingAttributes(TiXmlElement * in, TiXmlElement * out) {
+    if ((in==NULL) || (out==NULL)) { return; }
+    TiXmlAttribute* pAttrib=in->FirstAttribute();
+    while (pAttrib) {
+        const char * a  = out->Attribute(pAttrib->Name());
+        if (a==NULL) {
+            // Attribute does not exist in out, need to create it
+            out->SetAttribute(pAttrib->Name(),pAttrib->Value());
+        }
+        pAttrib=pAttrib->Next();
+    }
+}
+
+
+/**
  * Reads TCX directories
  */
 void GarminFilebasedDevice::readFitnessDataFromDevice(bool readTrackData, string fitnessDetailId) {
@@ -584,9 +601,10 @@ Thread-Status
             TiXmlDocument doc(workDir + "/" + files[i]);
             if (Log::enabledDbg()) { Log::dbg("Opening file: "+ files[i]); }
             if (doc.LoadFile()) {
-                TiXmlElement * train = doc.FirstChildElement("TrainingCenterDatabase");
-                if (train != NULL) {
-                    TiXmlElement * inputActivities = train->FirstChildElement("Activities");
+                TiXmlElement * trainFile = doc.FirstChildElement("TrainingCenterDatabase");
+                if (trainFile != NULL) {
+                    addMissingAttributes(trainFile, train);
+                    TiXmlElement * inputActivities = trainFile->FirstChildElement("Activities");
                     while ( inputActivities != NULL) {
                         TiXmlElement * inputActivity =inputActivities->FirstChildElement("Activity");
                         while ( inputActivity != NULL) {
@@ -606,13 +624,6 @@ Thread-Status
                                         while (trackNode != NULL) {
                                             node->RemoveChild( node->FirstChildElement("Track") );
                                             trackNode = node->FirstChildElement("Track");
-                                        }
-
-                                        // Remove extensions, they are not valid in this xsd
-                                        TiXmlNode * extensionNode = node->FirstChildElement("Extensions");
-                                        while (extensionNode  != NULL) {
-                                            node->RemoveChild( node->FirstChildElement("Extensions") );
-                                            extensionNode = node->FirstChildElement("Extensions");
                                         }
 
                                         //node = newAct->FirstChildElement("Lap");
