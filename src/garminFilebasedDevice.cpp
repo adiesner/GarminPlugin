@@ -607,6 +607,14 @@ Thread-Status
                                             node->RemoveChild( node->FirstChildElement("Track") );
                                             trackNode = node->FirstChildElement("Track");
                                         }
+
+                                        // Remove extensions, they are not valid in this xsd
+                                        TiXmlNode * extensionNode = node->FirstChildElement("Extensions");
+                                        while (extensionNode  != NULL) {
+                                            node->RemoveChild( node->FirstChildElement("Extensions") );
+                                            extensionNode = node->FirstChildElement("Extensions");
+                                        }
+
                                         //node = newAct->FirstChildElement("Lap");
                                         node = node->NextSibling();
                                     }
