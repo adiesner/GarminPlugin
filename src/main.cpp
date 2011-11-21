@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.5";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.6";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -86,6 +86,11 @@ static NPNetscapeFuncs *npnfuncs = NULL;
  * Unknown
  */
 static NPP              inst     = NULL;
+
+/**
+ * Counts the number of new's that have been executed on the plugin
+ */
+static int              instanceCount = 0;
 
 /**
  * Stores the information about plugin properties
@@ -1872,6 +1877,7 @@ static NPClass npcRefObject = {
  * @param saved ?
  */
 static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t argc, char *argn[], char *argv[], NPSavedData *saved) {
+    instanceCount++;
 	inst = instance;
 	if (Log::enabledDbg()) Log::dbg("new");
 
@@ -1950,10 +1956,16 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
  * @return NPERR_NO_ERROR
  */
 static NPError destroy(NPP instance, NPSavedData **save) {
-	if(so)
-		npnfuncs->releaseobject(so);
-	so = NULL;
 	if (Log::enabledDbg()) Log::dbg("destroy");
+	instanceCount--;
+	if (instanceCount == 0) {
+        if (Log::enabledDbg()) Log::dbg("destroy - last instance");
+        if ((so) && (npnfuncs != NULL)) {
+            npnfuncs->releaseobject(so);
+            so = NULL;
+        }
+	}
+
 	return NPERR_NO_ERROR;
 }
 
