@@ -1887,8 +1887,6 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
 
     if (Log::enabledDbg()) Log::dbg("Overwriting Garmin Javascript Browser detection!");
     NPString str;
-    char buf[1000];
-
 
     NPObject* windowObject = NULL;
     NPError err = npnfuncs->getvalue(inst, NPNVWindowNPObject, &windowObject);
@@ -1914,9 +1912,11 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
                                 }\
                               };\
                               garminOverwriteBrowserDetect();";
-    memcpy(buf, javascriptCode.c_str(), sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf));
+
+    char *buf = (char*)npnfuncs->memalloc(javascriptCode.size() + 1);
+    memcpy(buf, javascriptCode.c_str(), javascriptCode.size());
     GETSTRING(str) = buf;
-    GETSTRINGLENGTH(str) = sizeof(buf) > javascriptCode.size() ? javascriptCode.size(): sizeof(buf);
+    GETSTRINGLENGTH(str) = javascriptCode.size();
     if (!npnfuncs->evaluate(inst, windowObject, &str, &ret)) {
         Log::err("Unable to execute javascript: "+javascriptCode);
     }
