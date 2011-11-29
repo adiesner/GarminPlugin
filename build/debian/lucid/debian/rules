@@ -26,7 +26,7 @@ build-stamp: configure-stamp
 	# Add here commands to compile the package.
     # Lucid does not have tinyxml package, we need to provide it
 	if test -f tinyxml/Makefile; then cd tinyxml && make; fi
-	cd GarminPlugin && ./configure
+	cd GarminPlugin && ZLIB_CFLAGS="-I/usr/include" ZLIB_LIBS="-lz" ./configure
 	cd GarminPlugin && $(MAKE)
 	#docbook-to-man debian/garminplugin.sgml > garminplugin.1
 
