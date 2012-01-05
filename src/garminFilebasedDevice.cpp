@@ -857,6 +857,51 @@ bool GarminFilebasedDevice::isDeviceAvailable() {
     return false;
 }
 
+void GarminFilebasedDevice::setUpdatePathsFromConfiguration() {
+    if (this->deviceDescription != NULL) {
+        TiXmlElement * node = this->deviceDescription->FirstChildElement("Device");
+        if (node!=NULL) { node = node->FirstChildElement("Id"); }
+        if (node!=NULL) { deviceId = node->GetText(); }
+
+        node = this->deviceDescription->FirstChildElement("Device");
+        if (node!=NULL) { node = node->FirstChildElement("MassStorageMode"); }
+        if (node!=NULL) { node = node->FirstChildElement("UpdateFile"); }
+        while ( node != NULL) {
+            TiXmlElement *ti_path = node->FirstChildElement("Path");
+            TiXmlElement *ti_filename = node->FirstChildElement("FileName");
+            TiXmlElement *ti_partnum = node->FirstChildElement("PartNumber");
+            MassStorageDirectoryType devDir;
+
+            if (ti_path != NULL) {
+                devDir.path = ti_path->GetText();
+            }
+            if (ti_filename != NULL) {
+                devDir.basename = ti_filename->GetText();
+            }
+            if (ti_partnum != NULL) {
+                devDir.name = ti_partnum->GetText();
+            }
+            devDir.writeable = true;
+            devDir.readable = false;
+            devDir.dirType = UNKNOWN;
+
+            // Debug print
+            if (Log::enabledDbg()) {
+                stringstream ss;
+                ss << "UpdateFile: ";
+                ss << "Path: " << devDir.path;
+                ss << " File: " << devDir.basename;
+                ss << " Name: " << devDir.name;
+                Log::dbg("Found Feature: "+ss.str());
+            }
+
+            deviceDirectories.push_back(devDir);
+
+            node = node->NextSiblingElement("UpdateFile");
+        }
+    }
+}
+
 void GarminFilebasedDevice::setPathesFromConfiguration() {
     if (!deviceDirectories.empty()) { deviceDirectories.clear(); }
     this->fitnessFile = this->baseDirectory+"/Garmin/gpx/current/Current.gpx"; // Fallback
@@ -953,6 +998,7 @@ void GarminFilebasedDevice::setPathesFromConfiguration() {
             node = node->NextSiblingElement( "DataType" );
         }
     }
+    setUpdatePathsFromConfiguration();
 }
 
 int GarminFilebasedDevice::startReadFITDirectory() {

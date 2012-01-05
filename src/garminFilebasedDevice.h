@@ -403,6 +403,7 @@ protected:
    */
   bool transferSuccessful;
 
+  void setUpdatePathsFromConfiguration(); 
   virtual void setPathesFromConfiguration();
 
 /**
