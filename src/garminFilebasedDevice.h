@@ -403,8 +403,20 @@ protected:
    */
   bool transferSuccessful;
 
-  void setUpdatePathsFromConfiguration(); 
-  virtual void setPathesFromConfiguration();
+  /**
+   * Searches the configuration for the update directory and adds it.
+   */
+  void setUpdatePathsFromConfiguration();
+
+ /**
+  * Searches for FIT, TCX and GPX directories in the configuration
+  */
+  virtual void setPathsFromConfiguration();
+
+ /**
+  * Check upper/lower case of paths, if they match the file system and correct if needed
+  */
+  void checkPathsFromConfiguration();
 
 /**
  * Parses all attributes of a TiXmlElement and adds them to another TiXmlElement if it is missing
