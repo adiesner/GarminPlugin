@@ -1,3 +1,6 @@
+2012-01-23 - Version 0.3.8
+- Updated version number of garmin plugin from 3.0.1.0 to 4.0.1.0 (no new functionality !?)
+
 2012-01-18 - Version 0.3.7
 - Feature: Websites are now allowed to write files to the update directory of file based devices (which means you can perform an update)
 - Bugfix: Some people reported problems with incorrect upper/lowercase directory names in GarminDevice.xml. This will now be automatically corrected.

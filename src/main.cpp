@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.7";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.8";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -1508,7 +1508,7 @@ void initializePropertyList() {
 	Property value;
 	value.writeable = false;
 	value.type = NPVariantType_String;
-	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>3</VersionMajor>\n<VersionMinor>0</VersionMinor>\n<BuildMajor>1</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
+	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<Requests xmlns=\"http://www.garmin.com/xmlschemas/PcSoftwareUpdate/v2\">\n\n<Request>\n<PartNumber>006-A0160-00</PartNumber>\n<Version>\n<VersionMajor>4</VersionMajor>\n<VersionMinor>0</VersionMinor>\n<BuildMajor>1</BuildMajor>\n<BuildMinor>0</BuildMinor>\n<BuildType>Release</BuildType>\n</Version>\n<LanguageID>0</LanguageID>\n</Request>\n\n</Requests>\n";
 	propertyList["VersionXml"] = value;
 	value.stringValue = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\n<ProgressWidget xmlns=\"http://www.garmin.com/xmlschemas/PluginAPI/v1\">\n<Title>GarminPlugin Status not yet implemented</Title>\n<Text></Text>\n<Text></Text>\n<Text>0% complete</Text><ProgressBar Type=\"Percentage\" Value=\"0\"/></ProgressWidget>\n";
 	propertyList["ProgressXml"] = value;
