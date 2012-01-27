@@ -1,3 +1,6 @@
+2012-01-27 - Version 0.3.9
+- Bugfix: Downloading several URLs to the device failed for more than one download (eg. Updating Training Zones on Edge500)
+
 2012-01-23 - Version 0.3.8
 - Updated version number of garmin plugin from 3.0.1.0 to 4.0.1.0 (no new functionality !?)
 

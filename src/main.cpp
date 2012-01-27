@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.8";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.9";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -2099,6 +2099,16 @@ static NPError nppDestroyStream(NPP instance, NPStream* stream, NPReason  reason
         if (reason == NPRES_DONE) {
             if (Log::enabledDbg()) Log::dbg("nppDestroyStream: Stream done");
             currentWorkingDevice->saveDownloadData();
+
+            // Are there more downloads??
+            string urlToDownload = currentWorkingDevice->getNextDownloadDataUrl();
+            if (urlToDownload.length() > 0) {
+                if (Log::enabledDbg()) { Log::dbg("Requesting download for URL: "+urlToDownload); }
+                if (NPERR_NO_ERROR != npnfuncs->geturlnotify(inst, urlToDownload.c_str(), NULL, NULL)) {
+                    Log::err("Unable to get url: "+urlToDownload);
+                }
+            }
+
         } else {
             currentWorkingDevice->cancelDownloadData();
             Log::err("nppDestroyStream: Download to device was canceled because of errors");
