@@ -30,6 +30,8 @@
 
 #include <openssl/md5.h>
 
+#include <unistd.h>
+
 // needed for sort
 #include <algorithm>
 
