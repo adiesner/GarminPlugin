@@ -120,17 +120,12 @@ void Log::setConfiguration(TiXmlDocument * config) {
 }
 
 string Log::getTimestamp() {
-    const struct tm *tm;
-    size_t len;
-    time_t now;
-    char *s;
+    time_t now = time ( NULL );
+    const struct tm* tm = localtime ( &now );
 
-    now = time ( NULL );
-    tm = localtime ( &now );
-
-    s = new char[40];
-    len = strftime ( s, 40, "%d.%m.%y %H:%M:%S ", tm );
+    char* s = new char[40];
+    strftime ( s, 40, "%d.%m.%y %H:%M:%S ", tm );
     string str = s;
-    delete s;
+    delete[] s;
     return str;
 }

@@ -31,7 +31,7 @@ class MessageBox;
 class GpsDevice
 {
 public:
-    GpsDevice();
+    GpsDevice(string deviceName);
 
     virtual ~GpsDevice();
 

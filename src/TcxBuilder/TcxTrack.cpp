@@ -25,7 +25,7 @@ TcxTrack::TcxTrack() {
 
 TcxTrack::~TcxTrack() {
     vector<TcxTrackpoint*>::iterator it;
-    for ( it=trackpointList.begin() ; it < trackpointList.end(); it++ )
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); ++it )
     {
         TcxTrackpoint* trackpoint = *it;
         delete(trackpoint);
@@ -40,7 +40,7 @@ void TcxTrack::addTrackpoint(TcxTrackpoint* point) {
 TiXmlElement * TcxTrack::getTiXml() {
     TiXmlElement * xmlTrack = new TiXmlElement("Track");
     vector<TcxTrackpoint*>::iterator it;
-    for ( it=trackpointList.begin() ; it < trackpointList.end(); it++ )
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); ++it )
     {
         TcxTrackpoint* trackpoint = *it;
         xmlTrack->LinkEndChild(trackpoint->getTiXml());
@@ -52,7 +52,7 @@ vector<TiXmlElement *> TcxTrack::getGpxTiXml() {
     vector<TiXmlElement *> pointList;
 
     vector<TcxTrackpoint*>::iterator it;
-    for ( it=trackpointList.begin() ; it < trackpointList.end(); it++ )
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); ++it )
     {
         TcxTrackpoint* trackpoint = *it;
         if (trackpoint->hasCoordinates()) {
@@ -71,7 +71,7 @@ TcxTrack& operator<<(TcxTrack& track, TcxTrackpoint* point)
 string TcxTrack::getStartTime() {
     vector<TcxTrackpoint*>::iterator it;
     string startTime = "";
-    for ( it=trackpointList.begin() ; it < trackpointList.end(); it++ )
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); ++it )
     {
         TcxTrackpoint* trackpoint = *it;
         startTime = trackpoint->getTime();
@@ -88,7 +88,7 @@ double TcxTrack::calculateDistanceMeters() {
     vector<TcxTrackpoint*>::iterator it;
 
     TcxTrackpoint* lastTrackpoint = NULL;
-    for ( it=trackpointList.begin() ; it < trackpointList.end(); it++ )
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); ++it )
     {
         TcxTrackpoint* trackpoint = *it;
         if (NULL != lastTrackpoint) {
@@ -123,8 +123,5 @@ double TcxTrack::calculateTotalTime() {
 
 
 bool TcxTrack::isEmpty() {
-    if (trackpointList.size() == 0) {
-        return true;
-    }
-    return false;
+    return trackpointList.empty();
 }

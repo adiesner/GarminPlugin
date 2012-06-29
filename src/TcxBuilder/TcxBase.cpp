@@ -24,7 +24,7 @@ TcxBase::TcxBase() {
 
 TcxBase::~TcxBase() {
     vector<TcxActivities*>::iterator it;
-    for ( it=activitiesList.begin() ; it < activitiesList.end(); it++ )
+    for ( it=activitiesList.begin() ; it < activitiesList.end(); ++it )
     {
         TcxActivities* activities = *it;
         delete(activities);
@@ -65,7 +65,7 @@ TiXmlDocument * TcxBase::getTcxDocument(bool readTrackData, string fitnessDetail
     doc->LinkEndChild( train );
 
     vector<TcxActivities*>::iterator it;
-    for ( it=activitiesList.begin() ; it < activitiesList.end(); it++ )
+    for ( it=activitiesList.begin() ; it < activitiesList.end(); ++it )
     {
         TcxActivities* activities = *it;
         train->LinkEndChild( activities->getTiXml(readTrackData, fitnessDetailId) );
@@ -95,12 +95,12 @@ TiXmlDocument * TcxBase::getGpxDocument() {
     doc->LinkEndChild( gpx );
 
     vector<TcxActivities*>::iterator it;
-    for ( it=activitiesList.begin() ; it < activitiesList.end(); it++ )
+    for ( it=activitiesList.begin() ; it < activitiesList.end(); ++it )
     {
         TcxActivities* activities = *it;
         vector<TiXmlElement*> trkElem = activities->getGpxTiXml();
         vector<TiXmlElement*>::iterator it;
-        for ( it=trkElem.begin() ; it < trkElem.end(); it++ ) {
+        for ( it=trkElem.begin() ; it < trkElem.end(); ++it ) {
             TiXmlElement* elem = *it;
             gpx->LinkEndChild( elem );
         }

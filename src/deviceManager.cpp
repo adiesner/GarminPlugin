@@ -30,6 +30,7 @@
 #include <string>
 
 DeviceManager::DeviceManager()
+:configuration(0)
 {
 }
 
@@ -92,7 +93,7 @@ void DeviceManager::startFindDevices() {
     // Think about putting this routine into a thread when devices will be supported that take more time to search for
 
     // Remove active devices
-    while (gpsDeviceList.size() > 0)
+    while (!gpsDeviceList.empty())
     {
         GpsDevice *dev = gpsDeviceList.back();
         gpsDeviceList.pop_back();

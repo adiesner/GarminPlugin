@@ -137,7 +137,7 @@ GpsDevice * currentWorkingDevice = NULL;
 bool supportsXEmbed = false;
 
 
-string getParameterTypeStr(const NPVariant arg) {
+string getParameterTypeStr(const NPVariant& arg) {
     switch (arg.type) {
         case NPVariantType_Void:
                 return "VOID";
@@ -158,7 +158,7 @@ string getParameterTypeStr(const NPVariant arg) {
     }
 }
 
-string getStringFromNPString(const NPString inputStr) {
+string getStringFromNPString(const NPString& inputStr) {
     // Any NPString object returned when communicating with the browser cannot be
     // assumed to be null-terminated at the appropriate place
     // That is why I use memcpy here and null-terminate the string
@@ -166,7 +166,7 @@ string getStringFromNPString(const NPString inputStr) {
     memcpy(sTmp, GETSTRING(inputStr), GETSTRINGLENGTH(inputStr));
     sTmp[GETSTRINGLENGTH(inputStr)] = 0x00; // Null-terminate the string;
     string strValue = sTmp;
-    delete sTmp;
+    delete[] sTmp;
     return strValue;
 }
 
@@ -552,7 +552,7 @@ bool methodFinishWriteToGps(NPObject *obj, const NPVariant args[], uint32_t argC
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -655,7 +655,7 @@ bool methodDeviceDescription(NPObject *obj, const NPVariant args[], uint32_t arg
  */
 bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
 
@@ -717,7 +717,7 @@ bool methodFinishReadFitnessData(NPObject *obj, const NPVariant args[], uint32_t
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -814,7 +814,7 @@ bool methodFinishReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -894,7 +894,7 @@ bool methodFinishReadFitnessDetail(NPObject *obj, const NPVariant args[], uint32
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -967,7 +967,7 @@ bool methodFinishReadFromGps(NPObject *obj, const NPVariant args[], uint32_t arg
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -1108,7 +1108,7 @@ bool methodFinishDownloadData(NPObject *obj, const NPVariant args[], uint32_t ar
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -1153,7 +1153,7 @@ bool methodFinishReadFitnessDirectory(NPObject *obj, const NPVariant args[], uin
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -1234,7 +1234,7 @@ bool methodFinishWriteFitnessData(NPObject *obj, const NPVariant args[], uint32_
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -1344,7 +1344,7 @@ bool methodFinishReadableFileListing(NPObject *obj, const NPVariant args[], uint
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
@@ -1428,7 +1428,7 @@ bool methodFinishDirectoryListing(NPObject *obj, const NPVariant args[], uint32_
     2 = waiting for user input
     3 = finished
 */
-    if (messageList.size() > 0) {
+    if (!messageList.empty()) {
         // Push messages first
         MessageBox * msg = messageList.front();
         if (msg != NULL) {

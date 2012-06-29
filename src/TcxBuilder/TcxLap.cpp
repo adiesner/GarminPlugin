@@ -36,7 +36,7 @@ TcxLap::TcxLap() {
 
 TcxLap::~TcxLap() {
     vector<TcxTrack*>::iterator it;
-    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
     {
         TcxTrack* track = *it;
         delete(track);
@@ -123,7 +123,7 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
 
     if (readTrackData) {
         vector<TcxTrack*>::iterator it;
-        for ( it=trackList.begin() ; it < trackList.end(); it++ )
+        for ( it=trackList.begin() ; it < trackList.end(); ++it )
         {
             TcxTrack* track = *it;
             xmlLap->LinkEndChild(track->getTiXml());
@@ -156,12 +156,12 @@ TiXmlElement * TcxLap::getGpxTiXml() {
     TiXmlElement * segment = new TiXmlElement("trkseg");
 
     vector<TcxTrack*>::iterator it;
-    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
     {
         TcxTrack* track = *it;
         vector<TiXmlElement *> trkPointList = track->getGpxTiXml();
         vector<TiXmlElement *>::iterator it;
-        for ( it=trkPointList.begin() ; it < trkPointList.end(); it++ ) {
+        for ( it=trkPointList.begin() ; it < trkPointList.end(); ++it ) {
             TiXmlElement * elem = *it;
             segment->LinkEndChild(elem);
         }
@@ -205,7 +205,7 @@ void TcxLap::calculateTotalTimeSeconds() {
     double totalTime = 0;
 
     vector<TcxTrack*>::iterator it;
-    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
     {
         TcxTrack* track = *it;
         totalTime += track->calculateTotalTime();
@@ -219,7 +219,7 @@ void TcxLap::calculateDistanceMeters() {
     double totalDistanceMeters = 0;
 
     vector<TcxTrack*>::iterator it;
-    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
     {
         TcxTrack* track = *it;
         totalDistanceMeters += track->calculateDistanceMeters();
@@ -269,7 +269,7 @@ TcxLap& operator<<(TcxLap& lap, TcxTrack* track)
 
 string TcxLap::getStartTime() {
     vector<TcxTrack*>::iterator it;
-    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
     {
         TcxTrack* track = *it;
         string startTime = track->getStartTime();
@@ -282,7 +282,7 @@ string TcxLap::getStartTime() {
 
 bool TcxLap::isEmpty() {
     vector<TcxTrack*>::iterator it;
-    for ( it=trackList.begin() ; it < trackList.end(); it++ )
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
     {
         TcxTrack* track = *it;
         if (!track->isEmpty()) {
