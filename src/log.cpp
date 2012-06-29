@@ -123,9 +123,8 @@ string Log::getTimestamp() {
     time_t now = time ( NULL );
     const struct tm* tm = localtime ( &now );
 
-    char* s = new char[40];
+    char s[40];
     strftime ( s, 40, "%d.%m.%y %H:%M:%S ", tm );
     string str = s;
-    delete[] s;
     return str;
 }
