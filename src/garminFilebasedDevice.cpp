@@ -189,7 +189,7 @@ int GarminFilebasedDevice::startWriteToGps(const string filename, const string x
     // Determine Directory to write to
     string targetDirectory = "";
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if (currentDir.writeable) {
             // Compare file extension
             if (strncasecmp(fileToWriteExtension.c_str(), currentDir.extension.c_str(), currentDir.extension.length()) == 0) {
@@ -352,7 +352,7 @@ void GarminFilebasedDevice::readFileListingFromDevice() {
     bool doCalculateMd5 = this->readableFileListingComputeMD5;
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if ((currentDir.extension.compare(this->readableFileListingFileTypeName) == 0) &&  (currentDir.name.compare(this->readableFileListingDataTypeName) == 0) && (currentDir.readable)) {
             workDir = this->baseDirectory + "/" + currentDir.path;
             extensionToRead = currentDir.extension;
@@ -542,7 +542,7 @@ Thread-Status
     this->threadState = 1; // Working
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if ((currentDir.dirType == TCXDIR) &&  (currentDir.name.compare("FitnessHistory") == 0)) {
             workDir = this->baseDirectory + "/" + currentDir.path;
             extension = currentDir.extension;
@@ -699,7 +699,7 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
     vector <TiXmlNode *> fitFileList;
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentFitDir = (*it);
+        MassStorageDirectoryType const& currentFitDir = (*it);
         if ((currentFitDir.dirType != FITDIR)) {
             continue;
         }
@@ -911,7 +911,7 @@ void GarminFilebasedDevice::setUpdatePathsFromConfiguration() {
  */
 void GarminFilebasedDevice::checkPathsFromConfiguration() {
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         string fullDirectoryName = this->baseDirectory + "/" + currentDir.path;
         struct stat st;
 
@@ -960,7 +960,7 @@ void GarminFilebasedDevice::checkPathsFromConfiguration() {
 
             if (foundNewPath) {
                 if (currentDir.path.length() > 0) {
-                    std::string::iterator it = currentDir.path.end() - 1;
+                    std::string::const_iterator it = currentDir.path.end() - 1;
                     if (*it == '/') {
                         existingSubPath += "/";
                     }
@@ -1166,7 +1166,7 @@ int GarminFilebasedDevice::startReadFromGps() {
     // Search for GPSData in Configuration
     this->fitnessFile = "";
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if ((currentDir.dirType == GPXDIR) &&  (currentDir.name.compare("GPSData") == 0) && (currentDir.readable)) {
             this->fitnessFile = this->baseDirectory + "/" + currentDir.path;
             if (currentDir.basename.length() > 0) {
@@ -1297,7 +1297,7 @@ int GarminFilebasedDevice::startDownloadData(string gpsDataString) {
                         }
                         Log::dbg("Comparing with "+directoryOnly);
                         for (list<MassStorageDirectoryType>::iterator it=deviceDirectories.begin(); it!=deviceDirectories.end(); ++it) {
-                            MassStorageDirectoryType dt = (*it);
+                            MassStorageDirectoryType const& dt = (*it);
                             if ((directoryOnly.compare( dt.path ) == 0) && (dt.writeable)) { directoryIsValid = true; }
                         }
 
@@ -1427,7 +1427,7 @@ int GarminFilebasedDevice::startWriteFitnessData(string filename, string data, s
 
     string pathToWrite = "";
     for (list<MassStorageDirectoryType>::iterator it=deviceDirectories.begin(); it!=deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType dt = (*it);
+        MassStorageDirectoryType const& dt = (*it);
         if ((dataTypeName.compare(dt.name) == 0) && (dt.writeable)) {
             pathToWrite = dt.path;
         }
@@ -1615,7 +1615,7 @@ void GarminFilebasedDevice::readFitnessUserProfile() {
     this->threadState = 1; // Working
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if ((currentDir.readable) &&  (currentDir.name.compare("FitnessUserProfile") == 0)) {
             workFile = this->baseDirectory + "/" + currentDir.path +"/" + currentDir.basename + "." + currentDir.extension;
         }
@@ -1666,7 +1666,7 @@ void GarminFilebasedDevice::readFitnessCourses(bool readTrackData) {
     this->threadState = 1; // Working
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if ((currentDir.readable) &&  (currentDir.name.compare("FitnessCourses") == 0)) {
             workDir = this->baseDirectory + "/" + currentDir.path;
             extension = currentDir.extension;
@@ -1854,7 +1854,7 @@ void GarminFilebasedDevice::readFitnessWorkouts() {
     this->threadState = 1; // Working
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
-        MassStorageDirectoryType currentDir = (*it);
+        MassStorageDirectoryType const& currentDir = (*it);
         if ((currentDir.readable) &&  (currentDir.name.compare("FitnessWorkouts") == 0)) {
             workDir = this->baseDirectory + "/" + currentDir.path;
             extension = currentDir.extension;
