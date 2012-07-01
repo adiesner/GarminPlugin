@@ -27,7 +27,7 @@ TcxActivity::TcxActivity(string id) {
 
 TcxActivity::~TcxActivity() {
     vector<TcxLap*>::iterator it;
-    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
         delete(lap);
@@ -62,7 +62,7 @@ TiXmlElement * TcxActivity::getTiXml(bool readTrackData) {
     xmlId->LinkEndChild(new TiXmlText(this->id));
 
     vector<TcxLap*>::iterator it;
-    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
         xmlActivity->LinkEndChild( lap->getTiXml(readTrackData) );
@@ -82,7 +82,7 @@ TiXmlElement * TcxActivity::getGpxTiXml() {
     gpxname->LinkEndChild(new TiXmlText(this->id));
 
     vector<TcxLap*>::iterator it;
-    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
         trk->LinkEndChild( lap->getGpxTiXml() );
@@ -119,7 +119,7 @@ void TcxActivity::setId(string id) {
 
 bool TcxActivity::isEmpty() {
     vector<TcxLap*>::iterator it;
-    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
         if (!lap->isEmpty()) {
@@ -136,7 +136,7 @@ string TcxActivity::getOverview() {
     ss << " Laps: " << lapList.size() << "(";
 
     vector<TcxLap*>::iterator it;
-    for ( it=lapList.begin() ; it < lapList.end(); it++ )
+    for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
         ss << lap->getDistance();

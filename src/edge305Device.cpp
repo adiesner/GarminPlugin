@@ -23,16 +23,20 @@
 #include "edge305Device.h"
 #include <sstream>
 
-Edge305Device::Edge305Device() : fitnessData(NULL)
+Edge305Device::Edge305Device() 
+: GpsDevice("Edge305")
+, transferSuccessful(false)
+, runType(0)
+, fitnessData(NULL)
 {
-    this->displayName = "Edge305";
-    this->fitnessData = NULL;
-	this->runType = 0;
 }
 
-Edge305Device::Edge305Device(string name) : fitnessData(NULL)
+Edge305Device::Edge305Device(string name)
+: GpsDevice(name)
+, transferSuccessful(false)
+, runType(0)
+, fitnessData(NULL)
 {
-    this->displayName = name;
 }
 
 Edge305Device::~Edge305Device() {

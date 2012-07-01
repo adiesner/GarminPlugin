@@ -25,10 +25,14 @@
 #include <sstream>
 
 FitReader::FitReader(string filename)
+: headerLength(0)
+, dataSize(0)
+, remainingDataBytes(0)
+, doFitDebug(false)
+, fitMsgListener(0)
+, lastTimeOffset(0)
+, timestamp(0)
 {
-    this->doFitDebug=NULL;
-    this->fitMsgListener=NULL;
-
     // Initialize all message definition with undefined
     for (int i=0; i<MAX_LOCAL_MSG; i++) {
         localMsgDef[i].globalMsgNum = MESSAGE_TYPE_UNDEFIND;
@@ -36,9 +40,6 @@ FitReader::FitReader(string filename)
 
     // open file in binary mode
     this->file.open(filename.c_str(), ios::in | ios::binary);
-
-    // set remaining bytes to zero, if someone starts to read without checking for fit file
-    this->remainingDataBytes = 0;
 }
 
 FitReader::~FitReader()

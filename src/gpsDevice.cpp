@@ -26,7 +26,10 @@ pthread_mutex_t shareVariables_mtx= PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t      waitThreadCond  = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t     waitThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 
-GpsDevice::GpsDevice() : threadId (0), progressState(0) {
+GpsDevice::GpsDevice(string dispName)
+: displayName(dispName)
+, threadId (0)
+, progressState(0) {
 }
 
 GpsDevice::~GpsDevice() {

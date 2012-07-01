@@ -26,7 +26,7 @@ TcxActivities::TcxActivities() {
 
 TcxActivities::~TcxActivities() {
     vector<TcxActivity*>::iterator it;
-    for ( it=activityList.begin() ; it < activityList.end(); it++ )
+    for ( it=activityList.begin() ; it < activityList.end(); ++it )
     {
         TcxActivity* activity = *it;
         delete(activity);
@@ -55,7 +55,7 @@ TiXmlElement * TcxActivities::getTiXml(bool readTrackData, string fitnessDetailI
     sort (activityList.begin(), activityList.end(), activitySorter);
 
     vector<TcxActivity*>::iterator it;
-    for ( it=activityList.begin() ; it < activityList.end(); it++ )
+    for ( it=activityList.begin() ; it < activityList.end(); ++it )
     {
         TcxActivity* activity = *it;
         if (!activity->isEmpty()) {
@@ -71,7 +71,7 @@ vector<TiXmlElement*> TcxActivities::getGpxTiXml() {
     vector<TiXmlElement*> trkElements;
 
     vector<TcxActivity*>::iterator it;
-    for ( it=activityList.begin() ; it < activityList.end(); it++ )
+    for ( it=activityList.begin() ; it < activityList.end(); ++it )
     {
         TcxActivity* activity = *it;
         if (!activity->isEmpty()) {
