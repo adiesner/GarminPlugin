@@ -53,6 +53,7 @@ echo "Copying Sources..."
 
 cp -r "$GITREPOSITORYDIR/../../src" "./garminplugin-$VERSION/GarminPlugin"
 
+cd "garminplugin-$VERSION"
 TARGETDIR=`pwd`
 
 if [ -f "$GITREPOSITORYDIR/$DEBIANVERSION/buildEnv.sh" ]; then
