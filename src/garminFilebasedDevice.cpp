@@ -37,6 +37,7 @@
 
 GarminFilebasedDevice::GarminFilebasedDevice()
 : GpsDevice("")
+, deviceDescription(0)
 , fitFileElement(0)
 {
 }
