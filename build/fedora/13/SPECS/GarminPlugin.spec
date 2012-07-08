@@ -14,7 +14,6 @@ BuildRequires:  tinyxml-devel
 BuildRequires:  garmintools-devel
 BuildRequires:  libusb-devel
 BuildRequires:  zlib-devel
-BuildRequires:  openssl-devel
 BuildRequires:  xulrunner-devel
 
 %description

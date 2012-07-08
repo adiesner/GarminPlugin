@@ -57,6 +57,7 @@ zlib            - http://www.zlib.net
 Thanks goes to 
 	- Christian Kurek
 	- Bob Trower (http://base64.sourceforge.net)
+	- Gray Watson (MD5-Code) (http://256.com/gray/)	
 	- The contributors of the above projects
 
 Howto compile GarminPlugin:

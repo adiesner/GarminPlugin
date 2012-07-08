@@ -27,7 +27,6 @@ BuildRequires:  mozilla-xulrunner192-devel
 BuildRequires:  tinyxml-devel
 BuildRequires:  libgarmintools4-devel
 BuildRequires:  zlib-devel
-BuildRequires:  openssl-devel
 BuildRequires:  pkg-config
 %endif
 
@@ -38,7 +37,6 @@ BuildRequires:  tinyxml-devel
 BuildRequires:  garmintools-devel
 BuildRequires:  libusb-devel
 BuildRequires:  zlib-devel
-BuildRequires:  openssl-devel
 BuildRequires:  xulrunner-devel
 # is here because of error "have choice for desktop-notification-daemon needed by libnotify: kdebase-runtime notification-daemon xfce4-notifyd"
 BuildRequires:  notification-daemon

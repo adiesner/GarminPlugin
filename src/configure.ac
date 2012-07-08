@@ -24,10 +24,6 @@ PKG_CHECK_MODULES([ZLIB], [zlib])
 AC_SUBST(ZLIB_CFLAGS)
 AC_SUBST(ZLIB_LIBS)
 
-PKG_CHECK_MODULES([LIBCRYPTO], [libcrypto])
-AC_SUBST(LIBCRYPTO_CFLAGS)
-AC_SUBST(LIBCRYPTO_LIBS)
-
 
 #
 # Check for tinyxml
@@ -167,44 +163,6 @@ AC_CHECK_HEADERS([mntent.h stdlib.h unistd.h])
 
 AC_CHECK_HEADERS([zipstub.h],[],[],[])
 AC_CHECK_HEADERS([prtypes.h],[],[],[])
-
-# Checks for library ssl.
-#
-AC_MSG_CHECKING([for ssl])
-
-AC_ARG_WITH([ssl-libdir],
-	    AS_HELP_STRING([--with-ssl-libdir=DIR],
-		[specify where to find ssl library (libssl.so)]),
-	    [ssl_libdir=$withval],
-	    [ssl_libdir=""])
-
-AC_ARG_WITH([garmintools-incdir],
-	    AS_HELP_STRING([--with-ssl-incdir=DIR],
-		[specify where to find ssl header files (openssl/md5.h)]),
-	    [ssl_incdir=$withval],
-	    [ssl_incdir=""])
-
-if test "x$ssl_incdir" != "x" ; then
-  LIBSSL_CPPFLAGS="-I$ssl_incdir"
-elif test -f "/usr/include/openssl/md5.h" ; then
-  LIBSSL_CPPFLAGS="-I/usr/include/"
-else
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Unable to find ssl header files. Try 'apt-get install libssl-dev' or use --with-ssl-incdir=DIR])
-fi
-
-if test "x$ssl_libdir" != "x" ; then
-    LIBSSL_LDFLAGS="$ssl_libdir/libssl.so"
-elif test -f "/usr/lib64/libssl.so" ; then
-  LIBSSL_LDFLAGS="/usr/lib64/libssl.so"
-elif test -f "/usr/lib/libssl.so" ; then
-  LIBSSL_LDFLAGS="/usr/lib/libssl.so"
-else
-    LIBSSL_LDFLAGS="-lssl"
-fi
-
-AC_SUBST(LIBSSL_CPPFLAGS)
-AC_SUBST(LIBSSL_LDFLAGS)
 
 AC_MSG_RESULT([yes])
 

@@ -28,7 +28,7 @@
 
 #include "gpsFunctions.h"
 
-#include <openssl/md5.h>
+#include "md5/md5.h"
 
 #include <unistd.h>
 
@@ -37,6 +37,7 @@
 
 GarminFilebasedDevice::GarminFilebasedDevice()
 : GpsDevice("")
+, deviceDescription(0)
 , fitFileElement(0)
 {
 }
@@ -428,20 +429,21 @@ void GarminFilebasedDevice::readFileListingFromDevice() {
 
                 if ((!isDirectory) && (doCalculateMd5)) {
                     if (Log::enabledDbg()) { Log::dbg("Calculating MD5 sum of " + fullFileName);}
-                    MD5_CTX c;
-                    unsigned char md[MD5_DIGEST_LENGTH];
+
+                    md5_t c;
+                    unsigned char md[MD5_SIZE];
                     unsigned char buf[MD5READBUFFERSIZE];
                     FILE *f = fopen(fullFileName.c_str(),"r");
                     int fd=fileno(f);
-                    MD5_Init(&c);
+                    md5_init(&c);
                     for (;;) {
-                        int i=read(fd,buf,MD5READBUFFERSIZE);
+                    	unsigned int i=read(fd,buf,MD5READBUFFERSIZE);
                         if (i <= 0) break;
-                        MD5_Update(&c,buf,(unsigned long)i);
+                        md5_process(&c,buf,(unsigned int)i);
                     }
-                    MD5_Final(&(md[0]),&c);
+                    md5_finish(&c, &(md[0]));
                     string md5="";
-                    for (int i=0; i<MD5_DIGEST_LENGTH; i++) {
+                    for (int i=0; i<MD5_SIZE; i++) {
                         char temp[16];
                         sprintf(temp, "%02x",md[i]);
                         md5 += temp;
@@ -2106,20 +2108,20 @@ void GarminFilebasedDevice::readDirectoryListing() {
 
                 if ((!isDirectory) && (doCalculateMd5)) {
                     if (Log::enabledDbg()) { Log::dbg("Calculating MD5 sum of " + fullFileName);}
-                    MD5_CTX c;
-                    unsigned char md[MD5_DIGEST_LENGTH];
+                    md5_t c;
+                    unsigned char md[MD5_SIZE];
                     unsigned char buf[MD5READBUFFERSIZE];
                     FILE *f = fopen(fullFileName.c_str(),"r");
                     int fd=fileno(f);
-                    MD5_Init(&c);
+                    md5_init(&c);
                     for (;;) {
-                        int i=read(fd,buf,MD5READBUFFERSIZE);
+                    	unsigned int i=read(fd,buf,MD5READBUFFERSIZE);
                         if (i <= 0) break;
-                        MD5_Update(&c,buf,(unsigned long)i);
+                        md5_process(&c,buf,(unsigned int)i);
                     }
-                    MD5_Final(&(md[0]),&c);
+                    md5_finish(&c, &(md[0]));
                     string md5="";
-                    for (int i=0; i<MD5_DIGEST_LENGTH; i++) {
+                    for (int i=0; i<MD5_SIZE; i++) {
                         char temp[16];
                         sprintf(temp, "%02x",md[i]);
                         md5 += temp;

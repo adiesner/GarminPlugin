@@ -2,7 +2,7 @@ Source: garminplugin
 Section: misc
 Priority: optional
 Maintainer: Andreas Diesner <garminplugin@andreas-diesner.de>
-Build-Depends: debhelper (>= 7), libusb-0.1-4, zlib1g-dev, libgcc1, libc6, libusb-dev, libssl-dev, pkg-config, libc6, garmin-forerunner-tools
+Build-Depends: debhelper (>= 7), libusb-0.1-4, zlib1g-dev, libgcc1, libc6, libusb-dev, pkg-config, libc6, garmin-forerunner-tools
 Standards-Version: 3.8.1
 Homepage: http://www.andreas-diesner.de/garminplugin
 
