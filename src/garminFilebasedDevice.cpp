@@ -28,7 +28,8 @@
 
 #include "gpsFunctions.h"
 
-#include "md5/md5.h"
+
+#include <gcrypt.h>
 
 #include <unistd.h>
 
@@ -338,8 +339,6 @@ void GarminFilebasedDevice::doWork() {
     }
 }
 
-#define MD5READBUFFERSIZE 1024*16
-
 void GarminFilebasedDevice::readFileListingFromDevice() {
     if (Log::enabledDbg()) { Log::dbg("Thread readFileListing started"); }
 
@@ -429,26 +428,7 @@ void GarminFilebasedDevice::readFileListingFromDevice() {
 
                 if ((!isDirectory) && (doCalculateMd5)) {
                     if (Log::enabledDbg()) { Log::dbg("Calculating MD5 sum of " + fullFileName);}
-
-                    md5_t c;
-                    unsigned char md[MD5_SIZE];
-                    unsigned char buf[MD5READBUFFERSIZE];
-                    FILE *f = fopen(fullFileName.c_str(),"r");
-                    int fd=fileno(f);
-                    md5_init(&c);
-                    for (;;) {
-                    	unsigned int i=read(fd,buf,MD5READBUFFERSIZE);
-                        if (i <= 0) break;
-                        md5_process(&c,buf,(unsigned int)i);
-                    }
-                    md5_finish(&c, &(md[0]));
-                    string md5="";
-                    for (int i=0; i<MD5_SIZE; i++) {
-                        char temp[16];
-                        sprintf(temp, "%02x",md[i]);
-                        md5 += temp;
-
-                    }
+                    string md5 = getMd5FromFile(fullFileName);
                     curFile->SetAttribute("MD5Sum",md5);
                 }
 
@@ -2108,25 +2088,7 @@ void GarminFilebasedDevice::readDirectoryListing() {
 
                 if ((!isDirectory) && (doCalculateMd5)) {
                     if (Log::enabledDbg()) { Log::dbg("Calculating MD5 sum of " + fullFileName);}
-                    md5_t c;
-                    unsigned char md[MD5_SIZE];
-                    unsigned char buf[MD5READBUFFERSIZE];
-                    FILE *f = fopen(fullFileName.c_str(),"r");
-                    int fd=fileno(f);
-                    md5_init(&c);
-                    for (;;) {
-                    	unsigned int i=read(fd,buf,MD5READBUFFERSIZE);
-                        if (i <= 0) break;
-                        md5_process(&c,buf,(unsigned int)i);
-                    }
-                    md5_finish(&c, &(md[0]));
-                    string md5="";
-                    for (int i=0; i<MD5_SIZE; i++) {
-                        char temp[16];
-                        sprintf(temp, "%02x",md[i]);
-                        md5 += temp;
-
-                    }
+                    string md5 = getMd5FromFile(fullFileName);
                     curFile->SetAttribute("MD5Sum",md5);
                 }
                 dirList->LinkEndChild( curFile );
@@ -2151,4 +2113,44 @@ void GarminFilebasedDevice::readDirectoryListing() {
 
     if (Log::enabledDbg()) { Log::dbg("Thread readDirectoryListing finished"); }
     return;
+}
+
+#define MD5READBUFFERSIZE 1024*16
+string GarminFilebasedDevice::getMd5FromFile(string filename) {
+    if (!gcry_check_version (GCRYPT_VERSION)) {
+    	Log::err("Unable to use GNU Crypt library to calculate MD5 - wrong version!");
+    	return "";
+    }
+    if (!gcry_control (GCRYCTL_INITIALIZATION_FINISHED_P)) {
+        gcry_control (GCRYCTL_DISABLE_SECMEM, 0);          /* Disable secure memory.  */
+        gcry_control (GCRYCTL_INITIALIZATION_FINISHED, 0); /* Tell Libgcrypt that initialization has completed. */
+    }
+
+	gcry_md_hd_t c;
+    unsigned char buf[MD5READBUFFERSIZE];
+    gcry_md_open(&c, GCRY_MD_MD5, 0);
+    gcry_md_enable(c, GCRY_MD_MD5);
+    if (!c) {
+    	Log::err("Unable to use GNU Crypt library to calculate MD5");
+    	return "";
+    }
+
+    FILE *f = fopen(filename.c_str(),"r");
+    int fd=fileno(f);
+    for (;;) {
+    	unsigned int i=read(fd,buf,MD5READBUFFERSIZE);
+        if (i <= 0) break;
+        gcry_md_write(c, buf, i);
+    }
+    string md5="";
+    unsigned char * md = gcry_md_read(c, 0);
+    int md5len = gcry_md_get_algo_dlen(GCRY_MD_MD5);
+    for (int i=0; i<md5len; i++) {
+        char temp[2];
+        sprintf(temp, "%02x",md[i]);
+        md5 += temp;
+    }
+    gcry_md_close(c);
+
+	return md5;
 }

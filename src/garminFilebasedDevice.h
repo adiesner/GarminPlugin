@@ -525,6 +525,11 @@ protected:
    * Stores the file listing Data which was read from the device
    */
     string readableFileListingXml;
+
+    /**
+     * Read a file and calculate the md5 checksum
+     */
+    string getMd5FromFile(string filename);
 };
 
 #endif // GARMINFILEBASEDDEVICE_H_INCLUDED

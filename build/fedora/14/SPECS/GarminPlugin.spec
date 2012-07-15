@@ -15,6 +15,7 @@ BuildRequires:  garmintools-devel
 BuildRequires:  libusb-devel
 BuildRequires:  zlib-devel
 BuildRequires:  xulrunner-devel
+BuildRequires:  libgcrypt-devel
 
 %description
 This browser plugin has the same methods and properties as the official 

@@ -28,6 +28,7 @@ BuildRequires:  tinyxml-devel
 BuildRequires:  libgarmintools4-devel
 BuildRequires:  zlib-devel
 BuildRequires:  pkg-config
+BuildRequires:  libgcrypt-devel
 %endif
 
 %if 0%{?fedora} > 13
@@ -40,6 +41,7 @@ BuildRequires:  zlib-devel
 BuildRequires:  xulrunner-devel
 # is here because of error "have choice for desktop-notification-daemon needed by libnotify: kdebase-runtime notification-daemon xfce4-notifyd"
 BuildRequires:  notification-daemon
+BuildRequires:  libgcrypt-devel
 %endif
 
 

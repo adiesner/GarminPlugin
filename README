@@ -53,18 +53,20 @@ garmintools     - http://code.google.com/p/garmintools/
 libusb          - http://www.libusb.org/
 ticpp           - http://code.google.com/p/ticpp/
 zlib            - http://www.zlib.net
+gcrypt          - http://www.gnupg.org/
 
 Thanks goes to 
 	- Christian Kurek
 	- Bob Trower (http://base64.sourceforge.net)
-	- Gray Watson (MD5-Code) (http://256.com/gray/)	
+	- Gray Watson (MD5-Code) (http://256.com/gray/)
+	- Ralf Treinen (solving license issues)	
 	- The contributors of the above projects
 
 Howto compile GarminPlugin:
 
 # This example shows how to compile GarminPlugin on a 64bit Ubuntu System
 
-sudo apt-get install build-essential subversion git-core xulrunner-dev zlib1g-dev libusb-dev
+sudo apt-get install build-essential subversion git-core zlib1g-dev libusb-dev libgcrypt11-dev
 git clone http://github.com/adiesner/GarminPlugin.git
 svn export http://garmintools.googlecode.com/svn/trunk/ garmintools
 svn export http://ticpp.googlecode.com/svn/trunk/ ticpp
