@@ -24,9 +24,27 @@ PKG_CHECK_MODULES([ZLIB], [zlib])
 AC_SUBST(ZLIB_CFLAGS)
 AC_SUBST(ZLIB_LIBS)
 
-PKG_CHECK_MODULES([GCRYPT], [gcrypt])
-AC_SUBST(GCRYPT_CFLAGS)
-AC_SUBST(GCRYPT_LIBS)
+#
+# Check for GNU Crypt library
+#
+AC_ARG_WITH(
+	[libgcrypt-prefix],
+	[AC_HELP_STRING([--with-libgcrypt-prefix=DIR], [define libgcrypt prefix, default /usr])],
+	,
+	[with_libgcrypt_prefix="/usr" ]
+)
+
+AC_MSG_CHECKING([for libgcrypt])
+if ! test -x "${with_libgcrypt_prefix}/bin/libgcrypt-config"; then
+	AC_MSG_ERROR([Cannot locate libgcrypt])
+else
+	AC_MSG_RESULT([found])
+	GCRYPT_CFLAGS=`"${with_libgcrypt_prefix}/bin/libgcrypt-config" --cflags`
+	GCRYPT_LIBS=`"${with_libgcrypt_prefix}/bin/libgcrypt-config" --libs`
+	AC_SUBST(GCRYPT_CFLAGS)
+	AC_SUBST(GCRYPT_LIBS)
+fi
+
 
 #
 # Check for tinyxml
