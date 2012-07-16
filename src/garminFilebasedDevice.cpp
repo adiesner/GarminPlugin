@@ -2146,7 +2146,7 @@ string GarminFilebasedDevice::getMd5FromFile(string filename) {
     unsigned char * md = gcry_md_read(c, 0);
     int md5len = gcry_md_get_algo_dlen(GCRY_MD_MD5);
     for (int i=0; i<md5len; i++) {
-        char temp[2];
+        char temp[3];
         sprintf(temp, "%02x",md[i]);
         md5 += temp;
     }
