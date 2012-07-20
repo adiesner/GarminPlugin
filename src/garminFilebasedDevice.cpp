@@ -1469,7 +1469,7 @@ int GarminFilebasedDevice::bytesAvailable(string path) {
 
     struct statfs st;
     if (statfs(fullPath.c_str(), &st) == 0) {
-        long freeBytes = st.f_bfree * st.f_bsize;
+        unsigned long long freeBytes = (unsigned long long)st.f_bfree * (unsigned long long) st.f_bsize;
         if (Log::enabledDbg()) {
             stringstream ss;
             ss << "Bytes available for path " << fullPath << ": " << freeBytes;
@@ -1477,12 +1477,14 @@ int GarminFilebasedDevice::bytesAvailable(string path) {
         }
         if (freeBytes > INT_MAX) {
             return INT_MAX;
+        } else if (freeBytes < 0) {
+        	return 0;
         } else {
             return (int)freeBytes;
         }
     } else {
         Log::err("Error getting bytes available for path: "+fullPath);
-        return -1;
+        return 0;
     }
 }
 
