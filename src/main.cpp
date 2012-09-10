@@ -659,12 +659,13 @@ bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t a
         MessageBox * msg = messageList.front();
         if (msg != NULL) {
 
-            if (argCount == 1) {
-                if (args[0].type == NPVariantType_Int32) {
-                    msg->responseReceived(args[0].value.intValue);
-                } else {
-                    if (Log::enabledErr()) Log::err("methodRespondToMessageBox: Unable to handle responses other than INT");
-                }
+            if (argCount >= 1) {
+            	int response = getIntParameter(args, 0, -1);
+            	if (response == -1) {
+            		// Fallback to boolean
+            		response = (getBoolParameter(args, 0, false)) ? 1 : 0;
+            	}
+                msg->responseReceived(args[0].value.intValue);
             } else {
                 if (Log::enabledErr()) Log::err("methodRespondToMessageBox: Wrong parameter count");
             }
