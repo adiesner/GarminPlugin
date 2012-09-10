@@ -1022,14 +1022,6 @@ void Edge305Device::cancelReadFITDirectory() {
     Log::err("cancelReadFITDirectory is not implemented for this device "+this->displayName);
 }
 
-string Edge305Device::getFITData() {
-    Log::err("getFITData is not implemented for this device "+this->displayName);
-    // Return empty listing
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>\
-            <DirectoryListing xmlns=\"http://www.garmin.com/xmlschemas/DirectoryListing/v1\" RequestedPath=\"\" UnitId=\"3815526107\" VolumePrefix=\"\">\
-            </DirectoryListing>";
-}
-
 int Edge305Device::startReadFitnessDirectory(string dataTypeName) {
     if (Log::enabledDbg()) Log::dbg("Starting thread to read fitness dir from garmin device: "+this->displayName);
 

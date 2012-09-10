@@ -139,12 +139,6 @@ public:
    */
     virtual void cancelReadFITDirectory() = 0;
 
-    /**
-     * Gets the FIT data xml
-     * @return xml containing FIT directory data read from garmin device
-     */
-    virtual string getFITData() = 0;
-
   /**
    * Starts reading the fitness data without points
    * @param dataTypeName - which type of data should be read from the device

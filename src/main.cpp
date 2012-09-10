@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.12";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.13devel";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -839,7 +839,7 @@ bool methodFinishReadFITDirectory(NPObject *obj, const NPVariant args[], uint32_
                 }
             } else if (result->value.intValue == 3) { // transfer finished
                 propertyList["FitnessTransferSucceeded"].intValue = currentWorkingDevice->getTransferSucceeded();
-                propertyList["DirectoryListingXml"].stringValue = currentWorkingDevice->getFITData();
+                propertyList["DirectoryListingXml"].stringValue = currentWorkingDevice->getDirectoryListingXml();
                 debugOutputPropertyToFile("DirectoryListingXml");
                 updateProgressBar("Read FITDIR from GPS", 100);
             } else {
@@ -1764,6 +1764,24 @@ static bool hasProperty(NPObject *obj, NPIdentifier propertyName) {
 	return false;
 }
 
+
+/**
+ * Gets called during getProperty, fixes some broken Website behavior (opencaching.com)
+ * Some websites check the content of a variable with getProperty to determine if the function
+ * succeeded instead of using the Finishxxx functions. This results in an endless getProperty
+ * call, since the property is only updated during the Finishxxx call.
+ *
+ * Writes result to variable in propertyList
+ * @param name
+ */
+static void instantVariableUpdate(string name) {
+	if (currentWorkingDevice == NULL) { return; }
+	if (name.compare("DirectoryListingXml") == 0) {
+		Log::dbg("instantVariableUpdate updating DirectoryListingXml -- Remove me");
+		propertyList["DirectoryListingXml"].stringValue = currentWorkingDevice->getDirectoryListingXml();
+	}
+}
+
 /**
  * Gets called by the browser to get the content of a property
  * @param obj
@@ -1773,6 +1791,9 @@ static bool hasProperty(NPObject *obj, NPIdentifier propertyName) {
  */
 static bool getProperty(NPObject *obj, NPIdentifier propertyName, NPVariant *result) {
     string name = npnfuncs->utf8fromidentifier(propertyName);
+
+	// Fix for websites like opencaching.com which do not call Finishxxxx before querying the value
+	instantVariableUpdate(name);
 
 	map<string,Property>::iterator it;
 	it = propertyList.find(name);

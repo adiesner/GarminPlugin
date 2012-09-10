@@ -369,7 +369,7 @@ void GarminFilebasedDevice::readFileListingFromDevice() {
 
     TiXmlElement * dirList = new TiXmlElement( "DirectoryListing" );
     dirList->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/DirectoryListing/v1");
-    dirList->SetAttribute("RequestedPath","");
+    dirList->SetAttribute("RequestedPath",pathOnDevice);
     dirList->SetAttribute("UnitId",this->deviceId);
     dirList->SetAttribute("VolumePrefix","");
     output->LinkEndChild( dirList );
@@ -451,7 +451,7 @@ void GarminFilebasedDevice::readFileListingFromDevice() {
 
     lockVariables();
     this->threadState = 3; // Finished
-    this->readableFileListingXml = outputXml;
+    this->directoryListingXml = outputXml;
     this->transferSuccessful = true; // Successfull;
     unlockVariables();
 
@@ -757,7 +757,7 @@ void GarminFilebasedDevice::readFITDirectoryFromDevice() {
     delete(output);
 
     lockVariables();
-    this->fitDirectoryXml = outputXml;
+    this->directoryListingXml = outputXml;
     this->threadState = 3; // Finished
     this->transferSuccessful = true; // Successfull;
     unlockVariables();
@@ -1059,6 +1059,11 @@ void GarminFilebasedDevice::setPathsFromConfiguration() {
 int GarminFilebasedDevice::startReadFITDirectory() {
     if (Log::enabledDbg()) Log::dbg("Starting thread to read from garmin device");
 
+    lockVariables();
+    this->threadState = 1;
+    this->directoryListingXml = "";
+    unlockVariables();
+
     this->workType = READFITDIRECTORY;
 
     if (startThread()) {
@@ -1079,10 +1084,6 @@ int GarminFilebasedDevice::finishReadFITDirectory() {
 void GarminFilebasedDevice::cancelReadFITDirectory() {
     if (Log::enabledDbg()) { Log::dbg("cancelReadFITDirectory called for "+this->displayName); }
     cancelThread();
-}
-
-string GarminFilebasedDevice::getFITData() {
-    return  fitDirectoryXml;
 }
 
 int GarminFilebasedDevice::startReadFitnessDirectory(string dataTypeName) {
@@ -1549,7 +1550,7 @@ int GarminFilebasedDevice::startReadableFileListing(string dataTypeName, string 
     this->readableFileListingDataTypeName = dataTypeName;
     this->readableFileListingFileTypeName = fileTypeName;
     this->readableFileListingComputeMD5   = computeMd5;
-    this->readableFileListingXml = "";
+    this->directoryListingXml = "";
     unlockVariables();
 
     if (Log::enabledDbg()) Log::dbg("Starting thread to read file listing from garmin device "+this->displayName);
@@ -1588,7 +1589,7 @@ void GarminFilebasedDevice::cancelReadableFileListing() {
  * @return string with directory listing
  */
 string GarminFilebasedDevice::getDirectoryListingXml() {
-    return this->readableFileListingXml;
+    return this->directoryListingXml;
 }
 
 
@@ -1987,7 +1988,7 @@ int GarminFilebasedDevice::startDirectoryListing(string relativePath, bool compu
     this->threadState = 1;
     this->readableFileListingFileTypeName = relativePath;
     this->readableFileListingComputeMD5   = computeMd5;
-    this->readableFileListingXml = "";
+    this->directoryListingXml = "";
     unlockVariables();
 
     if (Log::enabledDbg()) Log::dbg("Starting thread to read directory listing from garmin device "+this->displayName);
@@ -2116,6 +2117,7 @@ void GarminFilebasedDevice::readDirectoryListing() {
     if (Log::enabledDbg()) { Log::dbg("Thread readDirectoryListing finished"); }
     return;
 }
+
 
 #define MD5READBUFFERSIZE 1024*16
 string GarminFilebasedDevice::getMd5FromFile(string filename) {

@@ -96,12 +96,6 @@ public:
    */
     virtual void cancelReadFITDirectory();
 
-    /**
-     * Gets the FIT data xml
-     * @return xml containing FIT directory data read from garmin device
-     */
-    virtual string getFITData();
-
   /**
    * Starts reading the fitness data without points
    * @param dataTypeName - which type of data should be read from the device
@@ -500,12 +494,6 @@ protected:
      */
     TiXmlElement * fitFileElement;
 
-  /**
-   * Stores the FIT Directory Data which was read from the device
-   */
-    string fitDirectoryXml;
-
-
    /**
     * Variable containing the dataTypeName to be read by the asynchronous task READABLEFILELISTING
     */
@@ -524,7 +512,7 @@ protected:
   /**
    * Stores the file listing Data which was read from the device
    */
-    string readableFileListingXml;
+    string directoryListingXml;
 
     /**
      * Read a file and calculate the md5 checksum
