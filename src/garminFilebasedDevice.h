@@ -433,8 +433,15 @@ protected:
    typedef struct _DeviceDownloadData {
         string url;          /**< URL to download */
         string destination;  /**< Local path to store url */
+        string destinationtmp;/**< Local path to store url while downloading */
         string regionId;     /**< RegionId - unknown purpose */
    } DeviceDownloadData;
+
+   /**
+    * Renames temporary file to real file name
+    * TimeZone data file needs post processing after download.
+    */
+   void postProcessDownloadData(DeviceDownloadData fileElement);
 
     /**
      * stores a list of files to download and store on the device (provided by startDownloadData())

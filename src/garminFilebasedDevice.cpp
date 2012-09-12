@@ -1291,6 +1291,7 @@ int GarminFilebasedDevice::startDownloadData(string gpsDataString) {
                             DeviceDownloadData fileElement;
                             fileElement.url = strUrl;
                             fileElement.destination = strDest;
+                            fileElement.destinationtmp = strDest+".tmp";
                             fileElement.regionId = strRegion;
                             deviceDownloadList.push_back(fileElement);
                         } else {
@@ -1333,7 +1334,7 @@ string GarminFilebasedDevice::getNextDownloadDataUrl() {
 int GarminFilebasedDevice::writeDownloadData(char * buf, int length) {
     if (!deviceDownloadList.empty()) {
         DeviceDownloadData downloadData = deviceDownloadList.front();
-        string filename = baseDirectory + "/" + downloadData.destination;
+        string filename = baseDirectory + "/" + downloadData.destinationtmp;
 
         if (Log::enabledDbg()) {
             stringstream ss;
@@ -1359,8 +1360,10 @@ void GarminFilebasedDevice::saveDownloadData() {
     if (downloadDataOutputStream.is_open()) {
         downloadDataOutputStream.close();
         if (!deviceDownloadList.empty()) {
-            deviceDownloadList.pop_front();
             Log::dbg("Removing file to download from list");
+        	DeviceDownloadData fileElement = deviceDownloadList.front();
+        	deviceDownloadList.pop_front();
+        	postProcessDownloadData(fileElement);
         }
     } else {
         Log::dbg("Not closing anything, since nothing was open...");
@@ -1379,6 +1382,36 @@ void GarminFilebasedDevice::cancelDownloadData() {
     this->transferSuccessful = false;
 }
 
+void GarminFilebasedDevice::postProcessDownloadData(DeviceDownloadData downloadData) {
+	string filename    = this->baseDirectory + "/" + downloadData.destination;
+	string filenametmp = this->baseDirectory + "/" + downloadData.destinationtmp;
+
+	if ((downloadData.destination.find("gmaptz.img") != string::npos) &&
+		(downloadData.url.find(".rgn") != string::npos)) {
+		if (Log::enabledDbg()) { Log::dbg("Downloaded new rgn timezone file to gmaptz.img. Deletion of first 60 bytes needed."); }
+		/**
+		 * The rgn file comes with an unknown header (to me), which needs to be deleted before the
+		 * device accepts it as an update file.
+		 * More information: http://www.noeman.org/gsm/garmin-maps/257457-garmin-timezone-map-v10-gmaptz-img.html
+		 */
+		std::ifstream fin(filenametmp.c_str(), ios::binary | ios::in );
+		std::ofstream fout(filename.c_str(), ios::binary | ios::out | ios::trunc);
+
+		if (!fin.is_open()) { Log::err("Unable to open "+filenametmp+" for reading!"); return; }
+		if (!fout.is_open()) { Log::err("Unable to open "+filename+" for writing!"); return; }
+
+		fin.seekg(60,ios_base::beg); // Skip first 60 bytes
+		fout << fin.rdbuf();         // Copy from temporary file name to real file name
+		fin.close();
+		fout.close();
+		remove(filenametmp.c_str());
+		if (Log::enabledDbg()) { Log::dbg("Deleted first 60 bytes in "+downloadData.destination); }
+	} else {
+		if (Log::enabledDbg()) { Log::dbg("Renaming "+downloadData.destinationtmp+" -> "+downloadData.destination); }
+		remove(filenametmp.c_str());
+		rename(filenametmp.c_str(), filename.c_str());
+	}
+}
 
 /**
  * This is used to indicate the status of the write download data process.
