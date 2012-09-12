@@ -1,7 +1,10 @@
-2012-09-12 - Version 0.3.13
+2012-09-12 - Version 0.3.14
 - Bugfix: Updating the timezone information file is now possible through garmin update
 - Bugfix: Websites can now read directory information containing wildcards (*.gpx)
 - Bugfix: Opencaching.com is now supported - uses file reading behavior not described by the API 
+
+2012-07-16 - Version 0.3.13
+- Bugfix: buffer overflow because of too small buffer for sprintf
 
 2012-07-09 - Version 0.3.12
 - Removed dependency to openssl due to licence issues
