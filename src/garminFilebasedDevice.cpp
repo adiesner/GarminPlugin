@@ -36,6 +36,9 @@
 // needed for sort
 #include <algorithm>
 
+// Searching for files with wildcards
+#include <glob.h>     // glob(), globfree()
+
 GarminFilebasedDevice::GarminFilebasedDevice()
 : GpsDevice("")
 , deviceDescription(0)
@@ -2015,10 +2018,8 @@ void GarminFilebasedDevice::cancelDirectoryListing() {
     cancelThread();
 }
 
-
 void GarminFilebasedDevice::readDirectoryListing() {
     if (Log::enabledDbg()) { Log::dbg("Thread readDirectoryListing started"); }
-
 
     lockVariables();
     string workDir=this->readableFileListingFileTypeName; // contains relative file path
@@ -2030,14 +2031,20 @@ void GarminFilebasedDevice::readDirectoryListing() {
     TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
     output->LinkEndChild( decl );
 
+    string volumePrefix = this->baseDirectory;
+    if (volumePrefix[volumePrefix.length()-1] != '/') { volumePrefix += '/'; }
+
     TiXmlElement * dirList = new TiXmlElement( "DirectoryListing" );
     dirList->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/DirectoryListing/v1");
     dirList->SetAttribute("RequestedPath",workDir);
     dirList->SetAttribute("UnitId",this->deviceId);
-    dirList->SetAttribute("VolumePrefix",this->baseDirectory);
+    dirList->SetAttribute("VolumePrefix",volumePrefix);
     output->LinkEndChild( dirList );
 
     stack<string> directoryList;
+
+    // Cut front slashes
+    while ((workDir.length()>0) && (workDir[0]=='/')) { workDir = workDir.substr(1); }
 
     string::size_type loc = workDir.find( "..", 0 );
     if( loc != string::npos ) {
@@ -2048,20 +2055,49 @@ void GarminFilebasedDevice::readDirectoryListing() {
 
     while (!directoryList.empty()) {
         string relativeWorkDir = directoryList.top();
-        string currentWorkDir = this->baseDirectory + "/" + relativeWorkDir;
         directoryList.pop(); // get rid of the element
+        string currentWorkDir = this->baseDirectory + "/" + relativeWorkDir;
 
-        DIR *dp;
-        struct dirent *dirp;
-        if((dp = opendir(currentWorkDir.c_str())) != NULL) {
-            while ((dirp = readdir(dp)) != NULL) {
-                string fileName = string(dirp->d_name);
-                string fullFileName = currentWorkDir+'/'+fileName;
-                string relativeFileName = relativeWorkDir+'/'+fileName;
+	    // Add / if directory exists
+        if (relativeWorkDir[relativeWorkDir.length()-1] != '/') {
+        	struct stat dirstat;
+            if(0 == stat(currentWorkDir.c_str(), &dirstat)) {
+            	if (S_ISDIR(dirstat.st_mode)) {
+            		currentWorkDir += '/';
+            		relativeWorkDir += '/';
+            	}
+            }
+        }
+
+        string pattern = "*";
+        string::size_type lastSlash= relativeWorkDir.rfind("/");
+        if ((lastSlash != string::npos) && (lastSlash != (relativeWorkDir.length()-1))) {
+        	pattern = relativeWorkDir.substr(lastSlash+1);
+        	relativeWorkDir = relativeWorkDir.substr(0,lastSlash+1);
+        	currentWorkDir = this->baseDirectory + "/" + relativeWorkDir;
+        }
+
+        if (Log::enabledDbg()) {
+        	stringstream ss;
+        	ss << "Searching for pattern [" << pattern <<"] in [" << currentWorkDir <<"]";
+        	Log::dbg(ss.str());
+        }
+
+        glob_t gl;
+        if (0 == glob(string(currentWorkDir+pattern).c_str(), 0, NULL, &gl)) {
+        	for(unsigned int i=0;i<gl.gl_pathc;++i){
+                string fileName = string(gl.gl_pathv[i]);
+                fileName = fileName.substr(currentWorkDir.length());
+                string fullFileName = string(gl.gl_pathv[i]);
+                string relativeFileName = relativeWorkDir+fileName;
                 if (relativeWorkDir.length() == 0) {
                     relativeFileName = fileName;
                 }
-                bool isDirectory = (dirp->d_type == 4) ? true : false;
+                struct stat filestatus;
+                bool isDirectory = false;
+                if(0 == stat(fullFileName.c_str(), &filestatus)) {
+                	isDirectory = S_ISDIR(filestatus.st_mode);
+                }
                 if (Log::enabledDbg()) { Log::dbg("Found file: "+fileName); }
                 if ((fileName == ".") || (fileName == "..")) { continue; }
 
@@ -2074,9 +2110,6 @@ void GarminFilebasedDevice::readDirectoryListing() {
                 }
                 curFile->SetAttribute("Path",relativeFileName);
 
-                // Get File Size
-                struct stat filestatus;
-                stat( fullFileName.c_str(), &filestatus );
                 if (!isDirectory) {
                     stringstream ss;
                     ss << filestatus.st_size;
@@ -2096,7 +2129,7 @@ void GarminFilebasedDevice::readDirectoryListing() {
                 }
                 dirList->LinkEndChild( curFile );
             }
-            closedir(dp);
+        	globfree(&gl);
         } else {
             Log::err("Error opening directory! "+ currentWorkDir);
         }
@@ -2110,7 +2143,7 @@ void GarminFilebasedDevice::readDirectoryListing() {
 
     lockVariables();
     this->threadState = 3; // Finished
-    this->readableFileListingXml = outputXml;
+    this->directoryListingXml = outputXml;
     this->transferSuccessful = true; // Successfull;
     unlockVariables();
 
