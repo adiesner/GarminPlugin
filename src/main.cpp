@@ -1392,6 +1392,13 @@ bool methodCancelReadableFileListing(NPObject *obj, const NPVariant args[], uint
 }
 
 
+/**
+ * Reads a directory from the device.
+ * The search is always recursive.
+ * @param deviceId - integer, identifying the device
+ * @param devicePath - string, relative path (eg: Garmin/GPX) on device, may contain wildcards (eg: Garmin/GPX/*.gpx)
+ * @param computeMD5 - set to true if you need md5 checksums for all files
+ */
 bool methodStartDirectoryListing(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
     if (argCount >= 3) {
         int deviceId = getIntParameter(args, 0, -1);

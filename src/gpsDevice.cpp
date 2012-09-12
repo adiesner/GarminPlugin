@@ -156,8 +156,9 @@ string GpsDevice::getDirectoryListingXml() {
 * This function lists all files that are available on the device. </br>
 * The result can be retrieved with getDirectoryListingXml().
 * Minimum plugin version 2.8.1.0 <br/>
+* The file search is recursive!
 *
-* @param {String} relativePath specifies the relative path on the device
+* @param {String} relativePath specifies the relative path on the device. May contain wildcards like (*.gpx)
 * @param {Boolean} computeMD5 If true, the plug-in will generate an MD5 checksum for each readable file.
 * @return int returns 1 if successful otherwise 0
 */
