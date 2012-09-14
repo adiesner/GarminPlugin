@@ -997,15 +997,16 @@ bool Edge305Device::isDeviceAvailable() {
 // So cut all unprintable characters at the end
 /*static*/
 string Edge305Device::filterDeviceName(string name) {
-    int cutBytes = 0;
-    for (int i=name.length()-1; i >= 0 ; i--)
-    {
-        char ch = name[i];
-        if ((((int)ch) < 32) || (((int)ch) > 127)) { // printable characters
-            cutBytes ++;
-        }
-    }
-    return name.substr(0,name.length()-cutBytes);
+    int i = 0; // new length of string
+    while (i<name.length()) {
+		if ((name[i]>=' ') && (name[i]<='~')) { // 32-126 printable ascii characters
+			i++;
+		} else {
+			break;
+		}
+	}
+	if (i==0) { return "Unknown device"; } // just in case
+	return name.substr(0,i);
 }
 
 int Edge305Device::startReadFITDirectory() {
