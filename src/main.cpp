@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.14";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.15devel";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -665,7 +665,7 @@ bool methodRespondToMessageBox(NPObject *obj, const NPVariant args[], uint32_t a
             		// Fallback to boolean
             		response = (getBoolParameter(args, 0, false)) ? 1 : 0;
             	}
-                msg->responseReceived(args[0].value.intValue);
+                msg->responseReceived(response);
             } else {
                 if (Log::enabledErr()) Log::err("methodRespondToMessageBox: Wrong parameter count");
             }
