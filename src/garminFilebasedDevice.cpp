@@ -1408,7 +1408,7 @@ void GarminFilebasedDevice::postProcessDownloadData(DeviceDownloadData downloadD
 		if (Log::enabledDbg()) { Log::dbg("Deleted first 60 bytes in "+downloadData.destination); }
 	} else {
 		if (Log::enabledDbg()) { Log::dbg("Renaming "+downloadData.destinationtmp+" -> "+downloadData.destination); }
-		remove(filenametmp.c_str());
+		remove(filename.c_str());
 		rename(filenametmp.c_str(), filename.c_str());
 	}
 }
