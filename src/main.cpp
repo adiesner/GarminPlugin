@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.15devel";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.15";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -1936,8 +1936,8 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
                                     BrowserDetect.browser='Firefox';\
                                 }\
                                 garminOverwriteBrowserDetectRunCount++;\
-                                if (garminOverwriteBrowserDetectRunCount < 20) {\
-                                    setTimeout ( \"garminOverwriteBrowserDetect()\", 100 );\
+                                if (garminOverwriteBrowserDetectRunCount < 80) {\
+                                    setTimeout ( \"garminOverwriteBrowserDetect()\", 25 );\
                                 }\
                               };\
                               garminOverwriteBrowserDetect();";
