@@ -644,11 +644,17 @@ Thread-Status
         activities->LinkEndChild( curAct );
     }
 
-
     TiXmlPrinter printer;
     printer.SetIndent( "  " );
     output->Accept( &printer );
     string fitnessXml = printer.Str();
+
+    // Write to backup directory if needed
+    if ((readTrackData) && (fitnessDetailId.length()>0)) {
+    	time_t startTime = GpsFunctions::getStartTimestampFromXml(output);
+    	backupWorkout(fitnessXml, extension, startTime);
+    }
+    // Delete Xml structure
     delete(output);
 
     lockVariables();
@@ -1230,6 +1236,28 @@ string GarminFilebasedDevice::getBinaryFile(string relativeFilePath) {
     std::stringstream buffer;
     buffer << in.rdbuf();
     in.close();
+
+    // Write to backup directory if needed
+    FitReader fit(fullFilePath);
+    if (fit.isFitFile()) {
+        fit.registerFitMsgFkt(this);
+    	FitMsg * fitMsg = fit.getNextFitMsgFromType(FIT_MESSAGE_FILE_ID);
+    	if (fitMsg != NULL) {
+    		if (fitMsg->GetType() == FIT_MESSAGE_FILE_ID) {
+    	        FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (fitMsg);
+    	        if (fileid != NULL) {
+    	        	if (fileid->GetFileType() == FIT_FILE_ID_TYPE_ACTIVITY) {
+    	        		time_t startTime = fileid->GetTimeCreated() + TIME_OFFSET;
+    	        		backupWorkout(buffer.str(), "fit", startTime);
+    	        	} else {
+    	        		Log::dbg("Not an activity - not creating a backup");
+    	        	}
+    	        }
+    		}
+    		delete(fitMsg);
+    	}
+    }
+
     return buffer.str();
 }
 
@@ -2224,3 +2252,4 @@ string GarminFilebasedDevice::getMd5FromFile(string filename) {
 
 	return md5;
 }
+
