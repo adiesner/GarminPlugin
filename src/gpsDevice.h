@@ -313,6 +313,11 @@ public:
      */
     virtual void cancelDirectoryListing();
 
+    /**
+     * Sets a path to store all workouts that are uploaded
+     */
+    virtual void setBackupPath(string path);
+
 protected:
     enum WorkType
     {
@@ -363,10 +368,22 @@ protected:
 
     virtual void doWork() = 0;
 
+    /**
+     * Stores a local copy of the workout on your disk (if configured)
+     * Timestamp is needed to replace variables like [YEAR] in path
+     */
+    void backupWorkout(string workout, string filename, time_t timestamp);
+
   /**
    * Is used for the progress bar and should be a value between 0 and 100%
    */
     int progressState;
+
+    /**
+     * Save a backup copy into this directory each time a workout is uploaded
+     */
+    string backupPath;
+
 
 private:
   /**

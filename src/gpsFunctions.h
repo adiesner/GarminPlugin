@@ -22,6 +22,9 @@
 #include <iostream>
 #include <math.h>
 #include <sstream>
+#include <string.h>
+#include <sys/stat.h>
+#include <cerrno>
 
 #define d2r (M_PI / 180.0)
 
@@ -98,6 +101,93 @@ class GpsFunctions {
 
       return (string)buf;
     }
+
+    static int mkpath(std::string path, mode_t mode) {
+        size_t pre=0,pos;
+        std::string dir;
+        int mdret;
+
+        if(path[path.size()-1]!='/') {
+            path+='/';
+        }
+
+        while((pos=path.find_first_of('/',pre))!=std::string::npos){
+            dir=path.substr(0,pos++);
+            pre=pos;
+            if(dir.size()==0) continue; // if leading / first time is 0 length
+            if((mdret=mkdir(dir.c_str(),mode)) && errno!=EEXIST){
+                return mdret;
+            }
+        }
+
+        struct stat status;
+        stat( path.c_str(), &status );
+        if ( status.st_mode & S_IFDIR ) {
+        	return EEXIST;
+        }
+        return mdret;
+    }
+
+
+    /**
+     * Parses a tcx file, and returns the unix timestamp for the start timestamp
+     */
+    static time_t getStartTimestampFromXml(string xml)
+    {
+    	if (xml.length() == 0) { return 0; }
+    	TiXmlDocument * xmldoc = new TiXmlDocument();
+    	xmldoc->Parse(xml.c_str());
+    	time_t res = getStartTimestampFromXml(xmldoc);
+    	delete(xmldoc);
+    	return res;
+    }
+
+    /**
+     * Parses a tcx file, and returns the unix timestamp for the start timestamp
+     */
+    static time_t getStartTimestampFromXml(TiXmlDocument * xmldoc)
+    {
+    	if (xmldoc == NULL) { return 0; }
+    	// TrainingCenterDatabase -> Activities -> Activity -> Lap . StartTime;
+    	TiXmlElement * pElem = xmldoc->FirstChildElement( "TrainingCenterDatabase" );
+    	if (pElem != NULL) {
+    		pElem = pElem->FirstChildElement( "Activities" );
+    		if (pElem != NULL) {
+    			pElem = pElem->FirstChildElement( "Activity" );
+    			if (pElem != NULL) {
+    				pElem = pElem->FirstChildElement( "Lap" );
+    				if (pElem != NULL) {
+    					const char * startTimeStr = pElem->Attribute("StartTime");
+    					if (startTimeStr!=NULL) {
+    						struct tm start;
+    						if (strptime(startTimeStr, "%FT%TZ",&start) != NULL) {
+    							return mktime(&start);
+    						}
+    						if (strptime(startTimeStr, "%FT%T.000Z",&start) != NULL) {
+    							return mktime(&start);
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return 0;
+    }
+
+    static string str_replace (string rep, string wit, string in) {
+    	  int pos;
+    	  while (true) {
+    	    pos = in.find(rep);
+    	    if (pos == -1) {
+    	      break;
+    	    } else {
+    	      in.erase(pos, rep.length());
+    	      in.insert(pos, wit);
+    	    }
+    	  }
+    	  return in;
+    }
+
 };
 
 #endif // GPSFUNCTIONS_H_INCLUDED

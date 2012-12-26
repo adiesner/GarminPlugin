@@ -19,7 +19,10 @@
 
 #include "gpsDevice.h"
 #include "log.h"
-
+#include "gpsFunctions.h"
+#include <istream>
+#include <ostream>
+#include <fstream>
 
 pthread_mutex_t shareVariables_mtx= PTHREAD_MUTEX_INITIALIZER;
 
@@ -29,7 +32,8 @@ pthread_mutex_t     waitThreadMutex = PTHREAD_MUTEX_INITIALIZER;
 GpsDevice::GpsDevice(string dispName)
 : displayName(dispName)
 , threadId (0)
-, progressState(0) {
+, progressState(0)
+, backupPath("") {
 }
 
 GpsDevice::~GpsDevice() {
@@ -181,4 +185,56 @@ int GpsDevice::finishDirectoryListing() {
  */
 void GpsDevice::cancelDirectoryListing() {
     Log::err("cancelDirectoryListing is not implemented for device "+this->displayName);
+}
+
+
+void GpsDevice::backupWorkout(string workout, string type, time_t timestamp) {
+	if (backupPath.empty()) {
+		Log::info("Workout backup is disabled");
+		return;
+	}
+	string path = backupPath;
+	if (*path.begin() == '~') {
+		string homeDir = getenv ("HOME");
+		path = homeDir + path.substr(1);
+	}
+	path = GpsFunctions::str_replace("[TYPE]", type, path);
+	path = GpsFunctions::str_replace("[YEAR]", "%Y", path);
+	path = GpsFunctions::str_replace("[MONTH]", "%m", path);
+	path = GpsFunctions::str_replace("[DAY]", "%d", path);
+	if (*path.rbegin() != '/') { path += '/'; }
+
+	path += "%Y-%m-%d_%H-%M-%S."+type;
+
+	char buffer[400];
+	struct tm * timeinfo = localtime ( &timestamp );
+	strftime(buffer,400,path.c_str(),timeinfo);
+	path = buffer;
+
+	// Check if the output file exists (by opening it)
+	ifstream ifile(path.c_str());
+	if (ifile) {
+		Log::info("Backup file exists, not creating workout backup: "+path);
+		return;
+	}
+
+	int pos=path.find_last_of('/');
+	string pathOnly = path.substr(0,pos);
+	Log::info("Creating backup of workout in: "+pathOnly);
+	if (GpsFunctions::mkpath(pathOnly, 0755) == EEXIST) {
+		Log::info("Successfully created path: "+pathOnly);
+		Log::info("Writing workout: "+path);
+		std::ofstream workoutFile;
+		workoutFile.open(path.c_str());
+		if (workoutFile.is_open()) {
+			workoutFile << workout;
+			workoutFile.close();
+		}
+	} else {
+		Log::err("Not saving workout! Unable to create path: "+pathOnly);
+	}
+}
+
+void GpsDevice::setBackupPath(string path) {
+	this->backupPath = path;
 }
