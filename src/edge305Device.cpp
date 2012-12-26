@@ -124,6 +124,12 @@ Thread-Status
 
     string fitnessDataXml = readFitnessData(readTrackData, fitnessDetailId);
 
+    // Write to backup directory if needed
+    if ((readTrackData) && (fitnessDetailId.length()>0)) {
+    	time_t startTime = GpsFunctions::getStartTimestampFromXml(fitnessDataXml);
+    	backupWorkout(fitnessDataXml, "tcx", startTime);
+    }
+
     lockVariables();
     this->threadState = 3;
     fitnessDataTcdXml = fitnessDataXml;
@@ -997,7 +1003,7 @@ bool Edge305Device::isDeviceAvailable() {
 // So cut all unprintable characters at the end
 /*static*/
 string Edge305Device::filterDeviceName(string name) {
-    int i = 0; // new length of string
+    unsigned int i = 0; // new length of string
     while (i<name.length()) {
 		if ((name[i]>=' ') && (name[i]<='~')) { // 32-126 printable ascii characters
 			i++;
