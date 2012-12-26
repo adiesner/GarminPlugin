@@ -60,10 +60,20 @@ class FitReader
         /**
          * Reads the next record in the file. If a FitMsgFkt was registered this function
          * gets called when a data message was decoded and the message is known.
+         * Calls fitMsgListener to consume the next fitMsg.
          * @throw FitFileException - on data format error
          * @return bool - true if more records exist
          */
         bool readNextRecord();
+
+        /**
+         * Reads the next fit msg in the file and returns it
+         * Caller must delete FitMsg!
+         * @throw FitFileException - on data format error
+         * @return bool - true if more records exist
+         */
+        FitMsg * readNextFitMsg();
+
 
         /**
          * Closes the fit file.
@@ -74,6 +84,11 @@ class FitReader
          * Enable/Disable debug output to FitMsg_Listener
          */
         void setDebugOutput(bool enable);
+
+        /**
+         * Reads the next fit message matching messageType
+         */
+        FitMsg * getNextFitMsgFromType(int messageType);
 
     private:
 
@@ -132,9 +147,10 @@ class FitReader
         MsgDef localMsgDef[MAX_LOCAL_MSG];
 
         /**
-         * Reads a data package from file and calls fitMsgReceiver if defined
+         * Reads a data package from file and returns it
+         * FitMsg needs to be deleted by caller!
          */
-        void readDataPackage(MsgDef msg, unsigned int timestamp);
+        FitMsg * readDataPackage(MsgDef msg, unsigned int timestamp);
 
         /**
          * Stores the header length (first byte in file)

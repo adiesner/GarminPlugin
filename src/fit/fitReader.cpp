@@ -204,7 +204,6 @@ bool FitReader::isCorrectCRC() {
 }
 
 bool FitReader::readNextRecord() {
-
     if ((!this->file.is_open()) || (this->file.bad()) || (this->remainingDataBytes <= 0)) {
         if (this->remainingDataBytes == 0) { // just for better debug message text
             dbg("End of fit file");
@@ -212,6 +211,28 @@ bool FitReader::readNextRecord() {
             dbg("File i/o error");
         }
         return false;
+    }
+
+    FitMsg *fitMsg = readNextFitMsg();
+    if (fitMsg != NULL) {
+        // Notify message listener
+    	if (this->fitMsgListener != NULL) {
+    		this->fitMsgListener->fitMsgReceived(fitMsg);
+    	}
+    	delete(fitMsg);
+    }
+    return true;
+}
+
+FitMsg * FitReader::readNextFitMsg() {
+
+    if ((!this->file.is_open()) || (this->file.bad()) || (this->remainingDataBytes <= 0)) {
+        if (this->remainingDataBytes == 0) { // just for better debug message text
+            dbg("End of fit file");
+        } else {
+            dbg("File i/o error");
+        }
+        return NULL;
     }
 
     char buf[6];
@@ -235,7 +256,8 @@ bool FitReader::readNextRecord() {
         //TODO: timestamp is never set, but should be!
         this->timestamp += (timeOffset - this->lastTimeOffset) & 0x1F;
         this->lastTimeOffset = timeOffset;
-        readDataPackage(this->localMsgDef[localMsgNr], this->timestamp);
+        FitMsg *fitMsg = readDataPackage(this->localMsgDef[localMsgNr], this->timestamp);
+        return fitMsg;
     } else { // if (!isNormalHeader)
         dbg("Is normal header");
         // isNormalHeader
@@ -290,14 +312,14 @@ bool FitReader::readNextRecord() {
                 throw FitFileException("FIT Decode Error. Local Message not yet defined!");
             }
 
-            readDataPackage(localMsgDef[localMsgNr], 0);
+            FitMsg *fitMsg = readDataPackage(localMsgDef[localMsgNr], 0);
+            return fitMsg;
         }
     }
-    return true;
+    return NULL;
 }
 
-
-void FitReader::readDataPackage(MsgDef msg, unsigned int timestamp) {
+FitMsg * FitReader::readDataPackage(MsgDef msg, unsigned int timestamp) {
 
     FitMsg * fitMsg = NULL;
     switch (msg.globalMsgNum)
@@ -345,15 +367,7 @@ void FitReader::readDataPackage(MsgDef msg, unsigned int timestamp) {
         ++fieldIter;
     }
 
-    // Notify message listener
-    if ((fitMsg != NULL) && (this->fitMsgListener != NULL)) {
-        this->fitMsgListener->fitMsgReceived(fitMsg);
-    }
-
-    // Cleanup
-    if (fitMsg != NULL) {
-        delete(fitMsg);
-    }
+    return fitMsg;
 }
 
 void FitReader::closeFitFile() {
@@ -361,4 +375,25 @@ void FitReader::closeFitFile() {
     if (this->file.is_open()) {
         this->file.close();
     }
+}
+
+FitMsg * FitReader::getNextFitMsgFromType(int messageType) {
+
+	if ((!this->file.good()) || (!this->file.is_open())) {
+		dbg("File not open");
+		return NULL;
+	}
+
+	while (this->remainingDataBytes > 0) {
+		FitMsg * msg = readNextFitMsg();
+		if (msg != NULL) {
+			if (msg->GetType() == messageType) {
+				return msg;
+			}
+			delete(msg);
+		}
+	}
+
+	return NULL;
+
 }
