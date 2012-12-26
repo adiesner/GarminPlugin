@@ -140,6 +140,7 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 /*
     <Settings>
         <ForerunnerTools enabled ="true"/>
+        <BackupWorkouts enabled ="true" path="/home/user/Dropbox/Workouts/[YEAR]/[MONTH]/"/>
     </Settings>
 */
     TiXmlElement * settings = new TiXmlElement( "Settings" );
@@ -149,6 +150,11 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 	settings->LinkEndChild( forerunnertools );
 
 	forerunnertools->SetAttribute("enabled", "true");
+
+    TiXmlElement * backupWorkouts = new TiXmlElement( "BackupWorkouts" );
+	settings->LinkEndChild( backupWorkouts );
+	backupWorkouts->SetAttribute("enabled", "false");
+	backupWorkouts->SetAttribute("path", homeDir + "/Dropbox/Workouts/<YEAR>/<MONTH>/");
 
     doc->SaveFile(configFile);
     configurationFile = configFile;
