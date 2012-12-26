@@ -104,32 +104,50 @@ void DeviceManager::startFindDevices() {
     struct mntent *ent = NULL;
     mounts = setmntent("/etc/mtab", "r");
 
-    Log::dbg("Searching for Edge705/Oregon300/...");
-    while ( (ent = getmntent(mounts)) != NULL ) {
-        string filesystype = ent->mnt_type;
-        if (filesystype.compare("vfat") == 0) {
-            string mountPath = ent->mnt_dir;
-
-            GpsDevice *dev = createGarminDeviceFromPath(mountPath, NULL);
-            if (dev != NULL) {
-                gpsDeviceList.push_back(dev);
-            }
-        }
-    }
-
     bool searchGarmin = true;
+    string backupPath = "";
     if (this->configuration != NULL) {
         TiXmlElement * pRoot = this->configuration->FirstChildElement( "GarminPlugin" );
         TiXmlElement * settings = NULL;
         TiXmlElement * ftools = NULL;
+        TiXmlElement * backup = NULL;
 
         if (pRoot != NULL) { settings = pRoot->FirstChildElement("Settings"); }
-        if (settings != NULL) { ftools = settings->FirstChildElement("ForerunnerTools"); } else { Log::dbg("settings is null!"); }
+        if (settings != NULL) {
+        	ftools = settings->FirstChildElement("ForerunnerTools");
+        	backup = settings->FirstChildElement("BackupWorkouts");
+        } else {
+        	Log::dbg("settings is null!");
+        }
         if (ftools != NULL) {
             searchGarmin = getXmlBoolAttribute(ftools, "enabled", true);
         } else {
 			Log::dbg("Xml Element ForerunnerTools is null!");
 		}
+        if (backup != NULL) {
+            bool doBackup = getXmlBoolAttribute(backup, "enabled", false);
+            if (doBackup) {
+            	backupPath = backup->Attribute("path");
+            } else {
+            	backupPath = "";
+            }
+        } else {
+			Log::dbg("Xml Element BackupWorkouts is null!");
+		}
+    }
+
+    Log::dbg("Searching for Edge705/Oregon300/...");
+    while ( (ent = getmntent(mounts)) != NULL ) {
+        string filesystype = ent->mnt_type;
+        string mountPath = ent->mnt_dir;
+        Log::dbg("Searching on ["+mountPath+"] ["+filesystype+"]");
+        if (filesystype.compare("vfat") == 0) {
+            GpsDevice *dev = createGarminDeviceFromPath(mountPath, NULL);
+            if (dev != NULL) {
+            	dev->setBackupPath(backupPath);
+                gpsDeviceList.push_back(dev);
+            }
+        }
     }
 
     string deviceName;
@@ -139,6 +157,7 @@ void DeviceManager::startFindDevices() {
         if (deviceName.length() > 0) {  // Found a device
             Log::dbg("Found device via garmintools: "+deviceName);
             Edge305Device * device = new Edge305Device(deviceName);
+            device->setBackupPath(backupPath);
             gpsDeviceList.push_back(device);
         }
     } else {
@@ -220,6 +239,7 @@ void DeviceManager::startFindDevices() {
                             }
 
                             if (currentDevice != NULL) {
+                            	currentDevice->setBackupPath(backupPath);
                                 gpsDeviceList.push_back(currentDevice);
                             }
                         }
