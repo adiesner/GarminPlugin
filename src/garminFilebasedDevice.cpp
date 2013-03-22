@@ -2234,12 +2234,18 @@ string GarminFilebasedDevice::getMd5FromFile(string filename) {
     }
 
     FILE *f = fopen(filename.c_str(),"r");
+    if (f==NULL) {
+    	Log::err("Unable open file to calculate MD5");
+    	gcry_md_close(c);
+    	return "";		
+	}
     int fd=fileno(f);
     for (;;) {
     	unsigned int i=read(fd,buf,MD5READBUFFERSIZE);
         if (i <= 0) break;
         gcry_md_write(c, buf, i);
     }
+    fclose(f);
     string md5="";
     unsigned char * md = gcry_md_read(c, 0);
     int md5len = gcry_md_get_algo_dlen(GCRY_MD_MD5);
