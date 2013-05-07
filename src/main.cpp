@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.16";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.17";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -1396,7 +1396,7 @@ bool methodCancelReadableFileListing(NPObject *obj, const NPVariant args[], uint
  * Reads a directory from the device.
  * The search is always recursive.
  * @param deviceId - integer, identifying the device
- * @param devicePath - string, relative path (eg: Garmin/GPX) on device, may contain wildcards (eg: Garmin/GPX/*.gpx)
+ * @param devicePath - string, relative path (eg: Garmin/GPX) on device, may contain wildcards (eg: Garmin/GPX/ *.gpx)
  * @param computeMD5 - set to true if you need md5 checksums for all files
  */
 bool methodStartDirectoryListing(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result) {
@@ -1908,7 +1908,14 @@ static NPClass npcRefObject = {
 static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t argc, char *argn[], char *argv[], NPSavedData *saved) {
     instanceCount++;
 	inst = instance;
-	if (Log::enabledDbg()) Log::dbg("new");
+	if (Log::enabledDbg()) {
+		stringstream ss;
+		ss << "NPP_New(instance=" << instance << ",mode=" << mode << ",argc=" << argc << ",args=[";
+		    for (int i = 0; i < argc; ++i) {
+		      ss << (i ? "," : "") << argn[i] << "=" << argv[i];
+		    }
+		Log::dbg(ss.str());
+	}
 
     if(!so) {
         so = npnfuncs->createobject(instance, &npcRefObject);
