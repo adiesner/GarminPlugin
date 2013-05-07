@@ -25,6 +25,7 @@
 #include "garminFilebasedDevice.h"
 
 #include "edge305Device.h"
+#include "gpsFunctions.h"
 
 #include <algorithm>
 #include <string>
@@ -140,13 +141,15 @@ void DeviceManager::startFindDevices() {
     while ( (ent = getmntent(mounts)) != NULL ) {
         string filesystype = ent->mnt_type;
         string mountPath = ent->mnt_dir;
-        Log::dbg("Searching on ["+mountPath+"] ["+filesystype+"]");
         if (filesystype.compare("vfat") == 0) {
+            Log::dbg("Searching on ["+mountPath+"] ["+filesystype+"]");
             GpsDevice *dev = createGarminDeviceFromPath(mountPath, NULL);
             if (dev != NULL) {
             	dev->setBackupPath(backupPath);
                 gpsDeviceList.push_back(dev);
             }
+        } else {
+            Log::dbg("Not searching on ["+mountPath+"] ["+filesystype+"] - wrong fstype.");
         }
     }
 
@@ -209,6 +212,7 @@ void DeviceManager::startFindDevices() {
 
                 if ((deviceEnabled) && (name!=NULL)) {
                     if (name->GetText() != NULL) {
+                        string devName = name->GetText();
                         for(unsigned int i=0; i < gpsDeviceList.size(); i++)
                         {
                             // Device exists, and is configured in configuration
@@ -217,10 +221,10 @@ void DeviceManager::startFindDevices() {
                             }
                         }
                         if (currentDevice == NULL) { // no device found
+                            Log::dbg("Creating device "+devName+" from configuration.");
 
                             currentDevice = createGarminDeviceFromPath(storagePath, NULL);
                             if (currentDevice == NULL) {
-                                string devName = name->GetText();
                                 if (Log::enabledDbg()) { Log::dbg("Device from configuration - no XML found for "+devName); }
 
                                 //TODO: Create a pseudo configuration file for this device
@@ -236,12 +240,16 @@ void DeviceManager::startFindDevices() {
                                 }
                                 currentDevice = createGarminDeviceFromPath(storagePath, doc);
                                 delete(doc);
+                            } else {
+                                Log::dbg("Created device "+devName+" from existing GarminDevice.xml configuration.");
                             }
 
                             if (currentDevice != NULL) {
                             	currentDevice->setBackupPath(backupPath);
                                 gpsDeviceList.push_back(currentDevice);
                             }
+                        } else {
+                            Log::dbg("Ignoring device "+devName+" from configuration - existing device with same name exists.");
                         }
                     }
                 }
@@ -320,9 +328,10 @@ GpsDevice * DeviceManager::createGarminDeviceFromPath(string devicepath, TiXmlDo
         }
 
         bool garminDirFound = false;
+        string dirname = "";
         while ((dirp = readdir(dp)) != NULL) {
-            string dir = string(dirp->d_name);
-            if (dir.compare("Garmin") == 0) {
+            dirname = string(dirp->d_name);
+            if (GpsFunctions::iequals(dirname, "Garmin")) {
                 garminDirFound = true;
                 break;
             }
@@ -330,7 +339,21 @@ GpsDevice * DeviceManager::createGarminDeviceFromPath(string devicepath, TiXmlDo
         closedir(dp);
 
         if (garminDirFound) {
-            string fullPath = devicepath + "/Garmin/GarminDevice.xml";
+            string basePath = devicepath + "/" + dirname;
+            string fullPath = basePath +"/GarminDevice.xml";
+
+            // Ignore case search for file GarminDevice.xml
+            if((dp = opendir(basePath.c_str())) != NULL) {
+            	while ((dirp = readdir(dp)) != NULL) {
+					string entry = string(dirp->d_name);
+					if (GpsFunctions::iequals(entry, "GarminDevice.xml")) {
+						fullPath = basePath + "/" + entry;
+						break;
+					}
+				}
+                closedir(dp);
+            }
+
             doc = new TiXmlDocument(fullPath);
             deleteXmlDoc = true;
             if (!doc->LoadFile()) {
