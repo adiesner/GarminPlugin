@@ -577,10 +577,10 @@ GREP
 CPP
 GARMINTOOLS_LDFLAGS
 GARMINTOOLS_CPPFLAGS
-TINYXML_LDFLAGS
-TINYXML_CPPFLAGS
 GCRYPT_LIBS
 GCRYPT_CFLAGS
+TINYXML_LIBS
+TINYXML_CFLAGS
 ZLIB_LIBS
 ZLIB_CFLAGS
 LIBUSB_LIBS
@@ -640,8 +640,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_libgcrypt_prefix
-with_tinyxml_libdir
-with_tinyxml_incdir
 with_garmintools_libdir
 with_garmintools_incdir
 '
@@ -663,6 +661,8 @@ LIBUSB_CFLAGS
 LIBUSB_LIBS
 ZLIB_CFLAGS
 ZLIB_LIBS
+TINYXML_CFLAGS
+TINYXML_LIBS
 CPP'
 
 
@@ -1276,12 +1276,6 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libgcrypt-prefix=DIR
                           define libgcrypt prefix, default /usr
-  --with-tinyxml-libdir=DIR
-                          specify where to find tinyxml library
-                          (libtinyxml.so)
-  --with-tinyxml-incdir=DIR
-                          specify where to find tinyxml header files
-                          (tinyxml.h)
   --with-garmintools-libdir=DIR
                           specify where to find garmintools library
                           (libgarmintools.a)
@@ -1309,6 +1303,10 @@ Some influential environment variables:
   LIBUSB_LIBS linker flags for LIBUSB, overriding pkg-config
   ZLIB_CFLAGS C compiler flags for ZLIB, overriding pkg-config
   ZLIB_LIBS   linker flags for ZLIB, overriding pkg-config
+  TINYXML_CFLAGS
+              C compiler flags for TINYXML, overriding pkg-config
+  TINYXML_LIBS
+              linker flags for TINYXML, overriding pkg-config
   CPP         C preprocessor
 
 Use these variables to override the choices made by `configure' or to help
@@ -3675,6 +3673,100 @@ fi
 
 
 
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for TINYXML" >&5
+$as_echo_n "checking for TINYXML... " >&6; }
+
+if test -n "$TINYXML_CFLAGS"; then
+    pkg_cv_TINYXML_CFLAGS="$TINYXML_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"tinyxml\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "tinyxml") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_TINYXML_CFLAGS=`$PKG_CONFIG --cflags "tinyxml" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$TINYXML_LIBS"; then
+    pkg_cv_TINYXML_LIBS="$TINYXML_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"tinyxml\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "tinyxml") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_TINYXML_LIBS=`$PKG_CONFIG --libs "tinyxml" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+   	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        TINYXML_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "tinyxml" 2>&1`
+        else
+	        TINYXML_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "tinyxml" 2>&1`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$TINYXML_PKG_ERRORS" >&5
+
+	as_fn_error $? "Package requirements (tinyxml) were not met:
+
+$TINYXML_PKG_ERRORS
+
+Consider adjusting the PKG_CONFIG_PATH environment variable if you
+installed software in a non-standard prefix.
+
+Alternatively, you may set the environment variables TINYXML_CFLAGS
+and TINYXML_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details." "$LINENO" 5
+elif test $pkg_failed = untried; then
+     	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "The pkg-config script could not be found or is too old.  Make sure it
+is in your PATH or set the PKG_CONFIG environment variable to the full
+path to pkg-config.
+
+Alternatively, you may set the environment variables TINYXML_CFLAGS
+and TINYXML_LIBS to avoid the need to call pkg-config.
+See the pkg-config man page for more details.
+
+To get pkg-config, see <http://pkg-config.freedesktop.org/>.
+See \`config.log' for more details" "$LINENO" 5; }
+else
+	TINYXML_CFLAGS=$pkg_cv_TINYXML_CFLAGS
+	TINYXML_LIBS=$pkg_cv_TINYXML_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+
+fi
+
+
+
 #
 # Check for GNU Crypt library
 #
@@ -3701,73 +3793,6 @@ $as_echo "found" >&6; }
 
 fi
 
-
-#
-# Check for tinyxml
-#
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tinyxml" >&5
-$as_echo_n "checking for tinyxml... " >&6; }
-
-
-# Check whether --with-tinyxml-libdir was given.
-if test "${with_tinyxml_libdir+set}" = set; then :
-  withval=$with_tinyxml_libdir; tinyxml_libdir=$withval
-else
-  tinyxml_libdir=""
-fi
-
-
-
-# Check whether --with-tinyxml-incdir was given.
-if test "${with_tinyxml_incdir+set}" = set; then :
-  withval=$with_tinyxml_incdir; tinyxml_incdir=$withval
-else
-  tinyxml_incdir=""
-fi
-
-
-if test "x$tinyxml_incdir" != "x" ; then
-  TINYXML_CPPFLAGS="-I$tinyxml_incdir"
-elif test -f "../tinyxml/tinyxml.h" ; then
-  TINYXML_CPPFLAGS="-I../tinyxml/"
-elif test -f "/usr/include/tinyxml.h" ; then
-  TINYXML_CPPFLAGS="-I/usr/include"
-elif test -f "tinyxml/tinyxml.h" ; then
-  TINYXML_CPPFLAGS="-Itinyxml"
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  as_fn_error $? "Unable to find tinyxml header file (tinyxml.h). Try 'apt-get install tinyxml-dev' or use --with-tinyxml-incdir=DIR" "$LINENO" 5
-fi
-
-if test "x$tinyxml_libdir" != "x" ; then
-  if test -f "$tinyxml_libdir/libtinyxml.so" ; then
-    TINYXML_LDFLAGS="$tinyxml_libdir/libtinyxml.so"
-  else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-    as_fn_error $? "Unable to find libtinyxml.so in $tinyxml_libdir. Is tinyxml compiled?" "$LINENO" 5
-  fi
-elif test -f "/usr/lib64/libtinyxml.so" ; then
-  TINYXML_LDFLAGS="/usr/lib64/libtinyxml.so"
-elif test -f "/usr/lib/libtinyxml.so" ; then
-  TINYXML_LDFLAGS="/usr/lib/libtinyxml.so"
-elif test -f "../tinyxml/libtinyxml.so" ; then
-  TINYXML_LDFLAGS="../tinyxml/libtinyxml.so"
-elif test -f "../tinyxml/tinyxml.o" ; then
-  TINYXML_LDFLAGS="../tinyxml/tinyxml.o ../tinyxml/tinystr.o ../tinyxml/tinyxmlerror.o ../tinyxml/tinyxmlparser.o"
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  as_fn_error $? "Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR" "$LINENO" 5
-fi
-
-
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
 
 #
 # Check GarminTools

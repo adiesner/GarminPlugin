@@ -24,6 +24,10 @@ PKG_CHECK_MODULES([ZLIB], [zlib])
 AC_SUBST(ZLIB_CFLAGS)
 AC_SUBST(ZLIB_LIBS)
 
+PKG_CHECK_MODULES([TINYXML], [tinyxml])
+AC_SUBST(TINYXML_CFLAGS)
+AC_SUBST(TINYXML_LIBS)
+
 #
 # Check for GNU Crypt library
 #
@@ -45,62 +49,6 @@ else
 	AC_SUBST(GCRYPT_LIBS)
 fi
 
-
-#
-# Check for tinyxml
-#
-
-AC_MSG_CHECKING([for tinyxml])
-
-AC_ARG_WITH([tinyxml-libdir],
-	    AS_HELP_STRING([--with-tinyxml-libdir=DIR],
-		[specify where to find tinyxml library (libtinyxml.so)]),
-	    [tinyxml_libdir=$withval],
-	    [tinyxml_libdir=""])
-
-AC_ARG_WITH([tinyxml-incdir],
-	    AS_HELP_STRING([--with-tinyxml-incdir=DIR],
-		[specify where to find tinyxml header files (tinyxml.h)]),
-	    [tinyxml_incdir=$withval],
-	    [tinyxml_incdir=""])
-
-if test "x$tinyxml_incdir" != "x" ; then
-  TINYXML_CPPFLAGS="-I$tinyxml_incdir"
-elif test -f "../tinyxml/tinyxml.h" ; then
-  TINYXML_CPPFLAGS="-I../tinyxml/"
-elif test -f "/usr/include/tinyxml.h" ; then
-  TINYXML_CPPFLAGS="-I/usr/include"
-elif test -f "tinyxml/tinyxml.h" ; then
-  TINYXML_CPPFLAGS="-Itinyxml"
-else
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Unable to find tinyxml header file (tinyxml.h). Try 'apt-get install tinyxml-dev' or use --with-tinyxml-incdir=DIR])
-fi
-
-if test "x$tinyxml_libdir" != "x" ; then
-  if test -f "$tinyxml_libdir/libtinyxml.so" ; then
-    TINYXML_LDFLAGS="$tinyxml_libdir/libtinyxml.so"
-  else
-    AC_MSG_RESULT([no])
-    AC_MSG_ERROR([Unable to find libtinyxml.so in $tinyxml_libdir. Is tinyxml compiled?])
-  fi
-elif test -f "/usr/lib64/libtinyxml.so" ; then
-  TINYXML_LDFLAGS="/usr/lib64/libtinyxml.so"
-elif test -f "/usr/lib/libtinyxml.so" ; then
-  TINYXML_LDFLAGS="/usr/lib/libtinyxml.so"
-elif test -f "../tinyxml/libtinyxml.so" ; then
-  TINYXML_LDFLAGS="../tinyxml/libtinyxml.so"
-elif test -f "../tinyxml/tinyxml.o" ; then
-  TINYXML_LDFLAGS="../tinyxml/tinyxml.o ../tinyxml/tinystr.o ../tinyxml/tinyxmlerror.o ../tinyxml/tinyxmlparser.o"
-else
-  AC_MSG_RESULT([no])
-  AC_MSG_ERROR([Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR])
-fi
-
-AC_SUBST(TINYXML_CPPFLAGS)
-AC_SUBST(TINYXML_LDFLAGS)
-
-AC_MSG_RESULT([yes])
 
 #
 # Check GarminTools
