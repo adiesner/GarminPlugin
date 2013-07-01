@@ -32,6 +32,8 @@ TcxLap::TcxLap() {
     this->triggerMethod = TrainingCenterDatabase::Manual;
     this->notes = "";
     this->cadenceSensorType = TrainingCenterDatabase::UndefinedCadenceType;
+    this->maxCadence="";
+    this->avgSpeed="";
 }
 
 TcxLap::~TcxLap() {
@@ -83,7 +85,7 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
     if (this->averageHeartRateBpm.length() > 0) {
         //TODO: Think about calculating averageHeartRateBpm value
         TiXmlElement * xmlAvgHeart = new TiXmlElement("AverageHeartRateBpm");
-        xmlAvgHeart->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
+        //xmlAvgHeart->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
         TiXmlElement * xmlValue = new TiXmlElement("Value");
         this->averageHeartRateBpm = TrainingCenterDatabase::limitIntValue(this->averageHeartRateBpm, 0,255);
         xmlValue->LinkEndChild(new TiXmlText(this->averageHeartRateBpm));
@@ -91,10 +93,13 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
         xmlLap->LinkEndChild(xmlAvgHeart);
     }
 
+    if (this->maximumHeartRateBpm.length() == 0) {
+    	calculateMaximumHeartRateBpm();
+    }
+
     if (this->maximumHeartRateBpm.length() > 0) {
-        //TODO: Think about calculating maximumHeartRateBpm value
         TiXmlElement * xmlAvgHeart = new TiXmlElement("MaximumHeartRateBpm");
-        xmlAvgHeart->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
+        //xmlAvgHeart->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
         TiXmlElement * xmlValue = new TiXmlElement("Value");
         this->maximumHeartRateBpm = TrainingCenterDatabase::limitIntValue(this->maximumHeartRateBpm, 0,255);
         xmlValue->LinkEndChild(new TiXmlText(this->maximumHeartRateBpm));
@@ -149,6 +154,39 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
         }
     }
 
+    if (this->maxCadence.length() > 0) {
+        if (xmlLapExtensions == NULL) {
+            xmlLapExtensions = new TiXmlElement("Extensions");
+            xmlLap->LinkEndChild(xmlLapExtensions);
+        }
+
+        string name = "MaxBikeCadence";
+        if (this->cadenceSensorType == TrainingCenterDatabase::Footpod) {
+        	name = "MaxRunningCadence";
+        }
+
+        TiXmlElement * xmlLX = new TiXmlElement("LX");
+        xmlLX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        xmlLapExtensions->LinkEndChild(xmlLX);
+        TiXmlElement * xmlMaxCadence = new TiXmlElement(name);
+        xmlMaxCadence->LinkEndChild(new TiXmlText(this->maxCadence));
+        xmlLX->LinkEndChild(xmlMaxCadence);
+    }
+
+    if (this->avgSpeed.length() > 0) {
+        if (xmlLapExtensions == NULL) {
+            xmlLapExtensions = new TiXmlElement("Extensions");
+            xmlLap->LinkEndChild(xmlLapExtensions);
+        }
+
+        TiXmlElement * xmlLX = new TiXmlElement("LX");
+        xmlLX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        xmlLapExtensions->LinkEndChild(xmlLX);
+        TiXmlElement * xmlAvgSpeed = new TiXmlElement("AvgSpeed");
+        xmlAvgSpeed->LinkEndChild(new TiXmlText(this->avgSpeed));
+        xmlLX->LinkEndChild(xmlAvgSpeed);
+    }
+
     return xmlLap;
 }
 
@@ -201,6 +239,13 @@ void TcxLap::setNotes(string note) {
     this->notes = note;
 }
 
+void TcxLap::setAvgSpeed(string speed) {
+	this->avgSpeed = speed;
+}
+void TcxLap::setMaxCadence(string cadence) {
+	this->maxCadence = cadence;
+}
+
 void TcxLap::calculateTotalTimeSeconds() {
     double totalTime = 0;
 
@@ -232,6 +277,22 @@ void TcxLap::calculateDistanceMeters() {
 void TcxLap::calculateCalories() {
     //TODO: Calculate Calories
     this->calories = "0";
+}
+
+void TcxLap::calculateMaximumHeartRateBpm() {
+    vector<TcxTrack*>::iterator it;
+    int maxHeartRate = 0;
+    for ( it=trackList.begin() ; it < trackList.end(); ++it )
+    {
+        TcxTrack* track = *it;
+        int currentMaxHeartRate = track->getMaxHeartRate();
+        maxHeartRate = (currentMaxHeartRate > maxHeartRate) ? currentMaxHeartRate : maxHeartRate;
+    }
+    if (maxHeartRate > 0) {
+    	stringstream ss;
+    	ss << maxHeartRate;
+    	this->maximumHeartRateBpm=ss.str();
+    }
 }
 
 string TcxLap::getIntensity(TrainingCenterDatabase::Intensity_t intensity) {

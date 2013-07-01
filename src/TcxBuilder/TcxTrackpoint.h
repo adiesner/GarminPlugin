@@ -39,7 +39,9 @@ public:
     void setAltitudeMeters(string altitude);
     void setDistanceMeters(string distance);
     void setHeartRateBpm(string heartrate);
+    string getHeartRateBpm();
     void setCadence(string cadence);
+    void setSpeed(string speed);
     void setSensorState(TrainingCenterDatabase::SensorState_t state);
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
     string getTime();
@@ -60,6 +62,7 @@ private:
     string distanceMeters;
     string heartRateBpm;
     string cadence;
+    string speed;
     TrainingCenterDatabase::SensorState_t sensorState;
     TrainingCenterDatabase::CadenceSensorType_t cadenceSensorType;
 

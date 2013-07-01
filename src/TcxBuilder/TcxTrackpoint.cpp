@@ -19,7 +19,6 @@
 
 #include "TcxTrackpoint.h"
 #include "../gpsFunctions.h"
-#include "../log.h"
 
 void TcxTrackpoint::initializeVariables() {
     this->longitude = "";
@@ -28,6 +27,7 @@ void TcxTrackpoint::initializeVariables() {
     this->distanceMeters = "";
     this->heartRateBpm = "";
     this->cadence = "";
+    this->speed = "";
     this->sensorState = TrainingCenterDatabase::UndefinedSensorState;
     this->cadenceSensorType = TrainingCenterDatabase::UndefinedCadenceType;
 }
@@ -65,8 +65,16 @@ void TcxTrackpoint::setHeartRateBpm(string heartrate) {
     this->heartRateBpm = heartrate;
 }
 
+string TcxTrackpoint::getHeartRateBpm() {
+	return this->heartRateBpm;
+}
+
 void TcxTrackpoint::setCadence(string cadence) {
     this->cadence = cadence;
+}
+
+void TcxTrackpoint::setSpeed(string speed) {
+    this->speed = speed;
 }
 
 void TcxTrackpoint::setSensorState(TrainingCenterDatabase::SensorState_t state) {
@@ -112,7 +120,7 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
 
     if (this->heartRateBpm.length() > 0) {
         TiXmlElement * xmlHeart = new TiXmlElement("HeartRateBpm");
-        xmlHeart->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
+        //xmlHeart->SetAttribute("xsi:type","HeartRateInBeatsPerMinute_t");
         TiXmlElement * xmlValue = new TiXmlElement("Value");
         this->heartRateBpm = TrainingCenterDatabase::limitIntValue(this->heartRateBpm, 0,255);
         xmlValue->LinkEndChild(new TiXmlText(this->heartRateBpm));
@@ -141,31 +149,49 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
         xmlTrackPoint->LinkEndChild(xmlSensor);
     }
 
-    if ((this->cadence.length() > 0) && ((this->cadenceSensorType != TrainingCenterDatabase::UndefinedCadenceType))) {
+    if ((this->cadence.length() > 0) && ((this->cadenceSensorType == TrainingCenterDatabase::Footpod))) {
         if (this->cadence != "255") {
             if (xmlTrackPointExtensions == NULL) {
                 xmlTrackPointExtensions = new TiXmlElement("Extensions");
                 xmlTrackPoint->LinkEndChild(xmlTrackPointExtensions);
             }
 
-            TiXmlElement * xmlTPX = new TiXmlElement("TPX");
-            xmlTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+			TiXmlElement * xmlExtensionTPX = new TiXmlElement("TPX");
+			xmlExtensionTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+			xmlTrackPointExtensions->LinkEndChild(xmlExtensionTPX);
+
             string cadType = "Unknown";
             if (this->cadenceSensorType == TrainingCenterDatabase::Bike) {
                 cadType = "Bike";
             } else if (this->cadenceSensorType == TrainingCenterDatabase::Footpod) {
                 cadType = "Footpod";
             }
-            xmlTPX->SetAttribute("CadenceSensor",cadType);
-            xmlTrackPointExtensions->LinkEndChild(xmlTPX);
+            xmlExtensionTPX->SetAttribute("CadenceSensor",cadType);
 
             if (this->cadenceSensorType == TrainingCenterDatabase::Footpod) {
                 TiXmlElement * xmlRunCad = new TiXmlElement("RunCadence");
                 xmlRunCad->LinkEndChild(new TiXmlText(this->cadence));
-                xmlTPX->LinkEndChild(xmlRunCad);
+                xmlExtensionTPX->LinkEndChild(xmlRunCad);
             }
         }
     }
+
+    if (this->speed.length() > 0) {
+        if (xmlTrackPointExtensions == NULL) {
+            xmlTrackPointExtensions = new TiXmlElement("Extensions");
+            xmlTrackPoint->LinkEndChild(xmlTrackPointExtensions);
+        }
+
+		TiXmlElement * xmlExtensionTPX = new TiXmlElement("TPX");
+		xmlExtensionTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+		xmlTrackPointExtensions->LinkEndChild(xmlExtensionTPX);
+
+        TiXmlElement * xmlSpeed = new TiXmlElement("Speed");
+        xmlSpeed->LinkEndChild(new TiXmlText(this->speed));
+        xmlExtensionTPX->LinkEndChild(xmlSpeed);
+    }
+
+
 
     return xmlTrackPoint;
 }

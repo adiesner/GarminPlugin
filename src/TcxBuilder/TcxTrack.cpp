@@ -121,6 +121,25 @@ double TcxTrack::calculateTotalTime() {
     return totalTimeSeconds;
 }
 
+int TcxTrack::getMaxHeartRate() {
+    int maxHeartRate = 0;
+
+    vector<TcxTrackpoint*>::iterator it;
+    for ( it=trackpointList.begin() ; it < trackpointList.end(); ++it )
+    {
+        TcxTrackpoint* trackpoint = *it;
+        string heartRate = trackpoint->getHeartRateBpm();
+        if (heartRate.length()>0) {
+        	stringstream ss(heartRate);
+        	int currentRate;
+        	ss >> currentRate;
+        	maxHeartRate = (currentRate > maxHeartRate) ? currentRate : maxHeartRate;
+        }
+    }
+
+    return maxHeartRate;
+}
+
 
 bool TcxTrack::isEmpty() {
     return trackpointList.empty();

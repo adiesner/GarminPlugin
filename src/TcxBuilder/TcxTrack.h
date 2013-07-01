@@ -41,6 +41,7 @@ public:
 
     double calculateDistanceMeters();
     double calculateTotalTime();
+    int getMaxHeartRate();
 
     bool isEmpty();
 

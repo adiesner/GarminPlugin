@@ -55,6 +55,7 @@ TiXmlElement * TcxActivity::getTiXml(bool readTrackData) {
             break;
         default:
             xmlActivity->SetAttribute("Sport","Other");
+            break;
     }
 
     TiXmlElement * xmlId = new TiXmlElement("Id");

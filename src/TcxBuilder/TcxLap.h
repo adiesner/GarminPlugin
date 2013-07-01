@@ -50,7 +50,8 @@ public:
     void setTriggerMethod(TrainingCenterDatabase::TriggerMethod_t method);
     void setNotes(string note);
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
-
+    void setAvgSpeed(string speed);
+    void setMaxCadence(string cadence);
     /**
      * Returns the distance of this lap - used for debug output
      * Do not call before all tracks and trackpoints are added to the lap
@@ -67,6 +68,7 @@ private:
     void calculateTotalTimeSeconds();
     void calculateDistanceMeters();
     void calculateCalories();
+    void calculateMaximumHeartRateBpm();
     string getTriggerMethod(TrainingCenterDatabase::TriggerMethod_t method);
     string getIntensity(TrainingCenterDatabase::Intensity_t intensity);
     string getStartTime();
@@ -79,6 +81,8 @@ private:
     string maximumHeartRateBpm;
     TrainingCenterDatabase::Intensity_t intensity;
     string cadence;
+    string maxCadence;
+    string avgSpeed;
     TrainingCenterDatabase::TriggerMethod_t triggerMethod;
     string notes;
     TrainingCenterDatabase::CadenceSensorType_t cadenceSensorType;
