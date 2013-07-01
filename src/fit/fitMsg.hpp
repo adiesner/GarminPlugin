@@ -1,7 +1,7 @@
 /* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 4; tab-width: 4 -*- */
 /*
  * GarminPlugin
- * Copyright (C) Andreas Diesner 2011 <garminplugin [AT] andreas.diesner [DOT] de>
+ * Copyright (C) Andreas Diesner 2013 <garminplugin [AT] andreas.diesner [DOT] de>
  *
  * GarminPlugin is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,6 +17,7 @@
  * with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 // The following profiles are not yet implemented!
 #define FIT_MESSAGE_CAPABILITIES                                ((unsigned char)1)
 #define FIT_MESSAGE_DEVICE_SETTINGS                             ((unsigned char)2)
@@ -30,16 +31,10 @@
 #define FIT_MESSAGE_MET_ZONE                                    ((unsigned char)10)
 #define FIT_MESSAGE_SPORT                                       ((unsigned char)12)
 #define FIT_MESSAGE_TRAINING_GOALS                              ((unsigned char)15)
-#define FIT_MESSAGE_SESSION                                     ((unsigned char)18)
-#define FIT_MESSAGE_LAP                                         ((unsigned char)19)
-#define FIT_MESSAGE_RECORD                                      ((unsigned char)20)
-#define FIT_MESSAGE_EVENT                                       ((unsigned char)21)
-#define FIT_MESSAGE_DEVICE_INFO                                 ((unsigned char)23)
 #define FIT_MESSAGE_WORKOUT                                     ((unsigned char)26)
 #define FIT_MESSAGE_WORKOUT_STEP                                ((unsigned char)27)
 #define FIT_MESSAGE_WEIGHT_SCALE                                ((unsigned char)30)
 #define FIT_MESSAGE_TOTALS                                      ((unsigned char)33)
-#define FIT_MESSAGE_ACTIVITY                                    ((unsigned char)34)
 #define FIT_MESSAGE_SOFTWARE                                    ((unsigned char)35)
 #define FIT_MESSAGE_FILE_CAPABILITIES                           ((unsigned char)37)
 #define FIT_MESSAGE_MESG_CAPABILITIES                           ((unsigned char)38)
@@ -48,6 +43,8 @@
 
 #ifndef FITMSG_H
 #define FITMSG_H
+
+#include <string.h>
 
 class FitMsg
 {
@@ -103,11 +100,12 @@ protected:
         bool isLittleEndian = ((arch & 0x01) == 0) ? 1 : 0;
         unsigned long ret;
         if (isLittleEndian) {
-            ret = ((unsigned char) buf[3] << 24) | ((unsigned char) buf[2] << 16) | ((unsigned char) buf[1] << 8) | (unsigned char)buf[0];
+            ret = ((0xFF & buf[3]) << 24) | ((0xFF & buf[2]) << 16) | ((0xFF & buf[1]) << 8) | (0xFF & buf[0]);
         } else {
             // God knows why, but the sdk never reads in big endian.
             ret = ((unsigned char) buf[0] << 24) | ((unsigned char) buf[1] << 16) | ((unsigned char) buf[2] << 8) | (unsigned char)buf[3];
         }
+        ret = ret & 0xFFFFFFFF;
         return ret;
     };
 
@@ -119,6 +117,79 @@ protected:
         return read0x8C(buf, arch);
     };
 
+
+    /**
+     * Reads 4 bytes signed long from buffer with the type 0x85 (endianes aware)
+     */
+    static signed long  read0x85(char * buf, unsigned char arch) {
+        bool isLittleEndian = ((arch & 0x01) == 0) ? 1 : 0;
+        signed long ret;
+        if (isLittleEndian) {
+            ret = ((0xFF & buf[3]) << 24) | ((0xFF & buf[2]) << 16) | ((0xFF & buf[1]) << 8) | (0xFF & buf[0]);
+        } else {
+            // God knows why, but the sdk never reads in big endian.
+            ret = ((0xFF & buf[0]) << 24) | ((0xFF & buf[1]) << 16) | ((0xFF & buf[2]) << 8) | (0xFF & buf[3]);
+        }
+        return ret;
+    };
+
+    /**
+     * Reads 4 bytes float from buffer with the type 0x88 (endianes aware)
+     */
+    static float  read0x88(char * buf, unsigned char arch) {
+    	return read0x88(buf,arch, 0x88,1,0);
+    };
+
+
+    /**
+     * Reads 4 bytes float from buffer with the type 0x88 (endianes aware)
+     * Supports scale and offset
+     */
+    static float  read0x88(char * buf, unsigned char arch, float scale, float offset, unsigned char baseType) {
+    	float float32Value=0;
+    	if (baseType == 0x84) {
+    		unsigned short sShortValue = read0x84(buf, arch);
+        	float32Value= sShortValue;
+    	} else if (baseType == 0x86) {
+			unsigned long sLongValue = read0x86(buf, arch);
+			float32Value= sLongValue;
+    	} else if (baseType == 0x85) {
+    		signed long sLongValue = read0x85(buf, arch);
+            memcpy(&float32Value, &sLongValue, sizeof(float32Value));
+    	} else if (baseType == 0x00) {
+    		unsigned char charVal= read0x00(buf,arch);
+			float32Value= charVal;
+    	}
+    	float32Value = float32Value / scale - offset;
+        return float32Value;
+    };
+
+    /**
+     * Reads 1 bytes unsigned char from buffer with the type 0x02
+     */
+    static unsigned char read0x02(char * buf, unsigned char arch) {
+    	unsigned char ret;
+    	ret = (0xFF & buf[0]);
+        return ret;
+    };
+
+    /**
+     * Reads 1 bytes unsigned char from buffer with the type 0x00
+     */
+    static unsigned char read0x00(char * buf, unsigned char arch) {
+    	unsigned char ret;
+    	ret = (0xFF & buf[0]);
+        return ret;
+    };
+
+    /**
+     * Reads 1 bytes signed char from buffer with the type 0x00
+     */
+    static signed char read0x01(char * buf, unsigned char arch) {
+    	signed char ret;
+    	ret = (signed char)buf[0];
+        return ret;
+    };
     /**
      * Stores the class type
      */

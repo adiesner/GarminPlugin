@@ -60,9 +60,9 @@ void GarminFilebasedDevice::fitMsgReceived(FitMsg *msg) {
         FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (msg);
          if (fileid != NULL) {
 
-            if (fileid->GetTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
+            if (fileid->getTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
                 TiXmlElement * timeElem = new TiXmlElement( "CreationTime" );
-                timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(fileid->GetTimeCreated())));
+                timeElem->LinkEndChild(new TiXmlText(GpsFunctions::print_dtime(fileid->getTimeCreated())));
                 this->fitFileElement->LinkEndChild(timeElem);
             }
 
@@ -72,42 +72,42 @@ void GarminFilebasedDevice::fitMsgReceived(FitMsg *msg) {
                 this->fitFileElement->LinkEndChild( fitId );
             }
 
-            if (fileid->GetTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
+            if (fileid->getTimeCreated() != FIT_FILE_ID_TIME_CREATED_INVALID) {
                 TiXmlElement * typeElem = new TiXmlElement( "Id" );
                 stringstream ss;
-                ss << (unsigned int)fileid->GetTimeCreated();
+                ss << (unsigned int)fileid->getTimeCreated();
                 typeElem->LinkEndChild(new TiXmlText(ss.str()));
                 fitId->LinkEndChild(typeElem);
             }
 
-            if (fileid->GetFileType() != FIT_FILE_ID_TYPE_INVALID) {
+            if (fileid->getType() != FIT_FILE_ID_TYPE_INVALID) {
                 TiXmlElement * typeElem = new TiXmlElement( "FileType" );
                 stringstream ss;
-                ss << (int)fileid->GetFileType();
+                ss << (int)fileid->getType();
                 typeElem->LinkEndChild(new TiXmlText(ss.str()));
                 fitId->LinkEndChild(typeElem);
             }
 
-            if (fileid->GetManufacturer() != FIT_FILE_ID_MANUFACTURER_INVALID) {
+            if (fileid->getManufacturer() != FIT_FILE_ID_MANUFACTURER_INVALID) {
                 TiXmlElement * manElem = new TiXmlElement( "Manufacturer" );
                 stringstream ss;
-                ss << fileid->GetManufacturer();
+                ss << fileid->getManufacturer();
                 manElem->LinkEndChild(new TiXmlText(ss.str()));
                 fitId->LinkEndChild(manElem);
             }
 
-            if (fileid->GetProduct() != FIT_FILE_ID_GARMIN_PRODUCT_INVALID) {
+            if (fileid->getProduct() != FIT_FILE_ID_GARMIN_PRODUCT_INVALID) {
                 TiXmlElement * prodElem = new TiXmlElement( "Product" );
                 stringstream ss;
-                ss << fileid->GetProduct();
+                ss << fileid->getProduct();
                 prodElem->LinkEndChild(new TiXmlText(ss.str()));
                 fitId->LinkEndChild(prodElem);
             }
 
-            if (fileid->GetSerialNumber() != FIT_FILE_ID_SERIAL_NUMBER_INVALID) {
+            if (fileid->getSerialNumber() != FIT_FILE_ID_SERIAL_NUMBER_INVALID) {
                 TiXmlElement * serElem = new TiXmlElement( "SerialNumber" );
                 stringstream ss;
-                ss << (fileid->GetSerialNumber() & 0xFFFFFFFF);
+                ss << (fileid->getSerialNumber() & 0xFFFFFFFF);
                 serElem->LinkEndChild(new TiXmlText(ss.str()));
                 fitId->LinkEndChild(serElem);
             }
@@ -1246,8 +1246,8 @@ string GarminFilebasedDevice::getBinaryFile(string relativeFilePath) {
     		if (fitMsg->GetType() == FIT_MESSAGE_FILE_ID) {
     	        FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (fitMsg);
     	        if (fileid != NULL) {
-    	        	if (fileid->GetFileType() == FIT_FILE_ID_TYPE_ACTIVITY) {
-    	        		time_t startTime = fileid->GetTimeCreated() + TIME_OFFSET;
+    	        	if (fileid->getType() == FIT_FILE_ID_TYPE_ACTIVITY) {
+    	        		time_t startTime = fileid->getTimeCreated() + TIME_OFFSET;
     	        		backupWorkout(buffer.str(), "fit", startTime);
     	        	} else {
     	        		Log::dbg("Not an activity - not creating a backup");

@@ -81,7 +81,7 @@ class FitMsg_File_ID : public FitMsg
 {
 public:
     FitMsg_File_ID() : FitMsg(FIT_MESSAGE_FILE_ID) {
-        this->fileType     = FIT_FILE_ID_TYPE_INVALID;              //  8 bit
+        this->type         = FIT_FILE_ID_TYPE_INVALID;              //  8 bit
         this->manufacturer = FIT_FILE_ID_MANUFACTURER_INVALID;      // 16 bit
         this->product      = FIT_FILE_ID_GARMIN_PRODUCT_INVALID;    // 16 bit
         this->serialNumber = FIT_FILE_ID_SERIAL_NUMBER_INVALID;     // 32 bit
@@ -95,76 +95,93 @@ public:
      * Gets the file type. See defines for valid values
      * @return unsigned char device type
      */
-    unsigned char GetFileType()    { return this->fileType; };
+    unsigned char getType()    { return this->type; };
 
     /**
      * Gets the manufacturer. See defines for valid values
      * @return unsigned short manufacturer
      */
-    unsigned short GetManufacturer() { return this->manufacturer; };
+    unsigned short getManufacturer() { return this->manufacturer; };
 
     /**
      * Gets the Product. See defines for valid values
      * @return unsigned long product
      */
-    unsigned short GetProduct()      { return this->product; };
+    unsigned short getProduct()      { return this->product; };
 
     /**
      * Gets the serial number.
      * @return unsigned long serial number
      */
-    unsigned long GetSerialNumber()  { return this->serialNumber; };
+    unsigned long getSerialNumber()  { return this->serialNumber; };
 
     /**
      * Gets the creation time.
      * @return unsigned long creation time
      */
-    unsigned long GetTimeCreated()   { return this->timeCreated; };
+    unsigned long getTimeCreated()   { return this->timeCreated; };
 
     /**
      * Gets the number (????).
      * @return unsigned short number
      */
-    unsigned short GetNumber()       { return this->number; };
+    unsigned short getNumber()       { return this->number; };
 
-    void SetFileType(unsigned char type)       { this->fileType = type; };
-    void SetManufacturer(unsigned short man)   { this->manufacturer = man; };
-    void SetProduct(unsigned short prod)       { this->product = prod; };
-    void SetSerialNumber(unsigned long serial) { this->serialNumber = serial; };
-    void SetTimeCreated(unsigned long time)    { this->timeCreated = time; };
-    void SetNumber(unsigned short nbr)         { this->number = nbr; };
+    void setType(unsigned char type)       { this->type = type; };
+    void setManufacturer(unsigned short man)   { this->manufacturer = man; };
+    void setProduct(unsigned short prod)       { this->product = prod; };
+    void setSerialNumber(unsigned long serial) { this->serialNumber = serial; };
+    void setTimeCreated(unsigned long time)    { this->timeCreated = time; };
+    void setNumber(unsigned short nbr)         { this->number = nbr; };
 
     bool addField(unsigned char fieldDefNum, unsigned char size, unsigned char baseType, unsigned char arch, char * data) {
         //TODO: Compare size with expected size
         //TODO: Compare baseType with expected baseType
         bool fieldWasAdded = true;
         switch (fieldDefNum) {
-            case 0: SetFileType((unsigned char)data[0]);
-                break;
-            case 1: SetManufacturer(read0x84(data,arch));
-                break;
-            case 2: SetProduct(read0x84(data,arch));
-                break;
-            case 3: SetSerialNumber(read0x8C(data,arch));
-                break;
-            case 4: SetTimeCreated(read0x86(data,arch));
-                break;
-            case 5: SetNumber(read0x84(data,arch));
-                break;
+			case 0: setType(read0x00(data,arch));
+					 break;
+			case 1: setManufacturer(read0x84(data,arch));
+					 break;
+			case 2: setProduct(read0x84(data,arch));
+					 break;
+			case 3: setSerialNumber(read0x8C(data,arch));
+		    		 break;
+			case 4: setTimeCreated(read0x86(data,arch));
+					 break;
+			case 5: setNumber(read0x84(data,arch));
+					 break;
+
             default:
                 fieldWasAdded = false;
+                break;
         }
         return fieldWasAdded;
     };
 
 
 private:
-    unsigned char fileType;
-    unsigned short manufacturer;
-    unsigned short product;
-    unsigned long serialNumber;
-    unsigned long timeCreated;
-    unsigned short number;
+	/* type - Unit:  */
+	unsigned char type;
+
+	/* manufacturer - Unit:  */
+	unsigned short manufacturer;
+
+	/* product - Unit:  */
+	unsigned short product;
+
+	/* product - Unit:  */
+	unsigned short garminProduct;
+
+	/* serial_number - Unit:  */
+	unsigned long serialNumber;
+
+	/* time_created - Unit:  */
+	unsigned long timeCreated;
+
+	/* number - Unit:  */
+	unsigned short number;
+
 };
 
 #endif // FITMSG_FILE_ID_H

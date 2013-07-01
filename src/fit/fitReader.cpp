@@ -21,6 +21,12 @@
 
 #include "fitMsg_File_ID.hpp"
 #include "fitMsg_File_Creator.hpp"
+#include "fitMsg_Lap.hpp"
+#include "fitMsg_Activity.hpp"
+#include "fitMsg_Record.hpp"
+#include "fitMsg_Event.hpp"
+#include "fitMsg_Session.hpp"
+#include "fitMsg_DeviceInfo.hpp"
 
 #include <sstream>
 
@@ -330,8 +336,27 @@ FitMsg * FitReader::readDataPackage(MsgDef msg, unsigned int timestamp) {
         case FIT_MESSAGE_FILE_CREATOR :
                 fitMsg = new FitMsg_File_Creator();
                 break;
+        case FIT_MESSAGE_LAP :
+            fitMsg = new FitMsg_Lap();
+            break;
+        case FIT_MESSAGE_ACTIVITY :
+            fitMsg = new FitMsg_Activity();
+            break;
+        case FIT_MESSAGE_RECORD :
+            fitMsg = new FitMsg_Record();
+            break;
+        case FIT_MESSAGE_EVENT :
+            fitMsg = new FitMsg_Event();
+            break;
+        case FIT_MESSAGE_DEVICE_INFO:
+            fitMsg = new FitMsg_DeviceInfo();
+            break;
+        case FIT_MESSAGE_SESSION:
+            fitMsg = new FitMsg_Session();
+            break;
         default:
             dbg("Profile not yet implemented: ", msg.globalMsgNum);
+            break;
     }
 
     // If timestamp from compressed header was given and message is known

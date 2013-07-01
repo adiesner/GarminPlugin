@@ -40,23 +40,23 @@ public:
      * Returns the software version
      * @return unsigned short Software Version
      */
-    unsigned short GetSoftwareVersion()  { return this->software_version; };
+    unsigned short getSoftwareVersion()  { return this->software_version; };
 
     /**
      * Returns the hardware version
      * @return unsigned char Hardware Version
      */
-    unsigned char GetHardwareVersion()   { return this->hardware_version; };
+    unsigned char getHardwareVersion()   { return this->hardware_version; };
 
     /**
      * Sets the software version
      */
-    void SetSoftwareVersion(unsigned short ver)     { this->software_version = ver; };
+    void setSoftwareVersion(unsigned short ver)     { this->software_version = ver; };
 
     /**
      * Sets the hardware version
      */
-    void SetHardwareVersion(unsigned char ver)    { this->hardware_version = ver; };
+    void setHardwareVersion(unsigned char ver)    { this->hardware_version = ver; };
 
     /**
      * Adds a field to the message. Unknown fields are rejected
@@ -67,12 +67,13 @@ public:
         //TODO: Compare baseType with expected baseType
         bool fieldWasAdded = true;
         switch (fieldDefNum) {
-            case 0: SetSoftwareVersion(read0x84(data,arch));
+            case 0: setSoftwareVersion(read0x84(data,arch));
                 break;
-            case 1: SetHardwareVersion((unsigned char)data[0]);
+            case 1: setHardwareVersion((unsigned char)data[0]);
                 break;
             default:
                 fieldWasAdded = false;
+                break;
         }
         return fieldWasAdded;
     };
