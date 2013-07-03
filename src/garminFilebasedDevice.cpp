@@ -25,6 +25,7 @@
 #include <dirent.h>
 #include <vector>
 #include <stack>
+#include "Fit2TcxConverter.h"
 
 #include "gpsFunctions.h"
 
@@ -525,6 +526,7 @@ Thread-Status
     string extension="";
     lockVariables();
     this->threadState = 1; // Working
+    bool doReadTcx=true;
 
     for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
         MassStorageDirectoryType const& currentDir = (*it);
@@ -533,38 +535,39 @@ Thread-Status
             extension = currentDir.extension;
         }
     }
+    // alternative, search for FIT files
+    if (workDir.length() == 0) {
+        for (list<MassStorageDirectoryType>::iterator it = deviceDirectories.begin(); it != deviceDirectories.end(); ++it) {
+            MassStorageDirectoryType const& currentDir = (*it);
+            if ((currentDir.dirType == FITDIR) &&  (currentDir.name.compare("FIT_TYPE_4") == 0)) {
+                workDir = this->baseDirectory + "/" + currentDir.path;
+                extension = currentDir.extension;
+                doReadTcx = false;
+            }
+        }
+    }
     unlockVariables();
 
-    // Check if the device supports reading tcx files
-    if (workDir.length() == 0) {
-        Log::err("Device does not support reading TCX Files. Element FitnessHistory not found in xml!");
-        lockVariables();
-        this->fitnessDataTcdXml = "";
-        this->threadState = 3; // Finished
-        this->transferSuccessful = false; // Failed;
-        unlockVariables();
-        return;
-    }
-
-    DIR *dp;
-    struct dirent *dirp;
     vector<string> files = vector<string>();
 
-    if((dp = opendir(workDir.c_str())) == NULL) {
-        Log::err("Error opening fitness directory! "+ workDir);
+    // Check if the device supports reading tcx or fit files
+    if (workDir.length() == 0) {
+        Log::err("Device does not support reading TCX or FIT Files. Element FitnessHistory/FIT_TYPE_4 not found in xml!");
+    } else {
+    	Log::dbg("Opening directory: "+workDir);
+        DIR *dp;
+        struct dirent *dirp;
 
-        lockVariables();
-        this->fitnessDataTcdXml = "";
-        this->threadState = 3; // Finished
-        this->transferSuccessful = false; // Failed;
-        unlockVariables();
-        return;
+        if((dp = opendir(workDir.c_str())) != NULL) {
+            while ((dirp = readdir(dp)) != NULL) {
+                files.push_back(string(dirp->d_name));
+            }
+            closedir(dp);
+        } else {
+            Log::err("Error opening fitness directory! "+ workDir);
+        }
     }
 
-    while ((dirp = readdir(dp)) != NULL) {
-        files.push_back(string(dirp->d_name));
-    }
-    closedir(dp);
 
     TiXmlDocument * output = new TiXmlDocument();
     TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no");
@@ -585,54 +588,91 @@ Thread-Status
 
     // Loop over all files in Fitnessdirectory:
     for (unsigned int i = 0;i < files.size();i++) {
-        if (files[i].find("."+extension)!=string::npos) {
-            TiXmlDocument doc(workDir + "/" + files[i]);
-            if (Log::enabledDbg()) { Log::dbg("Opening file: "+ files[i]); }
-            if (doc.LoadFile()) {
-                TiXmlElement * trainFile = doc.FirstChildElement("TrainingCenterDatabase");
-                if (trainFile != NULL) {
-                    addMissingAttributes(trainFile, train);
-                    TiXmlElement * inputActivities = trainFile->FirstChildElement("Activities");
-                    while ( inputActivities != NULL) {
-                        TiXmlElement * inputActivity =inputActivities->FirstChildElement("Activity");
-                        while ( inputActivity != NULL) {
+    	if (files[i].length() > extension.length()) {
+			string lastFilePart = files[i].substr(files[i].length() - extension.length());
+			if (strncasecmp(lastFilePart.c_str(), extension.c_str(), extension.length()) == 0) {
+				if (Log::enabledDbg()) { Log::dbg("Opening file: "+ files[i]); }
 
-                            string currentLapId="";
-                            TiXmlElement * idNode = inputActivity->FirstChildElement("Id");
-                            if (idNode != NULL) { currentLapId = idNode->GetText(); }
+				TiXmlDocument *doc = NULL;
+				if (doReadTcx) {
+					doc = new TiXmlDocument(workDir + "/" + files[i]);
+					if (!doc->LoadFile()) {
+						delete(doc);
+						doc=NULL;
+						Log::err("Unable to load file: "+ files[i]);
+					}
+				} else {
+					Fit2TcxConverter *fitConv = new Fit2TcxConverter();
+					FitReader *fit = new FitReader(workDir + "/" + files[i]);
+					fit->registerFitMsgFkt(fitConv);
+					try {
+						if (fit->isFitFile()) {
+							while (fit->readNextRecord())  {
+							}
+							fit->closeFitFile();
+							doc = fitConv->getTiXmlDocument(readTrackData, fitnessDetailId);
+						} else {
+							Log::err("Not a fit file: " + workDir + "/" + files[i]);
+						}
+					} catch (FitFileException *e) {
+						Log::err("Exception: " + e->getError());
+						delete(e);
+					} catch (...) {
+						Log::err("Unknown exception happened while reading fit file!");
+					}
+					delete (fit);
+				}
 
-                            if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
-                                TiXmlNode * newAct = inputActivity->Clone();
+				if (doc != NULL) {
+					TiXmlElement * trainFile = doc->FirstChildElement("TrainingCenterDatabase");
+					if (trainFile != NULL) {
+						addMissingAttributes(trainFile, train);
+						TiXmlElement * inputActivities = trainFile->FirstChildElement("Activities");
+						while ( inputActivities != NULL) {
+							TiXmlElement * inputActivity =inputActivities->FirstChildElement("Activity");
+							while ( inputActivity != NULL) {
 
-                                if (!readTrackData) {
-                                    // Track data must be deleted
-                                    TiXmlNode * node = newAct->FirstChildElement("Lap");
-                                    while (node != NULL) {
-                                        TiXmlNode * trackNode = node->FirstChildElement("Track");
-                                        while (trackNode != NULL) {
-                                            node->RemoveChild( node->FirstChildElement("Track") );
-                                            trackNode = node->FirstChildElement("Track");
-                                        }
+								string currentLapId="";
+								TiXmlElement * idNode = inputActivity->FirstChildElement("Id");
+								if (idNode != NULL) { currentLapId = idNode->GetText(); }
 
-                                        //node = newAct->FirstChildElement("Lap");
-                                        node = node->NextSibling();
-                                    }
-                                }
+								if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
+									TiXmlNode * newAct = inputActivity->Clone();
 
-                                //activities->LinkEndChild( newAct );
-                                activitiesList.push_back(newAct);
+									if (!readTrackData) {
+										// Track data must be deleted
+										TiXmlNode * node = newAct->FirstChildElement("Lap");
+										while (node != NULL) {
+											TiXmlNode * trackNode = node->FirstChildElement("Track");
+											while (trackNode != NULL) {
+												node->RemoveChild( node->FirstChildElement("Track") );
+												trackNode = node->FirstChildElement("Track");
+											}
 
-                                if (Log::enabledDbg()) { Log::dbg("Adding activity "+currentLapId+" from file "+files[i]); }
-                            }
-                            inputActivity = inputActivity->NextSiblingElement( "Activity" );
-                        }
-                        inputActivities = inputActivities->NextSiblingElement( "Activities" );
-                    }
-                }
-            } else {
-                Log::err("Unable to load fitness file "+files[i]);
-            }
-        }
+											//node = newAct->FirstChildElement("Lap");
+											node = node->NextSibling();
+										}
+									}
+
+									//activities->LinkEndChild( newAct );
+									activitiesList.push_back(newAct);
+
+									if (Log::enabledDbg()) { Log::dbg("Adding activity "+currentLapId+" from file "+files[i]); }
+								}
+								inputActivity = inputActivity->NextSiblingElement( "Activity" );
+							}
+							inputActivities = inputActivities->NextSiblingElement( "Activities" );
+						}
+					}
+					delete(doc);
+					doc = NULL;
+				} else {
+					Log::err("Unable to load fitness file "+files[i]);
+				}
+			} else {
+				if (Log::enabledDbg()) { Log::dbg("File "+files[i]+" has wrong extension!. Not ["+extension+"]"); }
+			}
+    	}
     }
 
     // Sort list, newest activity must be on top
