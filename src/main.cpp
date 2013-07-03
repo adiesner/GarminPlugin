@@ -1982,6 +1982,8 @@ static NPError nevv(NPMIMEType pluginType, NPP instance, uint16_t mode, int16_t 
 
     npnfuncs->releaseobject(windowObject);
 
+    setlocale(LC_ALL, "POSIX");
+
 	return NPERR_NO_ERROR;
 }
 
