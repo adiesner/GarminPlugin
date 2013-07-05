@@ -639,6 +639,8 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_tinyxml_libdir
+with_tinyxml_incdir
 with_libgcrypt_prefix
 with_garmintools_libdir
 with_garmintools_incdir
@@ -1274,6 +1276,12 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-tinyxml-libdir=DIR
+                          specify where to find tinyxml library
+                          (libtinyxml.so)
+  --with-tinyxml-incdir=DIR
+                          specify where to find tinyxml header files
+                          (tinyxml.h)
   --with-libgcrypt-prefix=DIR
                           define libgcrypt prefix, default /usr
   --with-garmintools-libdir=DIR
@@ -3673,6 +3681,7 @@ fi
 
 
 
+if pkg-config --exists tinyxml; then
 
 pkg_failed=no
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for TINYXML" >&5
@@ -3766,6 +3775,73 @@ $as_echo "yes" >&6; }
 fi
 
 
+else
+	#
+	# Check for tinyxml (pgk info is not available on many distros)
+	#
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for tinyxml" >&5
+$as_echo_n "checking for tinyxml... " >&6; }
+
+
+# Check whether --with-tinyxml-libdir was given.
+if test "${with_tinyxml_libdir+set}" = set; then :
+  withval=$with_tinyxml_libdir; tinyxml_libdir=$withval
+else
+  tinyxml_libdir=""
+fi
+
+
+
+# Check whether --with-tinyxml-incdir was given.
+if test "${with_tinyxml_incdir+set}" = set; then :
+  withval=$with_tinyxml_incdir; tinyxml_incdir=$withval
+else
+  tinyxml_incdir=""
+fi
+
+
+	if test "x$tinyxml_incdir" != "x" ; then
+	  TINYXML_CFLAGS="-I$tinyxml_incdir"
+	elif test -f "../tinyxml/tinyxml.h" ; then
+	  TINYXML_CFLAGS="-I../tinyxml/"
+	elif test -f "/usr/include/tinyxml.h" ; then
+	  TINYXML_CFLAGS="-I/usr/include"
+	elif test -f "tinyxml/tinyxml.h" ; then
+	  TINYXML_CFLAGS="-Itinyxml"
+	else
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	  as_fn_error $? "Unable to find tinyxml header file (tinyxml.h). Try 'apt-get install tinyxml-dev' or use --with-tinyxml-incdir=DIR" "$LINENO" 5
+	fi
+
+	if test "x$tinyxml_libdir" != "x" ; then
+	  if test -f "$tinyxml_libdir/libtinyxml.so" ; then
+	    TINYXML_LIBS="$tinyxml_libdir/libtinyxml.so"
+	  else
+	    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	    as_fn_error $? "Unable to find libtinyxml.so in $tinyxml_libdir. Is tinyxml compiled?" "$LINENO" 5
+	  fi
+	elif test -f "/usr/lib64/libtinyxml.so" ; then
+	  TINYXML_LIBS="/usr/lib64/libtinyxml.so"
+	elif test -f "/usr/lib/libtinyxml.so" ; then
+	  TINYXML_LIBS="/usr/lib/libtinyxml.so"
+	elif test -f "../tinyxml/libtinyxml.so" ; then
+	  TINYXML_LIBS="../tinyxml/libtinyxml.so"
+	elif test -f "../tinyxml/tinyxml.o" ; then
+	  TINYXML_LIBS="../tinyxml/tinyxml.o ../tinyxml/tinystr.o ../tinyxml/tinyxmlerror.o ../tinyxml/tinyxmlparser.o"
+	else
+	  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	  as_fn_error $? "Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR" "$LINENO" 5
+	fi
+
+
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+fi
 
 #
 # Check for GNU Crypt library
