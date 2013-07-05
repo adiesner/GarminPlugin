@@ -1,3 +1,7 @@
+2013-07-05 - Version 0.3.18
+- Added FIT->TCX converter now supporting websites that can not handle FIT files
+- Now supporting new TCX fields (Speed, MaxHeartRate, MaxCadence and AvgSpeed)
+
 2013-05-07 - Version 0.3.17
 - Added new feature to backup every uploaded file to a local directory
 - Bugfix: Now using case insensitive search for configuration file on device
