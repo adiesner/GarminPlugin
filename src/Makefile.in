@@ -26,6 +26,13 @@ LINK_dll = $(GCC) -o $@ $^ $(LDLIBS) -shared $(LDFLAGS)
 LINK_lib = rm -f $@ && ar rcs $@ $^
 COMPILE_cpp = $(GCC) $(CFLAGS) -o $@ -c $< $(MAKEDEP) $(INCLUDES)
 
+CPP_FILES := $(wildcard *.cpp) \
+        $(wildcard TcxBuilder/*.cpp) \
+        $(wildcard fit/*.cpp)
+        
+OBJ_FILES := $(CPP_FILES:.cpp=.o)  
+DEP_FILES := $(CPP_FILES:.cpp=.d)  
+
 %.o : %.cpp ; $(COMPILE_cpp)
 .SUFFIXES: .o .d .cpp
 
@@ -47,8 +54,8 @@ clean :
 # Release_target
 
 Release_target.BIN = npGarminPlugin.so
-Release_target.OBJ = TcxBuilder/TcxActivities.o TcxBuilder/TcxActivity.o TcxBuilder/TcxAuthor.o TcxBuilder/TcxBase.o TcxBuilder/TcxCreator.o TcxBuilder/TcxLap.o TcxBuilder/TcxTrack.o TcxBuilder/TcxTrackpoint.o  configManager.o deviceManager.o edge305Device.o fit/fitReader.o garminFilebasedDevice.o gpsDevice.o log.o main.o messageBox.o  
-DEP_FILES += TcxBuilder/TcxActivities.d TcxBuilder/TcxActivity.d TcxBuilder/TcxAuthor.d TcxBuilder/TcxBase.d TcxBuilder/TcxCreator.d TcxBuilder/TcxLap.d TcxBuilder/TcxTrack.d TcxBuilder/TcxTrackpoint.d  configManager.d deviceManager.d edge305Device.d fit/fitReader.d garminFilebasedDevice.d gpsDevice.d log.d main.d messageBox.d  
+Release_target.OBJ = $(OBJ_FILES)
+DEP_FILES += $(DEP_FILES)
 clean.OBJ += $(Release_target.BIN) $(Release_target.OBJ)
 
 Release_target : Release_target.before $(Release_target.BIN) Release_target.after_always
