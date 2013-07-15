@@ -293,7 +293,8 @@ void Fit2TcxConverter::handle_File_ID(FitMsg_File_ID *fileid) {
 			case FIT_FILE_MONITORING_DAILY:	type="MONITORING_DAILY"; break;
 			case FIT_FILE_INVALID: 			type="INVALID"; break;
 		}
-		throw new FitFileException("Wrong FIT file type. Expected ACTIVITY, but found: "+type);
+		FitFileException exc("Wrong FIT file type. Expected ACTIVITY, but found: "+type);
+		throw exc;
 	}
 
 	string manufacturer="Unknown";

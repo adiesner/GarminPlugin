@@ -614,9 +614,8 @@ Thread-Status
 						} else {
 							Log::err("Not a fit file: " + workDir + "/" + files[i]);
 						}
-					} catch (FitFileException *e) {
-						Log::err("Exception: " + e->getError());
-						delete(e);
+					} catch (FitFileException &e) {
+						Log::err("Exception: " + e.getError());
 					} catch (...) {
 						Log::err("Unknown exception happened while reading fit file!");
 					}
