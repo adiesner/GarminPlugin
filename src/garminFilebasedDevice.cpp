@@ -1581,8 +1581,6 @@ int GarminFilebasedDevice::bytesAvailable(string path) {
         }
         if (freeBytes > INT_MAX) {
             return INT_MAX;
-        } else if (freeBytes < 0) {
-        	return 0;
         } else {
             return (int)freeBytes;
         }

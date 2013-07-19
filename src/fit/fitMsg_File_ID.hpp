@@ -170,9 +170,6 @@ private:
 	/* product - Unit:  */
 	unsigned short product;
 
-	/* product - Unit:  */
-	unsigned short garminProduct;
-
 	/* serial_number - Unit:  */
 	unsigned long serialNumber;
 
