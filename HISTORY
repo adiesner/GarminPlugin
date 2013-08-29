@@ -1,3 +1,6 @@
+2013-08-29 - Version 0.3.19
+- Bugfix: Fit2Tcx conversion problem fixed when GPS signal was lost/invalid
+
 2013-07-05 - Version 0.3.18
 - Added FIT->TCX converter now supporting websites that can not handle FIT files
 - Now supporting new TCX fields (Speed, MaxHeartRate, MaxCadence and AvgSpeed)

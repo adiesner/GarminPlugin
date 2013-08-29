@@ -54,7 +54,7 @@ const char * pluginName = "Garmin Communicator";
 /**
  * A variable that stores the plugin description (may contain HTML)
  */
-const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.18";
+const char * pluginDescription = "<a href=\"http://www.andreas-diesner.de/garminplugin/\">Garmin Communicator - Fake</a> plugin. Version 0.3.19";
 
 /**
  * A variable that stores the mime description of the plugin.
@@ -484,10 +484,16 @@ bool methodCancelFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
  */
 bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
-    result->type = NPVariantType_Int32;
-    result->value.intValue = devManager->finishedFindDevices();
-    printFinishState("FinishFindDevices", result->value.intValue);
-    return true;
+    result->type = NPVariantType_Bool;
+    int searchState = devManager->finishedFindDevices();
+    printFinishState("FinishFindDevices", searchState);
+    if (searchState != 1) {
+    	result->value.boolValue = true;
+    } else {
+    	result->value.boolValue = false;
+    }
+
+  	return true;
 }
 
 /**
