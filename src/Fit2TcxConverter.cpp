@@ -111,15 +111,20 @@ void Fit2TcxConverter::handle_Record(FitMsg_Record *record) {
 
 	string timeId = GpsFunctions::print_dtime(record->getTimestamp());
 
-    stringstream lat;
-    lat.precision(10); // default 4 decimal chars which is not enough
-    stringstream lon;
-    lon.precision(10); // default 4 decimal chars which is not enough
-    lat << SEMI2DEG(record->getPositionLat());
-    lon << SEMI2DEG(record->getPositionLong());
+    TcxTrackpoint * point;
+    if ((record->getPositionLat() != FIT_POSITION_INVALID) && (record->getPositionLong() != FIT_POSITION_INVALID)) {
+        stringstream lat;
+        lat.precision(10); // default 4 decimal chars which is not enough
+        stringstream lon;
+        lon.precision(10); // default 4 decimal chars which is not enough
+        lat << SEMI2DEG(record->getPositionLat());
+        lon << SEMI2DEG(record->getPositionLong());
+        point = new TcxTrackpoint(timeId, lat.str(), lon.str());
+    } else {
+        point = new TcxTrackpoint(timeId);
+    }
 
-	TcxTrackpoint * point = new TcxTrackpoint(timeId, lat.str(), lon.str());
-	*(tcxTrack) << point;
+    *(tcxTrack) << point;
 	trackpointList.push_back(point);
 
     stringstream ss;
