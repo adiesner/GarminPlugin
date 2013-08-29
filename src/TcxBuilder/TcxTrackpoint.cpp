@@ -95,7 +95,7 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
 
     TiXmlElement * xmlTrackPointExtensions = NULL;
 
-    if ((this->latitude.length() > 0) && (this->latitude.length() > 0)) {
+    if ((this->latitude.length() > 0) && (this->longitude.length() > 0)) {
         TiXmlElement * xmlPosition = new TiXmlElement("Position");
         TiXmlElement * xmlLat = new TiXmlElement("LatitudeDegrees");
         xmlLat->LinkEndChild(new TiXmlText(this->latitude));
@@ -220,12 +220,14 @@ string TcxTrackpoint::getTime() {
 
 double TcxTrackpoint::calculateDistanceTo(double totalTrackDistance, TcxTrackpoint * nextPoint) {
     double distance = 0;
-    distance = GpsFunctions::haversine_m_str(this->latitude, this->longitude, nextPoint->latitude, nextPoint->longitude);
+    if ((this->latitude.length() > 0) && (this->longitude.length() > 0) &&
+    	(nextPoint->latitude.length() > 0) && (nextPoint->longitude.length() > 0)) {
+        distance = GpsFunctions::haversine_m_str(this->latitude, this->longitude, nextPoint->latitude, nextPoint->longitude);
 
-    char distanceBuf[50];
-    snprintf(&distanceBuf[0], sizeof(distanceBuf), "%.2f", totalTrackDistance);
-    this->distanceMeters = distanceBuf;
-
+        char distanceBuf[50];
+        snprintf(&distanceBuf[0], sizeof(distanceBuf), "%.2f", totalTrackDistance);
+        this->distanceMeters = distanceBuf;
+    }
     return distance;
 }
 
