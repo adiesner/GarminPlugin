@@ -101,20 +101,19 @@ void DeviceManager::startFindDevices() {
         delete(dev);
     }
 
-    FILE *mounts = NULL;
-    struct mntent *ent = NULL;
-    mounts = setmntent("/etc/mtab", "r");
-
+    bool scanMounted = true;
     bool searchGarmin = true;
     string backupPath = "";
     if (this->configuration != NULL) {
         TiXmlElement * pRoot = this->configuration->FirstChildElement( "GarminPlugin" );
         TiXmlElement * settings = NULL;
+        TiXmlElement * mounted = NULL;
         TiXmlElement * ftools = NULL;
         TiXmlElement * backup = NULL;
 
         if (pRoot != NULL) { settings = pRoot->FirstChildElement("Settings"); }
         if (settings != NULL) {
+        	mounted = settings->FirstChildElement("ScanMounted");
         	ftools = settings->FirstChildElement("ForerunnerTools");
         	backup = settings->FirstChildElement("BackupWorkouts");
         } else {
@@ -124,6 +123,11 @@ void DeviceManager::startFindDevices() {
             searchGarmin = getXmlBoolAttribute(ftools, "enabled", true);
         } else {
 			Log::dbg("Xml Element ForerunnerTools is null!");
+		}
+        if (mounted != NULL) {
+            scanMounted = getXmlBoolAttribute(ftools, "enabled", true);
+        } else {
+			Log::dbg("Xml Element ScanMounted is null!");
 		}
         if (backup != NULL) {
             bool doBackup = getXmlBoolAttribute(backup, "enabled", false);
@@ -137,20 +141,28 @@ void DeviceManager::startFindDevices() {
 		}
     }
 
-    Log::dbg("Searching for Edge705/Oregon300/...");
-    while ( (ent = getmntent(mounts)) != NULL ) {
-        string filesystype = ent->mnt_type;
-        string mountPath = ent->mnt_dir;
-        if (filesystype.compare("vfat") == 0) {
-            Log::dbg("Searching on ["+mountPath+"] ["+filesystype+"]");
-            GpsDevice *dev = createGarminDeviceFromPath(mountPath, NULL);
-            if (dev != NULL) {
-            	dev->setBackupPath(backupPath);
-                gpsDeviceList.push_back(dev);
+    if (scanMounted) {
+        FILE *mounts = NULL;
+        struct mntent *ent = NULL;
+        mounts = setmntent("/etc/mtab", "r");
+
+        Log::dbg("Searching for Edge705/Oregon300/...");
+        while ( (ent = getmntent(mounts)) != NULL ) {
+            string filesystype = ent->mnt_type;
+            string mountPath = ent->mnt_dir;
+            if (filesystype.compare("vfat") == 0) {
+                Log::dbg("Searching on ["+mountPath+"] ["+filesystype+"]");
+                GpsDevice *dev = createGarminDeviceFromPath(mountPath, NULL);
+                if (dev != NULL) {
+                    dev->setBackupPath(backupPath);
+                    gpsDeviceList.push_back(dev);
+                }
+            } else {
+                Log::dbg("Not searching on ["+mountPath+"] ["+filesystype+"] - wrong fstype.");
             }
-        } else {
-            Log::dbg("Not searching on ["+mountPath+"] ["+filesystype+"] - wrong fstype.");
         }
+    } else {
+        Log::dbg("Scanning for mounted devices is disabled!");
     }
 
     string deviceName;

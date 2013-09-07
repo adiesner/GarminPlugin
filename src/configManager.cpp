@@ -139,12 +139,18 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
 
 /*
     <Settings>
+        <ScanMounted enabled ="true"/>
         <ForerunnerTools enabled ="true"/>
         <BackupWorkouts enabled ="true" path="/home/user/Dropbox/Workouts/[YEAR]/[MONTH]/"/>
     </Settings>
 */
     TiXmlElement * settings = new TiXmlElement( "Settings" );
 	plugin->LinkEndChild( settings );
+
+    TiXmlElement * scanMounted = new TiXmlElement( "ScanMounted" );
+	settings->LinkEndChild( scanMounted );
+
+	scanMounted->SetAttribute("enabled", "true");
 
     TiXmlElement * forerunnertools = new TiXmlElement( "ForerunnerTools" );
 	settings->LinkEndChild( forerunnertools );
