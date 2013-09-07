@@ -488,9 +488,9 @@ bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
     int searchState = devManager->finishedFindDevices();
     printFinishState("FinishFindDevices", searchState);
     if (searchState != 1) {
-    	result->value.boolValue = true;
-    } else {
     	result->value.boolValue = false;
+    } else {
+    	result->value.boolValue = true;
     }
 
   	return true;
