@@ -487,15 +487,17 @@ bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
     /*
      * Unlike most other routines, this function knows only "0" or "1" as return value
      * (not "0"=idle, "1"=working, "2"=waiting, "3"=finished)
-     */
+     *
+     * The deviceManager uses internally the state (0=idle, 1=working and 3=finished)
+     * which results in this confusing code: if state!=1 return 1     */
 
     result->type = NPVariantType_Int32;
     int searchState = devManager->finishedFindDevices();
     printFinishState("FinishFindDevices", searchState);
-    if (searchState != 1) { /* 1 = Working */
-    	result->value.intValue = 1;   // Return 1 when finished
+    if (searchState != 1 /* = WORKING */ ) { 
+    	result->value.intValue = 1;   /* FINISHED SEARCHING */
     } else {
-    	result->value.intValue = 0;   // Not yet finished
+    	result->value.intValue = 0;   /* STILL SEARCHING */
     }
 
   	return true;
