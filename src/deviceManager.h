@@ -45,12 +45,12 @@ public:
     const std::string getDevicesXML();
 
   /**
-   * Triggers a search for new devices. Currently it has no implementation
+   * Triggers a search for new devices.
    */
     void startFindDevices();
 
   /**
-   * Cancels a search for new devices. Currently it has no implementation
+   * Cancels a search for new devices.
    */
     void cancelFindDevices();
 
@@ -118,6 +118,27 @@ private:
      * @return Xml document (in the format of GarminDevice.xml)
      */
     TiXmlDocument * addGpxProfile(TiXmlDocument * doc, string gpxpath);
+
+    /**
+     * Stores the thread id
+     */
+      pthread_t threadId;
+
+      /**
+       * Stores the status of the thread
+       * 0 = idle    1 = working    2 = waiting    3 = finished
+       */
+     int findDeviceState;
+
+     /**
+      * Thread gets called to search for devices
+      */
+     static void * findDeviceThread(void * pthis);
+
+     /**
+      * Thread that actually searches for a device
+      */
+     void findDevices();
 
 };
 

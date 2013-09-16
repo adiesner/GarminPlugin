@@ -91,8 +91,26 @@ const std::string DeviceManager::getDevicesXML()
 }
 
 void DeviceManager::startFindDevices() {
-    // Think about putting this routine into a thread when devices will be supported that take more time to search for
+	this->findDeviceState=1;
+	int code = pthread_create(&(this->threadId), NULL, DeviceManager::findDeviceThread, (void*)this);
 
+    if (code != 0) {
+        Log::err("Creation of findDevices thread failed!");
+        this->findDeviceState=0;
+        return;  // Not really able to continue :-(
+    }
+}
+
+/*static*/
+void * DeviceManager::findDeviceThread(void * pthis) {
+	DeviceManager *mgm = (DeviceManager*)pthis;
+	if (mgm!=NULL) {
+		mgm->findDevices();
+	}
+	return NULL;
+}
+
+void DeviceManager::findDevices() {
     // Remove active devices
     while (!gpsDeviceList.empty())
     {
@@ -267,6 +285,8 @@ void DeviceManager::startFindDevices() {
     std::ostringstream infoOut;
     infoOut << "Number of devices found: " << gpsDeviceList.size();
     Log::info(infoOut.str());
+
+    this->findDeviceState = 3;
 }
 
 void DeviceManager::setConfiguration(TiXmlDocument * config) {
@@ -276,11 +296,16 @@ void DeviceManager::setConfiguration(TiXmlDocument * config) {
 
 
 void DeviceManager::cancelFindDevices() {
-
+    Log::dbg("Cancel findDevice thread in DeviceManager");
+    if (this->threadId > 0) {
+        pthread_cancel(this->threadId);
+        this->threadId = 0;
+    }
+    this->findDeviceState = 0;
 }
 
 int DeviceManager::finishedFindDevices() {
-    return 1;
+    return this->findDeviceState;
 }
 
 GpsDevice * DeviceManager::getGpsDevice(int number)

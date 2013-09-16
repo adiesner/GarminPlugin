@@ -484,13 +484,18 @@ bool methodCancelFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
  */
 bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t argCount, NPVariant * result)
 {
-    result->type = NPVariantType_Bool;
+    /*
+     * Unlike most other routines, this function knows only "0" or "1" as return value
+     * (not "0"=idle, "1"=working, "2"=waiting, "3"=finished)
+     */
+
+    result->type = NPVariantType_Int32;
     int searchState = devManager->finishedFindDevices();
     printFinishState("FinishFindDevices", searchState);
-    if (searchState != 1) {
-    	result->value.boolValue = true;
+    if (searchState != 1) { /* 1 = Working */
+    	result->value.intValue = 1;   // Return 1 when finished
     } else {
-    	result->value.boolValue = false;
+    	result->value.intValue = 0;   // Not yet finished
     }
 
   	return true;

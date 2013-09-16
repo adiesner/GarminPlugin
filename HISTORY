@@ -1,3 +1,7 @@
+2013-09-16 - Version 0.3.20
+- Bugfix: Fixed broken "FindDevice" function from 0.3.19 (searched forever)
+- Now using a thread to search for devices (needed in future with ANT devices)
+
 2013-08-29 - Version 0.3.19
 - Bugfix: Fit2Tcx conversion problem fixed when GPS signal was lost/invalid
 
