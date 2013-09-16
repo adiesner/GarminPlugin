@@ -143,7 +143,7 @@ void DeviceManager::findDevices() {
 			Log::dbg("Xml Element ForerunnerTools is null!");
 		}
         if (mounted != NULL) {
-            scanMounted = getXmlBoolAttribute(ftools, "enabled", true);
+            scanMounted = getXmlBoolAttribute(mounted, "enabled", true);
         } else {
 			Log::dbg("Xml Element ScanMounted is null!");
 		}
