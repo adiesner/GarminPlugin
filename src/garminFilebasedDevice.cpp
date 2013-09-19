@@ -1277,24 +1277,28 @@ string GarminFilebasedDevice::getBinaryFile(string relativeFilePath) {
     in.close();
 
     // Write to backup directory if needed
-    FitReader fit(fullFilePath);
-    if (fit.isFitFile()) {
-        fit.registerFitMsgFkt(this);
-    	FitMsg * fitMsg = fit.getNextFitMsgFromType(FIT_MESSAGE_FILE_ID);
-    	if (fitMsg != NULL) {
-    		if (fitMsg->GetType() == FIT_MESSAGE_FILE_ID) {
-    	        FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (fitMsg);
-    	        if (fileid != NULL) {
-    	        	if (fileid->getType() == FIT_FILE_ID_TYPE_ACTIVITY) {
-    	        		time_t startTime = fileid->getTimeCreated() + TIME_OFFSET;
-    	        		backupWorkout(buffer.str(), "fit", startTime);
-    	        	} else {
-    	        		Log::dbg("Not an activity - not creating a backup");
-    	        	}
-    	        }
-    		}
-    		delete(fitMsg);
-    	}
+    try {
+        FitReader fit(fullFilePath);
+        if (fit.isFitFile()) {
+            fit.registerFitMsgFkt(this);
+            FitMsg * fitMsg = fit.getNextFitMsgFromType(FIT_MESSAGE_FILE_ID);
+            if (fitMsg != NULL) {
+                if (fitMsg->GetType() == FIT_MESSAGE_FILE_ID) {
+                    FitMsg_File_ID *fileid = dynamic_cast<FitMsg_File_ID*> (fitMsg);
+                    if (fileid != NULL) {
+                        if (fileid->getType() == FIT_FILE_ID_TYPE_ACTIVITY) {
+                            time_t startTime = fileid->getTimeCreated() + TIME_OFFSET;
+                            backupWorkout(buffer.str(), "fit", startTime);
+                        } else {
+                            Log::dbg("Not an activity - not creating a backup");
+                        }
+                    }
+                }
+                delete(fitMsg);
+            }
+        }
+    } catch (FitFileException &e) {
+        Log::err("FitFileException on file "+fullFilePath+": "+e.getError());
     }
 
     return buffer.str();
