@@ -1,3 +1,6 @@
+2013-11-02 - Version 0.3.22
+- Updated official garmin communicator plugin version number to 4.1.0 since Garmin changed it
+
 2013-09-23 - Version 0.3.21
 - Bugfix: Plugin crashed when trying to import a broken FIT file
 
