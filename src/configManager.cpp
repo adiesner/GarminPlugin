@@ -160,7 +160,7 @@ TiXmlDocument * ConfigManager::createNewConfiguration() {
     TiXmlElement * backupWorkouts = new TiXmlElement( "BackupWorkouts" );
 	settings->LinkEndChild( backupWorkouts );
 	backupWorkouts->SetAttribute("enabled", "false");
-	backupWorkouts->SetAttribute("path", homeDir + "/Dropbox/Workouts/<YEAR>/<MONTH>/");
+	backupWorkouts->SetAttribute("path", homeDir + "/Dropbox/Workouts/[YEAR]/[MONTH]/");
 
     doc->SaveFile(configFile);
     configurationFile = configFile;
