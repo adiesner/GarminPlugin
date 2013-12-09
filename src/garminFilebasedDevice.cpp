@@ -1576,21 +1576,32 @@ int GarminFilebasedDevice::bytesAvailable(string path) {
     string fullPath = baseDirectory + "/" + path;
 
     struct statfs st;
+    unsigned long long freeBytes = 0;
     if (statfs(fullPath.c_str(), &st) == 0) {
-        unsigned long long freeBytes = (unsigned long long)st.f_bfree * (unsigned long long) st.f_bsize;
-        if (Log::enabledDbg()) {
-            stringstream ss;
-            ss << "Bytes available for path " << fullPath << ": " << freeBytes;
-            Log::dbg(ss.str());
-        }
-        if (freeBytes > INT_MAX) {
-            return INT_MAX;
-        } else {
-            return (int)freeBytes;
-        }
+        freeBytes = (unsigned long long)st.f_bfree * (unsigned long long) st.f_bsize;
     } else {
         Log::err("Error getting bytes available for path: "+fullPath);
-        return 0;
+
+        /*
+         * Apparently Garmin Map Updater requests invalid pathes like this one:
+         * BytesAvailable(0,"Garmin/http://downloadg.garmin.com/direct/D3288000A.IMG?garmindlm=12345_678")
+         * In this case, return baseDirectory size
+         */
+        fullPath = baseDirectory;
+        if (statfs(fullPath.c_str(), &st) == 0) {
+            freeBytes = (unsigned long long)st.f_bfree * (unsigned long long) st.f_bsize;
+        }
+    }
+
+    if (Log::enabledDbg()) {
+        stringstream ss;
+        ss << "Bytes available for path " << fullPath << ": " << freeBytes;
+        Log::dbg(ss.str());
+    }
+    if (freeBytes > INT_MAX) {
+        return INT_MAX;
+    } else {
+        return (int)freeBytes;
     }
 }
 
