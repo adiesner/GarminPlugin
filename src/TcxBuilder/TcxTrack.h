@@ -38,6 +38,7 @@ public:
     friend TcxTrack& operator<<(TcxTrack& base, TcxTrackpoint* track);
 
     string getStartTime();
+    string getEndTime();
 
     double calculateDistanceMeters();
     double calculateTotalTime();

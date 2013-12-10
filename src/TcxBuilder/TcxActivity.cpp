@@ -63,10 +63,13 @@ TiXmlElement * TcxActivity::getTiXml(bool readTrackData) {
     xmlId->LinkEndChild(new TiXmlText(this->id));
 
     vector<TcxLap*>::iterator it;
+    TcxLap* previousLap=NULL;
     for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
+        lap->correctMissingStartTime(previousLap);
         xmlActivity->LinkEndChild( lap->getTiXml(readTrackData) );
+        previousLap = lap;
     }
 
     if (this->creator != NULL) {
@@ -83,10 +86,13 @@ TiXmlElement * TcxActivity::getGpxTiXml() {
     gpxname->LinkEndChild(new TiXmlText(this->id));
 
     vector<TcxLap*>::iterator it;
+    TcxLap* previousLap=NULL;
     for ( it=lapList.begin() ; it < lapList.end(); ++it )
     {
         TcxLap* lap = *it;
+        lap->correctMissingStartTime(previousLap);
         trk->LinkEndChild( lap->getGpxTiXml() );
+        previousLap=lap;
     }
     return trk;
 }

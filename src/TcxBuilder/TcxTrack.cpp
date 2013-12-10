@@ -82,6 +82,20 @@ string TcxTrack::getStartTime() {
     return startTime;
 }
 
+string TcxTrack::getEndTime() {
+    vector<TcxTrackpoint*>::reverse_iterator it;
+    string startTime = "";
+    for ( it=trackpointList.rbegin() ; it != trackpointList.rend(); ++it )
+    {
+        TcxTrackpoint* trackpoint = *it;
+        startTime = trackpoint->getTime();
+        if (startTime.length() > 0) {
+            break;
+        }
+    }
+    return startTime;
+}
+
 double TcxTrack::calculateDistanceMeters() {
     double totalDistance = 0;
 

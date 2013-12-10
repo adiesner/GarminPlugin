@@ -135,9 +135,11 @@ void Fit2TcxConverter::handle_Record(FitMsg_Record *record) {
     ss << record->getDistance();
     point->setDistanceMeters(ss.str());
 
-	ss.str("");
-	ss << (int)record->getHeartRate();
-	point->setHeartRateBpm(ss.str());
+    if (((int)record->getHeartRate()) > 0) {
+        ss.str("");
+        ss << (int)record->getHeartRate();
+        point->setHeartRateBpm(ss.str());
+    }
 
 	if (((int)record->getCadence()) > 0) {
 		ss.str("");
@@ -163,6 +165,15 @@ void Fit2TcxConverter::handle_Record(FitMsg_Record *record) {
 void Fit2TcxConverter::handle_Lap(FitMsg_Lap *lap) {
 	// A new lap comes always after the record data of this lap
 
+    // Create new lap if needed
+    if (tcxLap == NULL) {
+        trackpointList.clear();
+        tcxLap = new TcxLap();
+        *(tcxActivity) << tcxLap;
+        tcxTrack = new TcxTrack();
+        *(tcxLap) << tcxTrack;
+    }
+
 	stringstream ss;
 
 	// 999km is a randomly choosen maximum, because I observed values like (1.84467e+17)
@@ -172,7 +183,7 @@ void Fit2TcxConverter::handle_Lap(FitMsg_Lap *lap) {
 		this->tcxLap->setDistanceMeters(ss.str());
 	}
 
-	if (((int)lap->getAvgHeartRate()) > 0) {
+	if ((((int)lap->getAvgHeartRate()) > 0) && (((int)lap->getAvgHeartRate()) != 255)) {
 		ss.str("");
 		ss << (int)lap->getAvgHeartRate();
 		this->tcxLap->setAverageHeartRateBpm(ss.str());
@@ -255,10 +266,18 @@ void Fit2TcxConverter::handle_Lap(FitMsg_Lap *lap) {
 			this->tcxActivity->setSportType(TrainingCenterDatabase::Running);
 			this->tcxLap->setCadenceSensorType(TrainingCenterDatabase::Footpod);
 			setTrackpointCadenceType(TrainingCenterDatabase::Footpod);
+
+		    if (lap->getTotalCycles() > 0) {
+		        ss.str("");
+		        ss << (lap->getTotalCycles() * 2);
+		        this->tcxLap->setSteps(ss.str());
+		    }
+
 			break;
 		default:
 			break;
 	}
+
 
 	// Next RECORD Entry will create tcxLap again
 	this->tcxLap = NULL;

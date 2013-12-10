@@ -52,6 +52,7 @@ public:
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
     void setAvgSpeed(string speed);
     void setMaxCadence(string cadence);
+    void setSteps(string steps);
     /**
      * Returns the distance of this lap - used for debug output
      * Do not call before all tracks and trackpoints are added to the lap
@@ -61,6 +62,8 @@ public:
     bool isEmpty();
 
     friend TcxLap& operator<<(TcxLap& base, TcxTrack* track);
+
+    void correctMissingStartTime(TcxLap * previousLap);
 
 private:
     vector<TcxTrack*> trackList;
@@ -72,6 +75,7 @@ private:
     string getTriggerMethod(TrainingCenterDatabase::TriggerMethod_t method);
     string getIntensity(TrainingCenterDatabase::Intensity_t intensity);
     string getStartTime();
+    string getEndTime();
 
     string totalTimeSeconds;
     string distanceMeters;
@@ -86,6 +90,8 @@ private:
     TrainingCenterDatabase::TriggerMethod_t triggerMethod;
     string notes;
     TrainingCenterDatabase::CadenceSensorType_t cadenceSensorType;
+    string startTime;
+    string steps;
 
 };
 

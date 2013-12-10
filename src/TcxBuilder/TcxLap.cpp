@@ -34,6 +34,7 @@ TcxLap::TcxLap() {
     this->cadenceSensorType = TrainingCenterDatabase::UndefinedCadenceType;
     this->maxCadence="";
     this->avgSpeed="";
+    this->startTime="1970-01-01T00:00:00Z";
 }
 
 TcxLap::~TcxLap() {
@@ -131,7 +132,9 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
         for ( it=trackList.begin() ; it < trackList.end(); ++it )
         {
             TcxTrack* track = *it;
-            xmlLap->LinkEndChild(track->getTiXml());
+            if (!track->isEmpty()) {
+                xmlLap->LinkEndChild(track->getTiXml());
+            }
         }
     }
 
@@ -162,7 +165,7 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
 
         string name = "MaxBikeCadence";
         if (this->cadenceSensorType == TrainingCenterDatabase::Footpod) {
-        	name = "MaxRunningCadence";
+        	name = "MaxRunCadence";
         }
 
         TiXmlElement * xmlLX = new TiXmlElement("LX");
@@ -185,6 +188,20 @@ TiXmlElement * TcxLap::getTiXml(bool readTrackData) {
         TiXmlElement * xmlAvgSpeed = new TiXmlElement("AvgSpeed");
         xmlAvgSpeed->LinkEndChild(new TiXmlText(this->avgSpeed));
         xmlLX->LinkEndChild(xmlAvgSpeed);
+    }
+
+    if (this->steps.length() > 0) {
+        if (xmlLapExtensions == NULL) {
+            xmlLapExtensions = new TiXmlElement("Extensions");
+            xmlLap->LinkEndChild(xmlLapExtensions);
+        }
+
+        TiXmlElement * xmlLX = new TiXmlElement("LX");
+        xmlLX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+        xmlLapExtensions->LinkEndChild(xmlLX);
+        TiXmlElement * xmlSteps = new TiXmlElement("Steps");
+        xmlSteps->LinkEndChild(new TiXmlText(this->steps));
+        xmlLX->LinkEndChild(xmlSteps);
     }
 
     return xmlLap;
@@ -244,6 +261,10 @@ void TcxLap::setAvgSpeed(string speed) {
 }
 void TcxLap::setMaxCadence(string cadence) {
 	this->maxCadence = cadence;
+}
+
+void TcxLap::setSteps(string steps) {
+    this->steps = steps;
 }
 
 void TcxLap::calculateTotalTimeSeconds() {
@@ -335,10 +356,11 @@ string TcxLap::getStartTime() {
         TcxTrack* track = *it;
         string startTime = track->getStartTime();
         if (startTime.length() > 0) {
+            this->startTime = startTime;
             return startTime;
         }
     }
-    return "1970-01-01T00:00:00Z";
+    return this->startTime;
 }
 
 bool TcxLap::isEmpty() {
@@ -358,4 +380,25 @@ string TcxLap::getDistance() {
         calculateDistanceMeters();
     }
     return this->distanceMeters;
+}
+
+void TcxLap::correctMissingStartTime(TcxLap * previousLap) {
+    if (previousLap == NULL) { return; }
+    if (this->startTime.compare("1970-01-01T00:00:00Z")==0) {
+        this->startTime = previousLap->getEndTime();
+    }
+}
+
+string TcxLap::getEndTime() {
+    string endTime="";
+    vector<TcxTrack*>::reverse_iterator it;
+    for ( it=trackList.rbegin() ; it != trackList.rend(); ++it )
+    {
+        TcxTrack* track = *it;
+        endTime = track->getEndTime();
+        if (endTime.length() > 0) {
+            return endTime;
+        }
+    }
+    return this->startTime;
 }
