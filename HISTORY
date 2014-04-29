@@ -1,3 +1,8 @@
+2014-04-28 - Version 0.3.23
+- Bugfix: Plugin crashed on some fit files with empty laps
+- Bugfix: Incorrect default value for BackupWorkouts
+- Bugfix: bytesAvailable for MapUpdater on invalid pathes now returns correct value
+
 2013-11-02 - Version 0.3.22
 - Updated official garmin communicator plugin version number to 4.1.0 since Garmin changed it
 
