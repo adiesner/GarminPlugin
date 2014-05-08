@@ -42,6 +42,7 @@ public:
     void setTotalTimeSeconds(string time);
     void setDistanceMeters(string distance);
     void setMaximumSpeed(string speed);
+    void setMaxPower(string power);
     void setCalories(string calories);
     void setAverageHeartRateBpm(string averageBpm);
     void setMaximumHeartRateBpm(string maximumBpm);
@@ -51,6 +52,7 @@ public:
     void setNotes(string note);
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
     void setAvgSpeed(string speed);
+    void setAvgPower(string power);
     void setMaxCadence(string cadence);
     void setSteps(string steps);
     /**
@@ -80,6 +82,8 @@ private:
     string totalTimeSeconds;
     string distanceMeters;
     string maximumSpeed;
+    string maxPower;
+    string avgPower;
     string calories;
     string averageHeartRateBpm;
     string maximumHeartRateBpm;

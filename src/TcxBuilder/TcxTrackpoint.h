@@ -45,6 +45,8 @@ public:
     void setSensorState(TrainingCenterDatabase::SensorState_t state);
     void setCadenceSensorType(TrainingCenterDatabase::CadenceSensorType_t type);
     string getTime();
+    void setPower(string power);
+    string getPower(string power);
     double calculateDistanceTo(double totalTrackDistance, TcxTrackpoint * nextPoint);
 
     bool hasCoordinates();
@@ -63,6 +65,7 @@ private:
     string heartRateBpm;
     string cadence;
     string speed;
+    string power;
     TrainingCenterDatabase::SensorState_t sensorState;
     TrainingCenterDatabase::CadenceSensorType_t cadenceSensorType;
 

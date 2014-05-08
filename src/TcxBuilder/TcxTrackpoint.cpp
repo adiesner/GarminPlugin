@@ -28,6 +28,7 @@ void TcxTrackpoint::initializeVariables() {
     this->heartRateBpm = "";
     this->cadence = "";
     this->speed = "";
+    this->power = "";
     this->sensorState = TrainingCenterDatabase::UndefinedSensorState;
     this->cadenceSensorType = TrainingCenterDatabase::UndefinedCadenceType;
 }
@@ -47,6 +48,13 @@ TcxTrackpoint::TcxTrackpoint(string time) {
 TcxTrackpoint::~TcxTrackpoint() {
 }
 
+void TcxTrackpoint::setPower(string power) {
+    this->power = power;
+}
+
+string TcxTrackpoint::getPower(string power){
+    return this->power;
+}
 
 void TcxTrackpoint::setPosition(string latitude, string longitude) {
     this->longitude = longitude;
@@ -176,13 +184,15 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
         }
     }
 
+    TiXmlElement * xmlExtensionTPX = NULL;
+
     if (this->speed.length() > 0) {
         if (xmlTrackPointExtensions == NULL) {
             xmlTrackPointExtensions = new TiXmlElement("Extensions");
             xmlTrackPoint->LinkEndChild(xmlTrackPointExtensions);
         }
 
-		TiXmlElement * xmlExtensionTPX = new TiXmlElement("TPX");
+        xmlExtensionTPX = new TiXmlElement("TPX");
 		xmlExtensionTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
 		xmlTrackPointExtensions->LinkEndChild(xmlExtensionTPX);
 
@@ -191,6 +201,24 @@ TiXmlElement * TcxTrackpoint::getTiXml() {
         xmlExtensionTPX->LinkEndChild(xmlSpeed);
     }
 
+    if ((this->power.length() > 0) && (this->power != "65535")) {
+        if (xmlTrackPointExtensions == NULL) {
+            xmlTrackPointExtensions = new TiXmlElement("Extensions");
+            xmlTrackPoint->LinkEndChild(xmlTrackPointExtensions);
+        }
+
+        TiXmlElement * xmlPower = new TiXmlElement("Watts");
+        xmlPower->LinkEndChild(new TiXmlText(this->power));
+
+        if(xmlExtensionTPX == NULL){
+            TiXmlElement * xmlExtensionTPX = new TiXmlElement("TPX");
+            xmlExtensionTPX->SetAttribute("xmlns","http://www.garmin.com/xmlschemas/ActivityExtension/v2");
+            xmlTrackPointExtensions->LinkEndChild(xmlExtensionTPX);
+            xmlExtensionTPX->LinkEndChild(xmlPower);
+        } else {
+            xmlExtensionTPX->LinkEndChild(xmlPower);
+        }
+    }
 
 
     return xmlTrackPoint;
