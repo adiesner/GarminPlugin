@@ -53,6 +53,8 @@ public:
 
     TiXmlDocument * getTiXmlDocument(bool readTrackData, string fitnessDetailId);
 
+    string getId();
+
 private:
 
     void handle_File_ID(FitMsg_File_ID *fileid);
@@ -80,6 +82,8 @@ private:
 	TcxCreator *tcxCreator;
 
 	vector<TcxTrackpoint*> trackpointList;
+
+	string id;
 
 };
 

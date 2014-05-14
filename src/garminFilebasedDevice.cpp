@@ -554,18 +554,37 @@ Thread-Status
     if (workDir.length() == 0) {
         Log::err("Device does not support reading TCX or FIT Files. Element FitnessHistory/FIT_TYPE_4 not found in xml!");
     } else {
-    	Log::dbg("Opening directory: "+workDir);
-        DIR *dp;
-        struct dirent *dirp;
+    	std::map<string,string>::iterator it;
+    	it = idToFileMap.find(fitnessDetailId);
+    	if (it == idToFileMap.end()) {
+        	Log::dbg("Opening directory: "+workDir);
+            DIR *dp;
+            struct dirent *dirp;
 
-        if((dp = opendir(workDir.c_str())) != NULL) {
-            while ((dirp = readdir(dp)) != NULL) {
-                files.push_back(string(dirp->d_name));
+            if((dp = opendir(workDir.c_str())) != NULL) {
+                while ((dirp = readdir(dp)) != NULL) {
+
+                	string fileNameToAdd = string(dirp->d_name);
+                    bool alreadyInCache = false;
+                    it = idToFileMap.begin();
+                    while(it != idToFileMap.end()) {
+                    	alreadyInCache = (it->second == fileNameToAdd);
+                        if (alreadyInCache) { break; }
+                        ++it;
+                    }
+
+                    if (!alreadyInCache) {
+                    	files.push_back(fileNameToAdd);
+                    }
+                }
+                closedir(dp);
+            } else {
+                Log::err("Error opening fitness directory! "+ workDir);
             }
-            closedir(dp);
-        } else {
-            Log::err("Error opening fitness directory! "+ workDir);
-        }
+
+    	} else {
+    		files.push_back(it->second);
+    	}
     }
 
 
@@ -610,6 +629,7 @@ Thread-Status
 							while (fit->readNextRecord())  {
 							}
 							fit->closeFitFile();
+							idToFileMap[fitConv->getId()] = files[i];
 							doc = fitConv->getTiXmlDocument(readTrackData, fitnessDetailId);
 						} else {
 							Log::err("Not a fit file: " + workDir + "/" + files[i]);
@@ -620,6 +640,7 @@ Thread-Status
 						Log::err("Unknown exception happened while reading fit file!");
 					}
 					delete (fit);
+					delete(fitConv);
 				}
 
 				if (doc != NULL) {
@@ -634,6 +655,9 @@ Thread-Status
 								string currentLapId="";
 								TiXmlElement * idNode = inputActivity->FirstChildElement("Id");
 								if (idNode != NULL) { currentLapId = idNode->GetText(); }
+
+								// if not in cache, put into cache
+								idToFileMap[currentLapId] = files[i];
 
 								if ((fitnessDetailId.length() == 0) || (fitnessDetailId.compare(currentLapId) == 0)) {
 									TiXmlNode * newAct = inputActivity->Clone();
@@ -669,7 +693,7 @@ Thread-Status
 					Log::err("Unable to load fitness file "+files[i]);
 				}
 			} else {
-				if (Log::enabledDbg()) { Log::dbg("File "+files[i]+" has wrong extension!. Not ["+extension+"]"); }
+				if (Log::enabledDbg()) { Log::dbg("File "+files[i]+" has wrong extension! Not ["+extension+"]"); }
 			}
     	}
     }

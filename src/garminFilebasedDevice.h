@@ -23,6 +23,7 @@
 #include <list>
 #include <iostream>
 #include <fstream>
+#include <map>
 #include "messageBox.h"
 #include "gpsDevice.h"
 #include "log.h"
@@ -525,6 +526,12 @@ protected:
      * Read a file and calculate the md5 checksum
      */
     string getMd5FromFile(string filename);
+
+    /**
+     * Contains a map for faster file search 2014-05-06T05:41:56Z --> /garmin/Activities/2014-05-06-05-41-56.fit
+     * Used to prevents opening and reading the complete file over and over again while searching for another id
+     */
+    std::map<string,string> idToFileMap;
 };
 
 #endif // GARMINFILEBASEDDEVICE_H_INCLUDED

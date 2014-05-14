@@ -446,7 +446,8 @@ void Fit2TcxConverter::handle_Session(FitMsg_Session *session) {
 			break;
 	}
 
-	this->tcxActivity->setId(GpsFunctions::print_dtime(session->getStartTime()));
+	this->id = GpsFunctions::print_dtime(session->getStartTime());
+	this->tcxActivity->setId(this->id);
 }
 
 void Fit2TcxConverter::handle_DeviceInfo(FitMsg_DeviceInfo *deviceInfo) {
@@ -456,4 +457,8 @@ void Fit2TcxConverter::handle_DeviceInfo(FitMsg_DeviceInfo *deviceInfo) {
 	std::cout << "Serial Number: " << deviceInfo->getSerialNumber() << endl;
 	std::cout << "Software Version : " << deviceInfo->getSoftwareVersion() << endl;
 	 */
+}
+
+string Fit2TcxConverter::getId() {
+	return this->id;
 }
