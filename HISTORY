@@ -1,3 +1,7 @@
+2014-05-19 - Version 0.3.25
+- Bugfix: Memory leak
+- Speedup of reading entries in Fit2Tcx part
+
 2014-05-08 - Version 0.3.24
 - Added support for Power values in Fit2Tcx part
 - Bugfix: Invalid (=255) Heartrate and Cadence values have been outputted in fit2tcx part
