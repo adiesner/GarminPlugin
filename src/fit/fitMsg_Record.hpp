@@ -26,7 +26,39 @@
 class FitMsg_Record : public FitMsg
 {
 public:
-	FitMsg_Record() : FitMsg(FIT_MESSAGE_RECORD) {
+	FitMsg_Record() : FitMsg(FIT_MESSAGE_RECORD),
+	    //TODO: Check if other default values are better
+                timestamp(0),
+                positionLat(0),
+                positionLong(0),
+                altitude(0),
+                heartRate(0),
+                cadence(0),
+                distance(0),
+                speed(0),
+                power(0),
+                numCompressedSpeedDistance(0),
+                grade(0),
+                resistance(0),
+                timeFromCourse(0),
+                cycleLength(0),
+                temperature(0),
+                numSpeed1s(0),
+                cycles(0),
+                totalCycles(0),
+                compressedAccumulatedPower(0),
+                accumulatedPower(0),
+                leftRightBalance(0),
+                gpsAccuracy(0),
+                verticalSpeed(0),
+                calories(0),
+                leftTorqueEffectiveness(0),
+                rightTorqueEffectiveness(0),
+                leftPedalSmoothness(0),
+                rightPedalSmoothness(0),
+                combinedPedalSmoothness(0),
+                cadence256(0)
+	{
     };
 
     virtual ~FitMsg_Record() {};

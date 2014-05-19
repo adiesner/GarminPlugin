@@ -38,6 +38,10 @@ Fit2TcxConverter::Fit2TcxConverter() : 	tcxBase(NULL),
 
 Fit2TcxConverter::~Fit2TcxConverter() {
 	// TODO Auto-generated destructor stub
+    if (this->tcxBase != NULL) {
+        delete(this->tcxBase);
+        this->tcxBase = NULL;
+    }
 }
 
 void Fit2TcxConverter::fitMsgReceived(FitMsg *msg) {

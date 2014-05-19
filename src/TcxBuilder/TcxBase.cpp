@@ -30,6 +30,10 @@ TcxBase::~TcxBase() {
         delete(activities);
     }
     activitiesList.clear();
+    if (this->author != NULL) {
+        delete(this->author);
+        this->author = NULL;
+    }
 }
 
 void TcxBase::addActivities(TcxActivities* activities) {
