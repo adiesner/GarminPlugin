@@ -1,3 +1,6 @@
+2014-05-31 - Version 0.3.26
+- Updated official garmin communicator plugin version number to 4.2.0.0 since Garmin changed it
+
 2014-05-19 - Version 0.3.25
 - Bugfix: Memory leak
 - Speedup of reading entries in Fit2Tcx part
