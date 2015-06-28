@@ -58,6 +58,8 @@ else
 	  AC_MSG_RESULT([no])
 	  AC_MSG_ERROR([Unable to find tinyxml header file (tinyxml.h). Try 'apt-get install tinyxml-dev' or use --with-tinyxml-incdir=DIR])
 	fi
+
+	TINYXML_CFLAGS="${TINYXML_CFLAGS } -DTIXML_USE_STL"
 	
 	if test "x$tinyxml_libdir" != "x" ; then
 	  if test -f "$tinyxml_libdir/libtinyxml.so" ; then
@@ -78,7 +80,7 @@ else
 	  AC_MSG_RESULT([no])
 	  AC_MSG_ERROR([Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR])
 	fi
-	
+
 	AC_SUBST(TINYXML_CFLAGS)
 	AC_SUBST(TINYXML_LIBS)
 	
@@ -207,6 +209,13 @@ AC_CHECK_FUNCS([getmntent localtime_r memmove mkdir])
 
 AC_CONFIG_HEADERS([config.h])
 
+# Add option to disable additional (C|LD)FLAGS.
+AC_ARG_WITH(optflags,
+	AS_HELP_STRING([--without-optflags], [Disable maintainer's optmization-flags]))
+AS_IF([test "x${with_optflags}" != "xno"], [
+	AC_SUBST([COPTFLAGS], [-Os])
+	AC_SUBST([LDOPTFLAGS], [-s])
+])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
