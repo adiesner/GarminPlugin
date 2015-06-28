@@ -2313,7 +2313,7 @@ string GarminFilebasedDevice::getMd5FromFile(string filename) {
     if (f==NULL) {
     	Log::err("Unable open file to calculate MD5");
     	gcry_md_close(c);
-    	return "";		
+    	return "";
 	}
     int fd=fileno(f);
     for (;;) {

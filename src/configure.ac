@@ -5,7 +5,7 @@ AC_MSG_WARN([Warnung])
 AC_MSG_ERROR([Fehler])
 
 AC_PREREQ([2.64])
-AC_INIT(GarminPlugin, 0.2, garminplugin@andreas-diesner.de)
+AC_INIT(GarminPlugin, 0.3.27, garminplugin@andreas-diesner.de)
 AC_CONFIG_SRCDIR(main.cpp)
 
 # Checks for programs.
@@ -31,21 +31,21 @@ if pkg-config --exists tinyxml; then
 else
 	#
 	# Check for tinyxml (pgk info is not available on many distros)
-	#	
+	#
 	AC_MSG_CHECKING([for tinyxml])
-	
+
 	AC_ARG_WITH([tinyxml-libdir],
 		    AS_HELP_STRING([--with-tinyxml-libdir=DIR],
 			[specify where to find tinyxml library (libtinyxml.so)]),
 		    [tinyxml_libdir=$withval],
 		    [tinyxml_libdir=""])
-	
+
 	AC_ARG_WITH([tinyxml-incdir],
 		    AS_HELP_STRING([--with-tinyxml-incdir=DIR],
 			[specify where to find tinyxml header files (tinyxml.h)]),
 		    [tinyxml_incdir=$withval],
 		    [tinyxml_incdir=""])
-	
+
 	if test "x$tinyxml_incdir" != "x" ; then
 	  TINYXML_CFLAGS="-I$tinyxml_incdir"
 	elif test -f "../tinyxml/tinyxml.h" ; then
@@ -58,7 +58,9 @@ else
 	  AC_MSG_RESULT([no])
 	  AC_MSG_ERROR([Unable to find tinyxml header file (tinyxml.h). Try 'apt-get install tinyxml-dev' or use --with-tinyxml-incdir=DIR])
 	fi
-	
+
+	TINYXML_CFLAGS="${TINYXML_CFLAGS } -DTIXML_USE_STL"
+
 	if test "x$tinyxml_libdir" != "x" ; then
 	  if test -f "$tinyxml_libdir/libtinyxml.so" ; then
 	    TINYXML_LIBS="$tinyxml_libdir/libtinyxml.so"
@@ -78,11 +80,11 @@ else
 	  AC_MSG_RESULT([no])
 	  AC_MSG_ERROR([Unable to find libtinyxml.so. Try 'apt-get install tinyxml' and compile source or use --with-tinyxml-libdir=DIR])
 	fi
-	
+
 	AC_SUBST(TINYXML_CFLAGS)
 	AC_SUBST(TINYXML_LIBS)
-	
-	AC_MSG_RESULT([yes])	
+
+	AC_MSG_RESULT([yes])
 fi
 
 #
@@ -207,6 +209,13 @@ AC_CHECK_FUNCS([getmntent localtime_r memmove mkdir])
 
 AC_CONFIG_HEADERS([config.h])
 
+# Add option to disable additional (C|LD)FLAGS.
+AC_ARG_WITH(optflags,
+	AS_HELP_STRING([--without-optflags], [Disable maintainer's optmization-flags]))
+AS_IF([test "x${with_optflags}" != "xno"], [
+	AC_SUBST([COPTFLAGS], [-Os])
+	AC_SUBST([LDOPTFLAGS], [-s])
+])
 
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

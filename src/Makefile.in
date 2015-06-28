@@ -17,9 +17,12 @@ GCRYPT_LIBS = @GCRYPT_LIBS@
 LIBUSB_CFLAGS = @LIBUSB_CFLAGS@
 LIBUSB_LIBS = @LIBUSB_LIBS@
 
-CFLAGS +=  -Wall -O2 -fPIC  -Os -DTIXML_USE_STL
+COPTFLAGS = @COPTFLAGS@
+LDOPTFLAGS = @LDOPTFLAGS@
+
+CFLAGS += -fPIC -Wall $(COPTFLAGS)
 INCLUDES = $(CPPFLAGS) $(TINYXML_CFLAGS) $(GARMINTOOLS_CPPFLAGS) $(ZLIB_CFLAGS) $(LIBUSB_CFLAGS) $(LIBCRYPTO_CFLAGS) $(GCRYPT_CFLAGS)
-LDFLAGS +=  -s  $(CREATE_LIB) $(CREATE_DEF)
+LDFLAGS += $(LDOPTFLAGS) $(CREATE_LIB) $(CREATE_DEF)
 LDLIBS = $(T_LDLIBS) -lm $(ZLIB_LIBS) $(TINYXML_LIBS) $(GARMINTOOLS_LDFLAGS) $(LIBUSB_LIBS) $(GCRYPT_LIBS) -lpthread -lstdc++
 
 LINK_dll = $(GCC) -o $@ $^ $(LDLIBS) -shared $(LDFLAGS)
@@ -29,9 +32,9 @@ COMPILE_cpp = $(GCC) $(CFLAGS) -o $@ -c $< $(MAKEDEP) $(INCLUDES)
 CPP_FILES := $(wildcard *.cpp) \
         $(wildcard TcxBuilder/*.cpp) \
         $(wildcard fit/*.cpp)
-        
-OBJ_FILES := $(CPP_FILES:.cpp=.o)  
-DEP_FILES := $(CPP_FILES:.cpp=.d)  
+
+OBJ_FILES := $(CPP_FILES:.cpp=.o)
+DEP_FILES := $(CPP_FILES:.cpp=.d)
 
 %.o : %.cpp ; $(COMPILE_cpp)
 .SUFFIXES: .o .d .cpp
@@ -41,8 +44,8 @@ all: all.before all.targets all.after
 all.before :
 	-
 all.after : $(FIRST_TARGET)
-	
-all.targets : Release_target 
+
+all.targets : Release_target
 
 clean :
 	rm -fv $(clean.OBJ)
@@ -61,11 +64,11 @@ clean.OBJ += $(Release_target.BIN) $(Release_target.OBJ)
 Release_target : Release_target.before $(Release_target.BIN) Release_target.after_always
 
 Release_target.before :
-	
-	
+
+
 Release_target.after_always : $(Release_target.BIN)
-	
+
 $(Release_target.BIN) : $(Release_target.OBJ)
 	$(LINK_dll)
-	
+
 

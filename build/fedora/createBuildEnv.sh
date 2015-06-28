@@ -13,7 +13,7 @@ VERSION=$2
 GITREPOSITORYDIR=`pwd`
 
 if [ -z $FEDORAVERSION"" ]; then
-  echo "Please specify for which fedora version you want to build" 
+  echo "Please specify for which fedora version you want to build"
   echo "Example: createBuildEnv.sh 14 0.3.0"
   exit 1
 fi
@@ -29,7 +29,7 @@ if [ ! -n "$VERSION" ]; then
   # Determine last tag
   GITTAG=`git tag -l | tail -1`
   VERSION=`echo $GITTAG|cut -c2-`
-  echo "Please specify which plugin version you want to build" 
+  echo "Please specify which plugin version you want to build"
   echo "Example: createBuildEnv.sh 14 $VERSION"
   exit 1
 fi
@@ -91,9 +91,9 @@ while read curline; do
         if [ "$FIRSTCHAR" != "-" ]; then
             DATE=`echo $curline | cut -b-10`
             DATE=`date "+%a %b %d %Y" -d $DATE`
-            echo "* $DATE Andreas Diesner <garminplugin@andreas-diesner.de>" >>$SPECFILE 
+            echo "* $DATE Andreas Diesner <garminplugin@andreas-diesner.de>" >>$SPECFILE
         else
-            echo $curline >>$SPECFILE 
+            echo $curline >>$SPECFILE
         fi
     fi
 done < $INFILE
