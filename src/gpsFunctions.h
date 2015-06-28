@@ -105,7 +105,7 @@ class GpsFunctions {
     static int mkpath(std::string path, mode_t mode) {
         size_t pre=0,pos;
         std::string dir;
-        int mdret;
+        int mdret=0;
 
         if(path[path.size()-1]!='/') {
             path+='/';
