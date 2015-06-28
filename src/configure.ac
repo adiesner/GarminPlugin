@@ -5,7 +5,7 @@ AC_MSG_WARN([Warnung])
 AC_MSG_ERROR([Fehler])
 
 AC_PREREQ([2.64])
-AC_INIT(GarminPlugin, 0.2, garminplugin@andreas-diesner.de)
+AC_INIT(GarminPlugin, 0.3.27, garminplugin@andreas-diesner.de)
 AC_CONFIG_SRCDIR(main.cpp)
 
 # Checks for programs.

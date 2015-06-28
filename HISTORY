@@ -1,3 +1,9 @@
+2015-06-28 - Version 0.3.27
+- Added full GPLv3-license-text
+- Added configure-option '--without-optflags' to disable optimization flags for use when
+  building packages for linux-distribution-repos
+- Bugfix: Fixed `warning: 'mdret' may be used uninitialized in this function`
+
 2014-05-31 - Version 0.3.26
 - Updated official garmin communicator plugin version number to 4.2.0.0 since Garmin changed it
 
