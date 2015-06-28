@@ -494,7 +494,7 @@ bool methodFinishFindDevices(NPObject *obj, const NPVariant args[], uint32_t arg
     result->type = NPVariantType_Int32;
     int searchState = devManager->finishedFindDevices();
     printFinishState("FinishFindDevices", searchState);
-    if (searchState != 1 /* = WORKING */ ) { 
+    if (searchState != 1 /* = WORKING */ ) {
     	result->value.intValue = 1;   /* FINISHED SEARCHING */
     } else {
     	result->value.intValue = 0;   /* STILL SEARCHING */

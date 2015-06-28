@@ -23,7 +23,7 @@
 #include "edge305Device.h"
 #include <sstream>
 
-Edge305Device::Edge305Device() 
+Edge305Device::Edge305Device()
 : GpsDevice("Edge305")
 , transferSuccessful(false)
 , runType(0)

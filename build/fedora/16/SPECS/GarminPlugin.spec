@@ -17,11 +17,11 @@ BuildRequires:  zlib-devel
 BuildRequires:  libgcrypt-devel
 
 %description
-This browser plugin has the same methods and properties as the official 
+This browser plugin has the same methods and properties as the official
 Garmin Communicator Plugin (http://www8.garmin.com/products/communicator/).
 It can be used to transfer GPX files (Geocache Descriptions) to your garmin
 device using the official Garmin Javascript API. Its functionality depends on
-the device you use. 
+the device you use.
 - Edge305/Forerunner305: ReadFitnessData, ReadGpsData, No write support
 - Edge705/Oregon/Dakota: ReadFitnessData, ReadGpsData, Write Gpx files
 - Edge800: ReadFitnessData, Write Gpx/Tcx Files
@@ -49,7 +49,7 @@ rm -rf %{buildroot}
 
 %post
 /sbin/ldconfig
- 
+
 
 %postun -p /sbin/ldconfig
 

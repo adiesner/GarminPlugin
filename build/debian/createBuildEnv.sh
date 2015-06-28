@@ -12,7 +12,7 @@ VERSION=$2
 GITREPOSITORYDIR=`pwd`
 
 if [ -z $DEBIANVERSION"" ]; then
-  echo "Please specify for which debian version you want to build" 
+  echo "Please specify for which debian version you want to build"
   echo "Example: createBuildEnv.sh maverick 0.3.0"
   exit 1
 fi
@@ -28,7 +28,7 @@ if [ ! -n "$VERSION" ]; then
   # Determine last tag
   GITTAG=`git tag -l | tail -1`
   VERSION=`echo $GITTAG|cut -c2-`
-  echo "Please specify which plugin version you want to build" 
+  echo "Please specify which plugin version you want to build"
   echo "Example: createBuildEnv.sh maverick $VERSION"
   exit 1
 fi
@@ -47,7 +47,7 @@ cd "$GITREPOSITORYDIR/../.."
 mkdir "$GITREPOSITORYDIR/../../pbuilder"
 cd "$GITREPOSITORYDIR/../../pbuilder"
 mkdir "garminplugin-$VERSION"
-cp -r "$GITREPOSITORYDIR/$DEBIANVERSION/debian" "./garminplugin-$VERSION/debian" 
+cp -r "$GITREPOSITORYDIR/$DEBIANVERSION/debian" "./garminplugin-$VERSION/debian"
 
 echo "Copying Sources..."
 
@@ -63,7 +63,7 @@ fi
 
 cd "$GITREPOSITORYDIR/../../pbuilder"
 
-# now write changelog file 
+# now write changelog file
 INFILE="$GITREPOSITORYDIR/../../HISTORY"
 CHANGELOGFILE="$GITREPOSITORYDIR/../../pbuilder/garminplugin-$VERSION/debian/changelog"
 echo "Creating changelog file $CHANGELOGFILE"
@@ -76,22 +76,22 @@ while read curline; do
             if [ "a$VERSIONNUMBERENTRY" != "a$VERSION" ]; then
                 if [ "a$DOOUTPUT" != "a0" ]; then
                     DOOUTPUT="0"
-                    echo "">>$CHANGELOGFILE 
+                    echo "">>$CHANGELOGFILE
                     echo " -- Andreas Diesner <garminplugin@andreas-diesner.de>  $DATE"
-                    echo " -- Andreas Diesner <garminplugin@andreas-diesner.de>  $DATE">>$CHANGELOGFILE 
+                    echo " -- Andreas Diesner <garminplugin@andreas-diesner.de>  $DATE">>$CHANGELOGFILE
                 fi
-            else 
+            else
                 DATE=`echo $curline | cut -b-10`
                 DATE=`date -R -d $DATE`
                 DOOUTPUT="1"
-                echo "garminplugin ($VERSION-1~$DEBIANVERSION) $DEBIANVERSION; urgency=low">$CHANGELOGFILE 
-                echo "garminplugin ($VERSION-1~$DEBIANVERSION) $DEBIANVERSION; urgency=low" 
-                echo "">>$CHANGELOGFILE 
+                echo "garminplugin ($VERSION-1~$DEBIANVERSION) $DEBIANVERSION; urgency=low">$CHANGELOGFILE
+                echo "garminplugin ($VERSION-1~$DEBIANVERSION) $DEBIANVERSION; urgency=low"
+                echo "">>$CHANGELOGFILE
             fi
         else
             if [ "a$DOOUTPUT" != "a0" ]; then
                 curline=`echo $curline | cut -b2-`
-                echo "  *$curline" >>$CHANGELOGFILE 
+                echo "  *$curline" >>$CHANGELOGFILE
                 echo "  *$curline"
             fi
         fi
