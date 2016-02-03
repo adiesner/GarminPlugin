@@ -70,7 +70,7 @@ sudo apt-get install build-essential subversion git-core zlib1g-dev libusb-dev l
 git clone http://github.com/adiesner/GarminPlugin.git
 svn export http://garmintools.googlecode.com/svn/trunk/ garmintools
 svn export http://ticpp.googlecode.com/svn/trunk/ ticpp
-wget http://downloads.sourceforge.net/project/premake/Premake/4.2.1/premake-4.2.1-linux.tar.gz?use_mirror=ignum
+wget http://downloads.sourceforge.net/project/premake/Premake/4.2.1/premake-4.2.1-linux.tar.gz
 
 # compile ticpp
 tar xvzf premake-4.2.1-linux.tar.gz
@@ -88,10 +88,10 @@ make
 cd ..
 
 # compile GarminPlugin
-cd GarminPlugin
-./configure
+cd GarminPlugin/src
+/configure --with-garmintools-incdir=../../garmintools/src --with-garmintools-libdir=../../garmintools/src/.libs/
 make
-cd ..
+cd ../..
 
 # Install the plugin
-sudo cp GarminPlugin/npGarminPlugin.so /usr/lib/mozilla/plugins
+sudo cp GarminPlugin/src/npGarminPlugin.so /usr/lib/mozilla/plugins
