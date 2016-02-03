@@ -94,4 +94,4 @@ make
 cd ../..
 
 # Install the plugin
-sudo cp GarminPlugin/npGarminPlugin.so /usr/lib/mozilla/plugins
+sudo cp GarminPlugin/src/npGarminPlugin.so /usr/lib/mozilla/plugins
