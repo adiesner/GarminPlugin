@@ -24,6 +24,12 @@ PKG_CHECK_MODULES([ZLIB], [zlib])
 AC_SUBST(ZLIB_CFLAGS)
 AC_SUBST(ZLIB_LIBS)
 
+if pkg-config --exists libusb-1.0; then
+       PKG_CHECK_MODULES([LIBUSB], [libusb-1.0])
+       AC_SUBST(LIBUSB_CFLAGS)
+       AC_SUBST(LIBUSB_LIBS)
+fi
+
 if pkg-config --exists tinyxml; then
 	PKG_CHECK_MODULES([TINYXML], [tinyxml])
 	AC_SUBST(TINYXML_CFLAGS)

@@ -1,0 +1,26 @@
+This package was debianized by Andreas Diesner <garminplugin@andreas-diesner.de> on
+Thu, 15 Apr 2010 17:50:18 +0200.
+
+It was downloaded from http://www.andreas-diesner.de/garminplugin
+
+Upstream Author(s):
+
+    Andreas Diesner <garminplugin@andreas-diesner.de>
+
+Copyright:
+
+    Copyright (C) 2010 Andreas Diesner
+
+License:
+
+    GPL 3 or any later version
+
+The Debian packaging is:
+
+    Copyright (C) 2010 Andreas Diesner <garminplugin@andreas-diesner.de>
+
+and is licensed under the GPL version 3,
+see `/usr/share/common-licenses/GPL-3'.
+
+# Please also look if there are files or directories which have a
+# different copyright/license attached and list them here.
