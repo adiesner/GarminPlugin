@@ -1,0 +1,348 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+  
+  <title>
+    configuration    [Linux Garmin Communicator Plugin]
+  </title>
+
+  <meta name="generator" content="DokuWiki">
+<meta name="robots" content="index,follow">
+<meta name="date" content="2017-08-13T18:45:35+0000">
+<meta name="keywords" content="configuration">
+<link rel="canonical" href="configuration.html">
+
+
+
+
+
+
+  <link rel="shortcut icon" href="favicon.ico">
+
+  
+	
+	
+
+
+
+
+<link media="all" href="index.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="header">
+<!--      <div class="pagename">
+        [[<a href="configuration.html&amp;do=backlink" >configuration</a>]]
+      </div> -->
+      <div class="logo">
+        <a href="index.html" name="dokuwiki__top" id="dokuwiki__top" accesskey="h" title="[ALT+H]">Linux Garmin Communicator Plugin</a>      </div>
+
+      <div class="clearer"></div>
+    </div>
+    <div class="menu-top">
+    	<!--<div id="tpl_simple_navi">-->
+		    	<!--</div>-->
+    </div>
+
+    
+    
+    
+  </div>
+  
+  
+<div class="sideandpage">
+	
+			<div class="sideleft">
+		<div class="userbarandshadows">
+				<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tbody><tr>
+				<td>
+					<table width="100%" cellspacing="0" cellpadding="0" border="0">
+						<tbody><tr>
+						<td valign="top">
+						  <div class="userbar">
+							<div id="sidebarActionTableId">
+							<table width="100%" cellspacing="0" cellpadding="2" border="0">
+							<tbody><tr><td>
+								<div class="smallpadding">
+								<div id="sidebar">
+								<ul class="primary">
+<li class="level1"><div class="li"> <a href="index.html" class="wikilink1" title="start">GarminPlugin</a></div></li><li class="level1"><div class="li"> <a href="news.html" class="wikilink1" title="news">News</a></div></li><li class="level1"><div class="li"> <a href="devices.html" class="wikilink1" title="devices">Supported Devices</a></div></li><li class="level1"><div class="li"> <a href="installation.html" class="wikilink1" title="installation">Installation</a></div></li><li class="level1"><div class="li"> <a href="development.html" class="wikilink1" title="development">Development</a></div><ul><li class="level2"><div class="li"> <a href="source.html" class="wikilink1" title="source">Source Code</a></div></li><li class="level2"><div class="li"> <a href="history.html" class="wikilink1" title="history">History</a></div></li><li class="level2"><div class="li"> <a href="compiling.html" class="wikilink1" title="compiling">Compiling</a></div></li></ul></li><li class="level1"><div class="li"> <a href="howto_garmin_connect.html" class="wikilink1" title="howto_garmin_connect">Using the Plugin</a> </div><ul><li class="level2"><div class="li"> <a href="configuration.html" class="wikilink1" title="configuration">Configuration</a></div></li><li class="level2"><div class="li"> <a href="faq.html" class="wikilink1" title="faq">FAQ</a></div></li></ul></li><li class="level1"><div class="li"> <a href="donation.html" class="wikilink1" title="donation">Donation</a></div></li></ul><ul><li class="level1"><div class="li"> <a href="fit2tcx.html" class="wikilink1" title="fit2tcx">Fit2Tcx</a></div></li></ul>								</div>
+								</div>
+							</td></tr>
+							</tbody></table>
+							</div>
+						  </div>
+						</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+		</tbody></table><br>
+
+	</div> 
+
+      </div>
+		      <div class="mainright">
+	        <div class="page">
+        	  <!-- wikipage start -->
+	          <!-- TOC START -->
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header" style="cursor: pointer;"><span id="toc__toggle" class="toc_close"><span>−</span></span>Table of Contents</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="level1"><div class="li"><span class="li"><a href="#configuration" class="toc">Configuration</a></span></div>
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#the_configuration_in_detail" class="toc">The configuration in detail</a></span></div>
+<ul class="toc">
+<li class="level3"><div class="li"><span class="li"><a href="#a_new_device" class="toc">A new Device</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#settings" class="toc">Settings</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#debug_settings" class="toc">Debug settings</a></span></div></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<!-- TOC END -->
+
+<h1 class="sectionedit1"><a name="configuration" id="configuration">Configuration</a></h1>
+<div class="level1">
+
+<p>
+The plugin creates a configuration file on it's first run at one of these two places:
+</p>
+<pre class="code">~/.config/garminplugin/garminplugin.xml
+~/.garminplugin.xml</pre>
+
+<p>
+Initially created configuration file:
+</p>
+<pre class="code">&lt;?xml version="1.0" encoding="UTF-8" standalone="no" ?&gt;
+&lt;GarminPlugin logfile="" level="ERROR"&gt;
+    &lt;Devices&gt;
+        &lt;Device&gt;
+            &lt;Name&gt;Home /home/username&lt;/Name&gt;
+            &lt;StoragePath&gt;/home/username&lt;/StoragePath&gt;
+            &lt;StorageCommand&gt;&lt;/StorageCommand&gt;
+            &lt;FitnessDataPath&gt;&lt;/FitnessDataPath&gt;
+        &lt;/Device&gt;
+    &lt;/Devices&gt;
+    &lt;Settings&gt;
+        &lt;ScanMounted enabled="true" /&gt;
+        &lt;ForerunnerTools enabled="true" /&gt;
+        &lt;BackupWorkouts enabled="false" path="/home/user/Dropbox/Workouts/[YEAR]/[MONTH]/"/&gt;
+    &lt;/Settings&gt;
+&lt;/GarminPlugin&gt;</pre>
+
+<p>
+The initially created configuration file lets the plugin show your home directory as a Garmin device. 
+</p>
+
+</div>
+
+<h2 class="sectionedit2"><a name="the_configuration_in_detail" id="the_configuration_in_detail">The configuration in detail</a></h2>
+<div class="level2">
+
+<p>
+Garmin Devices that are accessible over the file system and that have the following file will be automatically detected (so no need to configure them).
+</p>
+<pre class="code">Garmin/GarminDevice.xml</pre>
+
+<p>
+Devices that are not automatically detected need to be added to the configuration. You can configure several devices by simply adding another &lt;Device&gt;…&lt;/Device&gt; block. A device will only be visible for the website that uses the plugin if the configured StoragePath exists.
+</p>
+
+</div>
+
+<h3 class="sectionedit3"><a name="a_new_device" id="a_new_device">A new Device</a></h3>
+<div class="level3">
+
+<p>
+Configuring a new device is simple. Simply add a new &lt;Device&gt;…&lt;/Device&gt; section to your configuration file.
+</p>
+<pre class="code">        &lt;Device&gt;
+            &lt;Name&gt;My eTrex&lt;/Name&gt;
+            &lt;StoragePath&gt;/tmp&lt;/StoragePath&gt;
+            &lt;StorageCommand&gt;gpsbabel -i gpx -f %1 -o garmin -F usb:&lt;/StorageCommand&gt;
+            &lt;FitnessDataPath&gt;&lt;/FitnessDataPath&gt;
+        &lt;/Device&gt;</pre>
+<ul>
+<li class="level1"><div class="li"> &lt;Name&gt;…&lt;/Name&gt;: This name will be displayed on the website for your device. </div>
+</li>
+<li class="level1"><div class="li"> &lt;StoragePath&gt;…&lt;/StoragePath&gt;: This directory will be used to store gpx files that you send to your device. If you need gpsbabel to send gpx files to your device set it to /tmp. If you are able to access the device over the file system, set it to the path where your device accepts gpx files</div>
+</li>
+<li class="level1"><div class="li"> &lt;StorageCommand&gt;…&lt;/StorageCommand&gt;: If you need to execute a command after the transfer of the gpx file to the &lt;StoragePath&gt; you can specify this command here. %1 will be replaced by the filename. </div>
+</li>
+<li class="level1"><div class="li"> &lt;FitnessDataPath&gt;…&lt;/FitnessDataPath&gt;: For future use…</div>
+</li>
+</ul>
+
+<p>
+The above configuration will store gpx files in the /tmp directory and then execute gpsbabel to transfer the file to your device.
+</p>
+
+</div>
+
+<h3 class="sectionedit4"><a name="settings" id="settings">Settings</a></h3>
+<div class="level3">
+
+</div>
+
+<h4><a name="backupworkouts" id="backupworkouts">BackupWorkouts</a></h4>
+<div class="level4">
+
+<p>
+It is possible to create a backup copy of every workout that you choose to upload to a website. Each time you hit upload, the plugin will automatically save the raw file that has been imported from the device to a directory that you specified. 
+To enable this feature use this configuration setting:
+</p>
+<pre class="code">    &lt;Settings&gt;
+        &lt;BackupWorkouts enabled="true" path="~/Dropbox/Workouts/[YEAR]/[MONTH]/" /&gt;
+    &lt;/Settings&gt;</pre>
+
+<p>
+In path you can use the following placeholders:
+</p>
+<ul>
+<li class="level1"><div class="li"> ~       - Replaced by your home path (eg. /home/andreas) (only first char)</div>
+</li>
+<li class="level1"><div class="li"> [YEAR]  - Replaced by the year of your workout (eg. 2013)</div>
+</li>
+<li class="level1"><div class="li"> [MONTH] - Replaced by the month of your workout (eg. 12)</div>
+</li>
+<li class="level1"><div class="li"> [DAY]   - Replaced by the day of your workout (eg. 31)</div>
+</li>
+<li class="level1"><div class="li"> [TYPE]  - Replaced by FIT or TCX, depending on file type</div>
+</li>
+</ul>
+
+<p>
+Needs plugin version 0.3.17
+</p>
+
+</div>
+
+<h4><a name="forerunnertools" id="forerunnertools">ForerunnerTools</a></h4>
+<div class="level4">
+
+<p>
+The plugin automatically searches for Edge305/Forerunner305 devices using <a href="http://code.google.com/p/garmintools/" class="urlextern" title="http://code.google.com/p/garmintools/" rel="nofollow">garmintools</a>. This search confuses some garmin devices so much that they switch themselves off during the next gpsbabel transfer. If you don't own an Edge305/Forerunner305 you can disable this search by setting enabled to false. 
+</p>
+<pre class="code">    &lt;Settings&gt;
+        &lt;ForerunnerTools enabled="false" /&gt;
+    &lt;/Settings&gt;</pre>
+
+</div>
+
+<h4><a name="disable_local_scan" id="disable_local_scan">Disable local scan</a></h4>
+<div class="level4">
+
+<p>
+The plugin automatically searches through all your mounts for any file based garmin device. When using only a virtual device you might want to disable this scan by setting enabled to false.
+</p>
+<pre class="code">    &lt;Settings&gt;
+        &lt;ScanMounted enabled="false" /&gt;
+    &lt;/Settings&gt;</pre>
+
+<p>
+Needs plugin version 0.3.20
+</p>
+
+</div>
+
+<h3 class="sectionedit5"><a name="debug_settings" id="debug_settings">Debug settings</a></h3>
+<div class="level3">
+
+<p>
+The plugin supports writting a file that contains debugging information. You can enable this by changing the following line in the configuration:
+</p>
+<pre class="code">   &lt;GarminPlugin logfile="/tmp/garminplugin.log" level="DEBUG"&gt;</pre>
+
+<p>
+If you want to enable logging set logfile to /tmp/garminplugin.log (or any other file). Level can be either DEBUG, INFO or ERROR. While Debug shows the most. If you set the level to DEBUG, the plugin will store all generated tcx and gpx files in the directory /tmp for further analysis (Format: &lt;timestamp&gt;.TcdXml or &lt;timestamp&gt;.GpsXml)
+</p>
+
+</div>
+
+	          <!-- wikipage stop -->
+        	</div>
+	     </div>
+	 
+      <div class="clearer">&nbsp;</div>
+</div>
+
+ 
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <div class="doc">
+        configuration.txt · Last modified: 2017/08/13 18:45 (external edit) &nbsp;
+		<span class="doclink">
+			&nbsp;
+	        <a href="#dokuwiki__top" class="action top" accesskey="x" rel="nofollow" title="Back to top [X]">Back to top</a>		</span>
+      </div>
+    </div>
+
+   
+    <div class="bar" id="bar__bottom">
+       <div class="footerinc">
+  
+
+  <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/" rel="license" title="Creative Commons License"><img src="button-cc.gif" alt="Creative Commons License" width="80" height="15"></a>
+  <a href="https://www.paypal.com/xclick/business=andreas.diesner%40gmx.de" title="Donate"><img src="button-donate.gif" alt="Donate" width="80" height="15"></a>
+<a href="http://flattr.com/thing/127221/Garmin-Communicator-Plugin-for-Linux" target="_top">
+<img src="flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+<a href="https://www.google.com/+AndreasDiesner?rel=author"><img src="icon-google-plus.png" alt="Google+" width="20" height="20"></a>
+<a href="https://scan.coverity.com/projects/1843">
+  <img alt="Coverity Scan Build Status" src="badge.svg">
+</a>
+
+<!--
+
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="">
+   <dc:type rdf:resource="http://purl.org/dc/dcmitype/Text" />
+   <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.0/" />
+</Work>
+
+<License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.0/">
+   <permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+   <permits rdf:resource="http://web.resource.org/cc/Distribution" />
+   <requires rdf:resource="http://web.resource.org/cc/Notice" />
+   <requires rdf:resource="http://web.resource.org/cc/Attribution" />
+   <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse" />
+   <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+   <requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+</License>
+
+</rdf:RDF>
+
+-->
+
+
+</div>
+<!-- Piwik --> 
+
+<!-- End Piwik Tracking Code -->
+       <img style="float: right;" class="footer_border" src="footer_image_right.png" alt=""> 
+     <div class="clearer"></div>
+    </div>
+    
+  </div>
+
+</div>
+
+<div class="no"><img src="indexer.php" alt="" width="2" height="1"></div>
+
+
+<div style="display: none; z-index: 1000; outline: 0px none;" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable" tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-media__popup_content"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-media__popup_content">Link settings</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="media__popup_content" class="ui-dialog-content ui-widget-content"><p id="media__link"><label>Link target</label><button class="button" id="media__linkbtn1" title="Link to detail page"><img src="media_link_lnk.png"></button><button class="button" id="media__linkbtn2" title="Direct link to original"><img src="media_link_direct.png"></button><button class="button" id="media__linkbtn3" title="No link"><img src="media_link_nolnk.png"></button><button class="button" id="media__linkbtn4" title="Show only the link."><img src="media_link_displaylnk.png"></button></p><p id="media__align"><label>Alignment</label><button class="button" id="media__alignbtn1" title="Use no align."><img src="media_align_noalign.png"></button><button class="button" id="media__alignbtn2" title="Align the image on the left."><img src="media_align_left.png"></button><button class="button" id="media__alignbtn3" title="Align the image in the middle."><img src="media_align_center.png"></button><button class="button" id="media__alignbtn4" title="Align the image on the right."><img src="media_align_right.png"></button></p><p id="media__size"><label>Image size</label><button class="button" id="media__sizebtn1" title="Small version"><img src="media_size_small.png"></button><button class="button" id="media__sizebtn2" title="Medium version"><img src="media_size_medium.png"></button><button class="button" id="media__sizebtn3" title="Large version"><img src="media_size_large.png"></button><button class="button" id="media__sizebtn4" title="Original version"><img src="media_size_original.png"></button></p><p><input id="media__sendbtn" class="button" value="Insert" type="button"></p></div></div></body>
+</html>

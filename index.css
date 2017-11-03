@@ -1,0 +1,179 @@
+/* ::::: https://www.andreas-diesner.de/garminplugin/lib/exe/css.php?t=newday&tseed=1502687443 ::::: */
+
+.mediafile { background: transparent url('file.png') no-repeat scroll 0px 1px; padding-left: 18px; padding-bottom: 1px; }
+.mf_xml { background-image: url('xml.png'); }
+.JSpopup, #link__wiz { position: absolute; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); z-index: 20; overflow: hidden; }
+#media__popup_content button.button { border: 1px outset; }
+.code .re0 { color: rgb(0, 0, 255); }
+.code .re1 { color: rgb(0, 0, 255); }
+.code .re2 { color: rgb(0, 0, 255); }
+.code .st0 { color: rgb(255, 0, 0); }
+.ui-helper-clearfix::after { content: "."; display: block; height: 0px; clear: both; visibility: hidden; }
+.ui-helper-clearfix { display: inline-block; }
+.ui-helper-clearfix { display: block; }
+.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
+.ui-widget { font-size: 1.1em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size: 1em; }
+.ui-widget-content { border: 1px solid rgb(170, 170, 170); background: rgb(255, 255, 255) url('ui-bg_flat_75_ffffff_40x100.png') repeat-x scroll 50% 50%; color: rgb(34, 34, 34); }
+.ui-widget-content a { color: rgb(34, 34, 34); }
+.ui-widget-header { border: 1px solid rgb(170, 170, 170); background: rgb(204, 204, 204) url('ui-bg_highlight-soft_75_cccccc_1x100.png') repeat-x scroll 50% 50%; color: rgb(34, 34, 34); font-weight: bold; }
+.ui-widget-header a { color: rgb(34, 34, 34); }
+.ui-widget :active { outline: medium none; }
+.ui-icon { width: 16px; height: 16px; background-image: url('ui-icons_222222_256x240.png'); }
+.ui-widget-content .ui-icon { background-image: url('ui-icons_222222_256x240.png'); }
+.ui-widget-header .ui-icon { background-image: url('ui-icons_222222_256x240.png'); }
+.ui-icon-closethick { background-position: -96px -128px; }
+.ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl { border-top-left-radius: 4px; }
+.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr { border-top-right-radius: 4px; }
+.ui-corner-all, .ui-corner-bottom, .ui-corner-left, .ui-corner-bl { border-bottom-left-radius: 4px; }
+.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br { border-bottom-right-radius: 4px; }
+button.ui-button::-moz-focus-inner { border: 0px none; padding: 0px; }
+.ui-dialog { position: absolute; padding: 0.2em; width: 300px; overflow: hidden; }
+.ui-dialog .ui-dialog-titlebar { padding: 0.4em 1em; position: relative; }
+.ui-dialog .ui-dialog-title { float: left; margin: 0.1em 16px 0.1em 0px; }
+.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: 0.3em; top: 50%; width: 19px; margin: -10px 0px 0px; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0px; }
+.ui-dialog .ui-dialog-content { position: relative; border: 0px none; padding: 0.5em 1em; background: rgba(0, 0, 0, 0) none repeat scroll 0% 0%; overflow: auto; }
+.ui-draggable .ui-dialog-titlebar { cursor: move; }
+div.dokuwiki .header { margin-top: 5px; background-image: url('wijkwiki_header_gradient.png'); background-repeat: repeat-x; height: 90px; overflow: hidden; }
+div.dokuwiki div.header div.logo { background-image: url('wijkwikiheader.png'); background-repeat: no-repeat; background-position: right top; height: 90px; overflow: hidden; font-size: 220%; font-weight: bolder; text-align: right; vertical-align: middle; }
+div.dokuwiki a#dokuwiki__top { float: left; margin-top: 20px; margin-left: 20px; font-family: helvetica; font-size: 36px; }
+div.dokuwiki .logo a:link, div.dokuwiki .logo a:visited, div.dokuwiki .logo a:hover, div.dokuwiki .logo a:active { color: rgb(67, 105, 118); text-decoration: none; font-variant: small-caps; letter-spacing: 2pt; }
+div.dokuwiki div.page { text-align: justify; padding: 5px 15px 30px; margin-left: 20px; background-image: url('page_background_line.png'); background-repeat: no-repeat; background-position: 100% 0%; border-bottom: 1px solid rgb(212, 212, 212); }
+div.dokuwiki div.userbarandshadows { margin-top: 4px; }
+div.dokuwiki div.userbar { background: rgba(0, 0, 0, 0) url('sidebar_background.png') no-repeat scroll 0% 0%; padding-bottom: 15px; padding-top: 4px; font-size: 80%; }
+div.dokuwiki div#sidebarActionTableId, div.dokuwiki div#pageActionTableId, div.dokuwiki div#wikiActionTableId, div.dokuwiki div#userActionTableId, div.dokuwiki div#submitActionTableId { margin-left: 30px; padding-top: 4px; }
+div.dokuwiki div#pageActionTableId { margin-top: 15px; }
+div.dokuwiki div.sideleft { margin-top: 4px; float: left; clear: left; width: 18%; }
+div.dokuwiki div.mainright { background: rgba(0, 0, 0, 0) url('page_shadow_background.png') no-repeat scroll 0px 0px; margin-top: 4px; float: right; clear: right; width: 75%; }
+div.dokuwiki div.searchbarandshadows table, div.dokuwiki div.userbarandshadows table, div.dokuwiki div.sidebarandshadows table { margin: 0px; padding: 0px; }
+div.dokuwiki .bar { background-color: rgb(222, 231, 236); background-image: url('footer_gradient.png'); margin-top: 2px; width: 100%; font-size: 80%; clear: both; overflow: hidden; height: 44px; }
+div.dokuwiki img.footer_border { float: right; margin-top: -34px; }
+div.dokuwiki #bar__bottom { margin-bottom: 3px; }
+div.dokuwiki div.meta { clear: both; margin-top: 1em; color: rgb(99, 140, 156); font-size: 70%; }
+div.dokuwiki div.meta div.user { float: left; margin-left: 20px; }
+div.dokuwiki div.meta div.doc { text-align: right; }
+* { padding: 0px; margin: 0px; }
+body { font: 80% "Lucida Grande",Verdana,Lucida,Helvetica,Arial,sans-serif; background-color: rgb(255, 255, 255); color: rgb(0, 0, 0); background-image: url('gradient_background.png'); background-repeat: repeat-x; background-position: 0% 0%; }
+div.dokuwiki { width: 92%; margin-left: auto; margin-right: auto; }
+div.dokuwiki table { font-size: 100%; }
+div.dokuwiki tr, div.dokuwiki td, div.dokuwiki th {  }
+div.dokuwiki img { border: 0px none; }
+div.dokuwiki p, div.dokuwiki blockquote, div.dokuwiki table, div.dokuwiki pre { margin: 0px 0px 1em; }
+div.dokuwiki hr { border-width: 1px 0px 0px; border-style: solid none none; border-color: rgb(212, 212, 212) currentcolor currentcolor; -moz-border-top-colors: none; -moz-border-right-colors: none; -moz-border-bottom-colors: none; -moz-border-left-colors: none; border-image: none; text-align: center; height: 0px; }
+div#sidebarActionTableId { margin-right: 30px; }
+div.smallpadding { margin: 5px 0px 10px 2px; }
+a.recent { padding: 10px 1px 10px 30px; background: transparent url('recent.png') no-repeat scroll left center; font-variant: small-caps; }
+a.index { padding: 10px 1px 10px 30px; background: transparent url('index_001.png') no-repeat scroll left center; font-variant: small-caps; }
+a.login, a.logout { padding: 10px 1px 10px 30px; background: transparent url('login.png') no-repeat scroll left center; font-variant: small-caps; }
+a.top { padding: 10px 24px 10px 1px; background-position: right center; font-variant: small-caps; }
+div.dokuwiki .leftalign { text-align: left; }
+div.dokuwiki form { border: medium none; display: inline; }
+input.edit { width: 40%; }
+div.dokuwiki input.edit, div.dokuwiki select.edit { font-size: 100%; border: 1px solid rgb(212, 212, 212); color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); vertical-align: middle; margin: 1px; padding: 0.2em 0.3em; display: inline; }
+html > body div.dokuwiki input.edit, html > body div.dokuwiki select.edit { background: rgb(255, 255, 255) url('inputshadow.png') repeat-x scroll center top; }
+div.dokuwiki input.button, div.dokuwiki button.button { border: 1px solid rgb(212, 212, 212); color: rgb(0, 0, 0); background-color: rgb(255, 255, 255); vertical-align: middle; text-decoration: none; font-size: 100%; cursor: pointer; margin: 1px; padding: 0.125em 0.4em; }
+html > body div.dokuwiki input.button, html > body div.dokuwiki button.button { background: rgb(255, 255, 255) url('buttonshadow.png') repeat-x scroll center bottom; }
+div.dokuwiki input.button:hover, button.button:hover { border: 1px solid rgb(212, 212, 212); background-color: rgb(222, 231, 236); }
+div.dokuwiki a:link, div.dokuwiki a:visited { color: rgb(67, 105, 118); text-decoration: underline; }
+div.dokuwiki a:hover, div.dokuwiki a:active { color: rgb(99, 184, 212); text-decoration: underline; }
+div.dokuwiki h1 a, div.dokuwiki h2 a, div.dokuwiki h3 a, div.dokuwiki h4 a, div.dokuwiki h5 a, div.dokuwiki h1 a:hover, div.dokuwiki h2 a:hover, div.dokuwiki h3 a:hover, div.dokuwiki h4 a:hover, div.dokuwiki h5 a:hover { color: rgb(0, 0, 0); text-decoration: none; }
+div.dokuwiki a.urlextern { background: transparent url('link_icon.gif') no-repeat scroll 0px 1px; padding: 1px 0px 1px 16px; color: rgb(67, 105, 118); text-decoration: underline; }
+div.dokuwiki a.urlextern:visited { color: rgb(67, 105, 118); }
+div.dokuwiki a.urlextern:hover { color: rgb(99, 184, 212); text-decoration: underline; }
+div.dokuwiki a.media { color: rgb(67, 105, 118); text-decoration: underline; }
+div.dokuwiki a.media:hover { color: rgb(99, 184, 212); text-decoration: underline; }
+div.dokuwiki a.mail { background: transparent url('mail_icon.gif') no-repeat scroll 0px 1px; padding: 1px 0px 1px 16px; color: rgb(67, 105, 118); text-decoration: underline; }
+div.dokuwiki a.mail:hover { color: rgb(99, 184, 212); text-decoration: underline; }
+div.dokuwiki a.wikilink1:link { color: rgb(67, 105, 118); text-decoration: underline; }
+div.dokuwiki a.wikilink1:visited { color: rgb(67, 105, 118); text-decoration: underline; }
+div.dokuwiki a.wikilink1:hover { color: rgb(99, 184, 212); text-decoration: underline; }
+div.dokuwiki div.breadcrumbs { color: rgb(102, 102, 102); font-size: 80%; padding: 10px 0px 10px 4px; vertical-align: middle; background-repeat: repeat-x; height: 17px; }
+div.dokuwiki img.media { margin: 3px; }
+div.dokuwiki img.middle { vertical-align: middle; }
+div.dokuwiki acronym { cursor: help; border-bottom: 1px dotted rgb(0, 0, 0); }
+div.dokuwiki h1, div.dokuwiki h2, div.dokuwiki h3, div.dokuwiki h4, div.dokuwiki h5 { color: rgb(0, 0, 0); background-color: transparent; font-family: "Lucida Grande",Verdana,Lucida,Helvetica,Arial,sans-serif; font-size: 100%; font-weight: normal; margin: 0px 0px 1em; padding: 0.5em 0px 0px; border-bottom: 1px solid rgb(212, 212, 212); clear: left; }
+div.dokuwiki h1 { font-size: 160%; margin-left: 0px; font-weight: bold; }
+div.dokuwiki h2 { font-size: 150%; margin-left: 3px; border-bottom: 1px dotted rgb(212, 212, 212); }
+div.dokuwiki h3 { font-size: 140%; margin-left: 6px; border-bottom: 1px dotted rgb(212, 212, 212); font-weight: bold; }
+div.dokuwiki h4 { font-size: 120%; margin-left: 9px; border-bottom: medium none; font-weight: bold; }
+div.dokuwiki div.level1 { margin-left: 3px; }
+div.dokuwiki div.level2 { margin-left: 6px; }
+div.dokuwiki div.level3 { margin-left: 9px; }
+div.dokuwiki div.level4 { margin-left: 12px; }
+div.dokuwiki ul { line-height: 1.5em; list-style-type: square; list-style-image: none; margin: 0px 0px 0.5em 1.5em; color: rgb(99, 140, 156); }
+div.dokuwiki .li { color: rgb(0, 0, 0); font-weight: normal; }
+div.dokuwiki pre { font-size: 120%; padding: 0.5em; border: 1px dashed rgb(140, 172, 187); color: rgb(0, 0, 0); overflow: auto; }
+div.dokuwiki pre.code { background-color: rgb(238, 243, 248); }
+div.dokuwiki pre.file { font-size: 120%; padding: 0.5em; border: 1px dotted rgb(140, 172, 187); color: black; background-color: rgb(222, 231, 236); overflow: auto; }
+.curid { font-weight: bold; }
+div.dokuwiki table.inline { border-style: none; background-color: rgb(255, 255, 255); }
+div.dokuwiki table.inline th { padding: 3px; border: 1px solid rgb(212, 212, 212); background-color: rgb(222, 231, 236); }
+div.dokuwiki table.inline td { padding: 3px; border: 1px solid rgb(212, 212, 212); }
+div.dokuwiki div.toc { background: rgba(0, 0, 0, 0) url('sidebar_background.png') repeat scroll 0% 0%; margin: 1.2em 0px 0px 2em; float: right; width: 200px; font-size: 80%; clear: both; }
+div.dokuwiki div.tocheader { text-align: left; font-weight: bold; padding: 3px; margin-bottom: 2px; margin-left: 15px; }
+div.dokuwiki #toc__inside { text-align: left; padding: 0.5em 0px 0.7em; margin-left: 5px; }
+div.dokuwiki ul.toc { list-style-type: none; list-style-image: none; line-height: 1.2em; padding-left: 1em; margin: 0px; }
+div.dokuwiki ul.toc li { background: transparent url('tocdot2.gif') no-repeat scroll 0px 0.6em; padding-left: 0.4em; }
+div.dokuwiki a.toc:link, div.dokuwiki a.toc:visited { color: rgb(0, 0, 0); text-decoration: none; }
+div.dokuwiki a.toc:hover, div.dokuwiki a.toc:active { color: rgb(0, 0, 0); text-decoration: underline; }
+div.dokuwiki div.footnotes { clear: both; border-top: 1px solid rgb(212, 212, 212); padding-left: 1em; margin-top: 1em; }
+div.dokuwiki div.fn { font-size: 90%; }
+div.dokuwiki a.fn_top { vertical-align: super; font-size: 80%; }
+div.dokuwiki a.fn_bot { vertical-align: super; font-size: 80%; font-weight: bold; }
+div.footerinc { margin-top: 18px; text-align: center; }
+.footerinc a img { opacity: 0.5; border: 0px none; }
+.footerinc a:hover img { opacity: 1; }
+div.dokuwiki div.ajax_qsearch { position: absolute; right: 237px; width: 200px; opacity: 0.9; display: none; font-size: 80%; line-height: 1.2em; border: 1px solid rgb(212, 212, 212); background-color: rgb(247, 249, 250); text-align: left; padding: 4px; }
+#sidebar ul ul, #sidebar ul li:hover ul ul, #sidebar ul ul li:hover ul ul {  }
+#sidebar ul li:hover ul, #sidebar ul ul li:hover ul, #sidebar ul ul ul li:hover ul { display: block; }
+.dokuwiki #sidebar ul.primary { width: 15em; }
+.dokuwiki #sidebar ul { margin: 0px; font-size: 12px; }
+.dokuwiki #sidebar li.level1 { list-style-type: none; display: block; }
+.dokuwiki #sidebar li:hover {  }
+.dokuwiki #sidebar li a { text-decoration: none; display: block; }
+.dokuwiki #sidebar li a:hover { background-color: rgb(175, 210, 230); }
+.dokuwiki #sidebar li.level1 ul { padding-left: 1.5em; }
+.dokuwiki #sidebar ul li.level2, .dokuwiki #sidebar ul li.level3, .dokuwiki #sidebar ul li.level4 { list-style-type: circle; }
+#pageActionTableId a, #wikiActionTableId a, #userActionTableId a, #submitActionTableId a { width: 15em; display: block; }
+#pageActionTableId a:hover, #wikiActionTableId a:hover, #userActionTableId a:hover, #submitActionTableId a:hover { background-color: rgb(175, 210, 230); color: rgb(0, 0, 0); }
+div.smallpadding { margin: 0px; padding: 0px; }
+div.dokuwiki div.menu-top { padding: 5px; height: 35px; text-align: center; background: rgb(255, 255, 255) url('menu_background_gradient.png') repeat-x scroll 0% 0%; }
+/* ::::: https://www.andreas-diesner.de/garminplugin/lib/exe/css.php?s=all&t=newday&tseed=1502687443 ::::: */
+
+.mediafile { background: transparent url('file.png') no-repeat scroll 0px 1px; padding-left: 18px; padding-bottom: 1px; }
+.mf_xml { background-image: url('xml.png'); }
+div.clearer { clear: both; font-size: 0px; line-height: 0; height: 0px; overflow: hidden; }
+.group::before, .group::after { content: ""; display: table; }
+.group::after { clear: both; }
+div.no { display: inline; margin: 0px; padding: 0px; }
+.leftalign { text-align: left; }
+.ui-helper-clearfix::after { content: "."; display: block; height: 0px; clear: both; visibility: hidden; }
+.ui-helper-clearfix { display: inline-block; }
+.ui-helper-clearfix { display: block; }
+.ui-icon { display: block; text-indent: -99999px; overflow: hidden; background-repeat: no-repeat; }
+.ui-widget { font-size: 1.1em; }
+.ui-widget input, .ui-widget select, .ui-widget textarea, .ui-widget button { font-size: 1em; }
+.ui-widget-content { border: 1px solid rgb(170, 170, 170); background: rgb(255, 255, 255) url('ui-bg_flat_75_ffffff_40x100.png') repeat-x scroll 50% 50%; color: rgb(34, 34, 34); }
+.ui-widget-content a { color: rgb(34, 34, 34); }
+.ui-widget-header { border: 1px solid rgb(170, 170, 170); background: rgb(204, 204, 204) url('ui-bg_highlight-soft_75_cccccc_1x100.png') repeat-x scroll 50% 50%; color: rgb(34, 34, 34); font-weight: bold; }
+.ui-widget-header a { color: rgb(34, 34, 34); }
+.ui-widget :active { outline: medium none; }
+.ui-icon { width: 16px; height: 16px; background-image: url('ui-icons_222222_256x240.png'); }
+.ui-widget-content .ui-icon { background-image: url('ui-icons_222222_256x240.png'); }
+.ui-widget-header .ui-icon { background-image: url('ui-icons_222222_256x240.png'); }
+.ui-icon-closethick { background-position: -96px -128px; }
+.ui-corner-all, .ui-corner-top, .ui-corner-left, .ui-corner-tl { border-top-left-radius: 4px; }
+.ui-corner-all, .ui-corner-top, .ui-corner-right, .ui-corner-tr { border-top-right-radius: 4px; }
+.ui-corner-all, .ui-corner-bottom, .ui-corner-left, .ui-corner-bl { border-bottom-left-radius: 4px; }
+.ui-corner-all, .ui-corner-bottom, .ui-corner-right, .ui-corner-br { border-bottom-right-radius: 4px; }
+button.ui-button::-moz-focus-inner { border: 0px none; padding: 0px; }
+.ui-dialog { position: absolute; padding: 0.2em; width: 300px; overflow: hidden; }
+.ui-dialog .ui-dialog-titlebar { padding: 0.4em 1em; position: relative; }
+.ui-dialog .ui-dialog-title { float: left; margin: 0.1em 16px 0.1em 0px; }
+.ui-dialog .ui-dialog-titlebar-close { position: absolute; right: 0.3em; top: 50%; width: 19px; margin: -10px 0px 0px; padding: 1px; height: 18px; }
+.ui-dialog .ui-dialog-titlebar-close span { display: block; margin: 1px; }
+.ui-dialog .ui-dialog-titlebar-close:hover, .ui-dialog .ui-dialog-titlebar-close:focus { padding: 0px; }
+.ui-dialog .ui-dialog-content { position: relative; border: 0px none; padding: 0.5em 1em; background: rgba(0, 0, 0, 0) none repeat scroll 0% 0%; overflow: auto; }
+.ui-draggable .ui-dialog-titlebar { cursor: move; }

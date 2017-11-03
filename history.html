@@ -1,0 +1,492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+  
+  <title>
+    history    [Linux Garmin Communicator Plugin]
+  </title>
+
+  <meta name="generator" content="DokuWiki">
+<meta name="robots" content="index,follow">
+<meta name="date" content="2017-08-13T18:45:35+0000">
+<meta name="keywords" content="history">
+<link rel="canonical" href="history.html">
+
+
+
+
+
+
+  <link rel="shortcut icon" href="favicon.ico">
+
+  
+	
+	
+
+
+
+
+<link media="all" href="index.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="header">
+<!--      <div class="pagename">
+        [[<a href="history.html&amp;do=backlink" >history</a>]]
+      </div> -->
+      <div class="logo">
+        <a href="index.html" name="dokuwiki__top" id="dokuwiki__top" accesskey="h" title="[ALT+H]">Linux Garmin Communicator Plugin</a>      </div>
+
+      <div class="clearer"></div>
+    </div>
+    <div class="menu-top">
+    	<!--<div id="tpl_simple_navi">-->
+		    	<!--</div>-->
+    </div>
+
+    
+    
+    
+  </div>
+  
+  
+<div class="sideandpage">
+	
+			<div class="sideleft">
+		<div class="userbarandshadows">
+				<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tbody><tr>
+				<td>
+					<table width="100%" cellspacing="0" cellpadding="0" border="0">
+						<tbody><tr>
+						<td valign="top">
+						  <div class="userbar">
+							<div id="sidebarActionTableId">
+							<table width="100%" cellspacing="0" cellpadding="2" border="0">
+							<tbody><tr><td>
+								<div class="smallpadding">
+								<div id="sidebar">
+								<ul class="primary">
+<li class="level1"><div class="li"> <a href="index.html" class="wikilink1" title="start">GarminPlugin</a></div></li><li class="level1"><div class="li"> <a href="news.html" class="wikilink1" title="news">News</a></div></li><li class="level1"><div class="li"> <a href="devices.html" class="wikilink1" title="devices">Supported Devices</a></div></li><li class="level1"><div class="li"> <a href="installation.html" class="wikilink1" title="installation">Installation</a></div></li><li class="level1"><div class="li"> <a href="development.html" class="wikilink1" title="development">Development</a></div><ul><li class="level2"><div class="li"> <a href="source.html" class="wikilink1" title="source">Source Code</a></div></li><li class="level2"><div class="li"> <a href="history.html" class="wikilink1" title="history">History</a></div></li><li class="level2"><div class="li"> <a href="compiling.html" class="wikilink1" title="compiling">Compiling</a></div></li></ul></li><li class="level1"><div class="li"> <a href="howto_garmin_connect.html" class="wikilink1" title="howto_garmin_connect">Using the Plugin</a> </div><ul><li class="level2"><div class="li"> <a href="configuration.html" class="wikilink1" title="configuration">Configuration</a></div></li><li class="level2"><div class="li"> <a href="faq.html" class="wikilink1" title="faq">FAQ</a></div></li></ul></li><li class="level1"><div class="li"> <a href="donation.html" class="wikilink1" title="donation">Donation</a></div></li></ul><ul><li class="level1"><div class="li"> <a href="fit2tcx.html" class="wikilink1" title="fit2tcx">Fit2Tcx</a></div></li></ul>								</div>
+								</div>
+							</td></tr>
+							</tbody></table>
+							</div>
+						  </div>
+						</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+		</tbody></table><br>
+
+	</div> 
+
+      </div>
+		      <div class="mainright">
+	        <div class="page">
+        	  <!-- wikipage start -->
+	          
+<h2 class="sectionedit1"><a name="version_history" id="version_history">Version History</a></h2>
+<div class="level2">
+
+<p>
+2013-09-16 - Version 0.3.20
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Fixed broken “FindDevice” function from 0.3.19 (searched forever) </div>
+</li>
+<li class="level1"><div class="li"> Now using a thread to search for devices (needed in future with ANT devices)</div>
+</li>
+<li class="level1"><div class="li"> Feature: Added possibility to disable scanning of local devices</div>
+</li>
+</ul>
+
+<p>
+2013-08-29 - Version 0.3.19 [BROKEN VERSION!]
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Fit2Tcx conversion problem fixed when GPS signal was lost/invalid</div>
+</li>
+</ul>
+
+<p>
+2013-07-05 - Version 0.3.18
+</p>
+<ul>
+<li class="level1"><div class="li"> Added FIT→TCX converter now supporting websites that can not handle FIT files</div>
+</li>
+<li class="level1"><div class="li"> Now supporting new TCX fields (Speed, MaxHeartRate, MaxCadence and AvgSpeed)</div>
+</li>
+</ul>
+
+<p>
+2013-05-07 - Version 0.3.17
+</p>
+<ul>
+<li class="level1"><div class="li"> Added new feature to backup every uploaded file to a local directory</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Now using case insensitive search for configuration file on device</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Calculation of checksum failed after several hundreds of files (too many open files)</div>
+</li>
+</ul>
+
+<p>
+2012-11-16 - Version 0.3.16
+</p>
+<ul>
+<li class="level1"><div class="li"> Updated official garmin communicator plugin version number to 4.0.4 since Garmin changed it</div>
+</li>
+</ul>
+
+<p>
+2012-11-04 - Version 0.3.15
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Fixed bug from 0.3.14, which deleted every downloaded file from the device</div>
+</li>
+<li class="level1"><div class="li"> Increased speed for javascript routine overwriting Garmins browser/<acronym title="Operating System">OS</acronym> detection</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Better filtering of incorrect device names returned by forerunner-tools</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Response to messagebox “Overwrite file” did not always understand a “yes” </div>
+</li>
+</ul>
+
+<p>
+2012-09-12 - Version 0.3.14
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Updating the timezone information file is now possible through garmin update</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Websites can now read directory information containing wildcards (*.gpx)</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Opencaching.com is now supported - uses file reading behavior not described by the <acronym title="Application Programming Interface">API</acronym> </div>
+</li>
+<li class="level1"><div class="li"> Bugfix: buffer overflow because of too small buffer for sprintf</div>
+</li>
+</ul>
+
+<p>
+2012-07-09 - Version 0.3.12
+</p>
+<ul>
+<li class="level1"><div class="li"> Removed dependency to openssl due to licence issues</div>
+</li>
+</ul>
+
+<p>
+2012-07-01 - Version 0.3.11
+</p>
+<ul>
+<li class="level1"><div class="li"> Updated the official Garmin Communicator Plugin Version to 4.0.3.0 (no changes in functionality) </div>
+</li>
+</ul>
+
+<p>
+2012-01-27 - Version 0.3.9
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Downloading more than one <acronym title="Uniform Resource Locator">URL</acronym> to the device failed. (eg. Updating Training Zones on Edge500)</div>
+</li>
+</ul>
+
+<p>
+2012-01-23 - Version 0.3.8
+</p>
+<ul>
+<li class="level1"><div class="li"> Updated the official Garmin Communicator Plugin Version to 4.0.1 (no changes in functionality) </div>
+</li>
+</ul>
+
+<p>
+2012-01-18 - Version 0.3.7
+</p>
+<ul>
+<li class="level1"><div class="li"> Feature: Websites are now allowed to write files to the update directory of file based devices (which means you can perform an update)</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Some people reported problems with incorrect upper/lowercase directory names in GarminDevice.xml. This will now be automatically corrected.</div>
+</li>
+</ul>
+
+<p>
+2011-11-21 - Version 0.3.6
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Fast opening and closing the plugin often crashed the plugin</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Tcx Files with extensions caused problems while uploading</div>
+</li>
+</ul>
+
+<p>
+2011-11-04 - Version 0.3.5
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Empty workouts when requesting a valid workout should no longer happen</div>
+</li>
+</ul>
+
+<p>
+2011-08-30 - Version 0.3.4
+</p>
+<ul>
+<li class="level1"><div class="li"> Feature: Added support for Forerunner 301</div>
+</li>
+<li class="level1"><div class="li"> Info: Updated plugin version number to 3.0.1.0 - added new function ParentDevice()</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: First time using the plugin often caused problems because of the “New configuration created message” - the message was removed</div>
+</li>
+</ul>
+
+<p>
+2011-06-28 - Version 0.3.3
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Some <a href="http://my.garmin.com/locate/savePOI.htm" class="urlextern" title="http://my.garmin.com/locate/savePOI.htm" rel="nofollow">sites</a> do not provide a file extension when saving a file to the device. Now the file type will be guessed and a proper extension added.</div>
+</li>
+</ul>
+
+<p>
+2011-06-21 - Version 0.3.2
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: When uploading a single TCX file, the GPS points were unintentionally stripped from the upload</div>
+</li>
+</ul>
+
+<p>
+2011-05-09 - Version 0.3.1
+</p>
+<ul>
+<li class="level1"><div class="li"> Added plugin functionality DirectoryListing</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Canceling not running jobs is now working without javascript error (needed by write heart rate on connect.garmin.com)</div>
+</li>
+</ul>
+
+<p>
+2011-03-27 - Version 0.3.0
+</p>
+<ul>
+<li class="level1"><div class="li"> All filebased Garmin Devices should now be supported (with file GarminDevice.xml)</div>
+</li>
+<li class="level1"><div class="li"> Reading of TcxProfile, Crs, CrsDir and Workout at filebased devices is now possible</div>
+</li>
+<li class="level1"><div class="li"> Added progress bar change</div>
+</li>
+<li class="level1"><div class="li"> Added new function ReadableFileListing</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Sorting of fit file output</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Now setting udev rule to access Edge305/Forerunner305 </div>
+</li>
+</ul>
+
+<p>
+2011-01-05 - Version 0.2.8
+</p>
+<ul>
+<li class="level1"><div class="li"> Added support for Edge 500</div>
+</li>
+<li class="level1"><div class="li"> Update version number of garmin plugin from 2.9.2 to 2.9.3</div>
+</li>
+</ul>
+
+<p>
+2011-01-03 - Version 0.2.7
+</p>
+<ul>
+<li class="level1"><div class="li"> Added support for Edge 800</div>
+</li>
+<li class="level1"><div class="li"> Manipulation of Garmin Javascript to disable browser check (no more User Agent setting necessary)</div>
+</li>
+<li class="level1"><div class="li"> Removed dependency to libboost (Better portability)</div>
+</li>
+<li class="level1"><div class="li"> Now working with Chrome</div>
+</li>
+</ul>
+
+<p>
+2010-10-16 - Version 0.2.6
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Edge305/Forerunner305 reported long/lat with only 4 positions after decimal point (which is not enough)</div>
+</li>
+</ul>
+
+<p>
+2010-10-04 - Version 0.2.5
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Edge305/Forerunner305 reported multiple laps in one lap</div>
+</li>
+</ul>
+
+<p>
+2010-09-29 - Version 0.2.4
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix: Edge305/Forerunner305 did not provide the complete route when (auto)pause function was used</div>
+</li>
+</ul>
+
+<p>
+2010-09-26 - Version 0.2.3
+</p>
+<ul>
+<li class="level1"><div class="li"> Added support for Oregon/Dakota to read FitnessData from Device</div>
+</li>
+<li class="level1"><div class="li"> Added support for gpsies.com (only Oregon/Dakota/Edge705/Edge305/Forerunner305)</div>
+</li>
+<li class="level1"><div class="li"> Bugfix: Sometimes the compressed fitness data was corrupted</div>
+</li>
+<li class="level1"><div class="li"> Added support for runningahead.com</div>
+</li>
+</ul>
+
+<p>
+2010-06-27 - Version 0.2.2
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix for Forerunner 305 used with a footpod. Used to report bike cadence, now reports run cadence</div>
+</li>
+<li class="level1"><div class="li"> Update version number of garmin plugin from 2.9.1 to 2.9.2</div>
+</li>
+</ul>
+
+<p>
+2010-05-30 - Version 0.2.1
+</p>
+<ul>
+<li class="level1"><div class="li"> Bugfix for devices like GPSmap 60CSx which turn itself of after a device scan using garmintools (device scan can now be switched of in the xml configuration)</div>
+</li>
+</ul>
+
+<p>
+2010-04-20 - Version 0.2.0
+</p>
+<ul>
+<li class="level1"><div class="li"> Created repository in Launchpad PPA</div>
+</li>
+<li class="level1"><div class="li"> Support for Hardy (8.04) to Lucid (10.04)</div>
+</li>
+<li class="level1"><div class="li"> Bugfix for Vista HCx which crashed browser on autodetect of Garmin Edge 305</div>
+</li>
+<li class="level1"><div class="li"> Bugfix for Forerunner 205 - read fitness data did not work</div>
+</li>
+<li class="level1"><div class="li"> Added support for connect.garmin.com</div>
+</li>
+</ul>
+
+<p>
+2010-03-25 - Version 0.2beta
+</p>
+<ul>
+<li class="level1"><div class="li"> Autodetect devices like Oregon 300, Edge 705, Edge 305</div>
+</li>
+<li class="level1"><div class="li"> Added garmintools to communicate with Edge 305 / Forerunner 305</div>
+</li>
+<li class="level1"><div class="li"> Read FitnessData of Edge 705, Edge 305</div>
+</li>
+<li class="level1"><div class="li"> Upload FitnessData to pages like <a href="http://www.cyclogz.com/" class="urlextern" title="http://www.cyclogz.com" rel="nofollow">www.cyclogz.com</a></div>
+</li>
+</ul>
+
+<p>
+2010-01-31 - Version 0.1
+</p>
+<ul>
+<li class="level1"><div class="li"> Send GPX to filesystem (tested on <a href="http://www.geocaching.com/" class="urlextern" title="http://www.geocaching.com" rel="nofollow">www.geocaching.com</a>)</div>
+</li>
+<li class="level1"><div class="li"> Configure several devices using a xml configuration file</div>
+</li>
+<li class="level1"><div class="li"> Execute a command after successfully storing a gpx file (like gpsbabel)</div>
+</li>
+</ul>
+
+</div>
+
+	          <!-- wikipage stop -->
+        	</div>
+	     </div>
+	 
+      <div class="clearer">&nbsp;</div>
+</div>
+
+ 
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <div class="doc">
+        history.txt · Last modified: 2017/08/13 18:45 (external edit) &nbsp;
+		<span class="doclink">
+			&nbsp;
+	        <a href="#dokuwiki__top" class="action top" accesskey="x" rel="nofollow" title="Back to top [X]">Back to top</a>		</span>
+      </div>
+    </div>
+
+   
+    <div class="bar" id="bar__bottom">
+       <div class="footerinc">
+  
+
+  <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/" rel="license" title="Creative Commons License"><img src="button-cc.gif" alt="Creative Commons License" width="80" height="15"></a>
+  <a href="https://www.paypal.com/xclick/business=andreas.diesner%40gmx.de" title="Donate"><img src="button-donate.gif" alt="Donate" width="80" height="15"></a>
+<a href="http://flattr.com/thing/127221/Garmin-Communicator-Plugin-for-Linux" target="_top">
+<img src="flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+<a href="https://www.google.com/+AndreasDiesner?rel=author"><img src="icon-google-plus.png" alt="Google+" width="20" height="20"></a>
+<a href="https://scan.coverity.com/projects/1843">
+  <img alt="Coverity Scan Build Status" src="badge.svg">
+</a>
+
+<!--
+
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="">
+   <dc:type rdf:resource="http://purl.org/dc/dcmitype/Text" />
+   <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.0/" />
+</Work>
+
+<License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.0/">
+   <permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+   <permits rdf:resource="http://web.resource.org/cc/Distribution" />
+   <requires rdf:resource="http://web.resource.org/cc/Notice" />
+   <requires rdf:resource="http://web.resource.org/cc/Attribution" />
+   <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse" />
+   <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+   <requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+</License>
+
+</rdf:RDF>
+
+-->
+
+
+</div>
+<!-- Piwik --> 
+
+<!-- End Piwik Tracking Code -->
+       <img style="float: right;" class="footer_border" src="footer_image_right.png" alt=""> 
+     <div class="clearer"></div>
+    </div>
+    
+  </div>
+
+</div>
+
+<div class="no"><img src="indexer.php" alt="" width="2" height="1"></div>
+
+
+<div style="display: none; z-index: 1000; outline: 0px none;" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable" tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-media__popup_content"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-media__popup_content">Link settings</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="media__popup_content" class="ui-dialog-content ui-widget-content"><p id="media__link"><label>Link target</label><button class="button" id="media__linkbtn1" title="Link to detail page"><img src="media_link_lnk.png"></button><button class="button" id="media__linkbtn2" title="Direct link to original"><img src="media_link_direct.png"></button><button class="button" id="media__linkbtn3" title="No link"><img src="media_link_nolnk.png"></button><button class="button" id="media__linkbtn4" title="Show only the link."><img src="media_link_displaylnk.png"></button></p><p id="media__align"><label>Alignment</label><button class="button" id="media__alignbtn1" title="Use no align."><img src="media_align_noalign.png"></button><button class="button" id="media__alignbtn2" title="Align the image on the left."><img src="media_align_left.png"></button><button class="button" id="media__alignbtn3" title="Align the image in the middle."><img src="media_align_center.png"></button><button class="button" id="media__alignbtn4" title="Align the image on the right."><img src="media_align_right.png"></button></p><p id="media__size"><label>Image size</label><button class="button" id="media__sizebtn1" title="Small version"><img src="media_size_small.png"></button><button class="button" id="media__sizebtn2" title="Medium version"><img src="media_size_medium.png"></button><button class="button" id="media__sizebtn3" title="Large version"><img src="media_size_large.png"></button><button class="button" id="media__sizebtn4" title="Original version"><img src="media_size_original.png"></button></p><p><input id="media__sendbtn" class="button" value="Insert" type="button"></p></div></div></body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+  
+  <title>
+    devices    [Linux Garmin Communicator Plugin]
+  </title>
+
+  <meta name="generator" content="DokuWiki">
+<meta name="robots" content="index,follow">
+<meta name="date" content="2017-08-13T18:45:35+0000">
+<meta name="keywords" content="devices">
+<link rel="canonical" href="devices.html">
+
+
+
+
+
+
+  <link rel="shortcut icon" href="favicon.ico">
+
+  
+	
+	
+
+
+
+
+<link media="all" href="index.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="header">
+<!--      <div class="pagename">
+        [[<a href="devices.html&amp;do=backlink" >devices</a>]]
+      </div> -->
+      <div class="logo">
+        <a href="index.html" name="dokuwiki__top" id="dokuwiki__top" accesskey="h" title="[ALT+H]">Linux Garmin Communicator Plugin</a>      </div>
+
+      <div class="clearer"></div>
+    </div>
+    <div class="menu-top">
+    	<!--<div id="tpl_simple_navi">-->
+		    	<!--</div>-->
+    </div>
+
+    
+    
+    
+  </div>
+  
+  
+<div class="sideandpage">
+	
+			<div class="sideleft">
+		<div class="userbarandshadows">
+				<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tbody><tr>
+				<td>
+					<table width="100%" cellspacing="0" cellpadding="0" border="0">
+						<tbody><tr>
+						<td valign="top">
+						  <div class="userbar">
+							<div id="sidebarActionTableId">
+							<table width="100%" cellspacing="0" cellpadding="2" border="0">
+							<tbody><tr><td>
+								<div class="smallpadding">
+								<div id="sidebar">
+								<ul class="primary">
+<li class="level1"><div class="li"> <a href="index.html" class="wikilink1" title="start">GarminPlugin</a></div></li><li class="level1"><div class="li"> <a href="news.html" class="wikilink1" title="news">News</a></div></li><li class="level1"><div class="li"> <a href="devices.html" class="wikilink1" title="devices">Supported Devices</a></div></li><li class="level1"><div class="li"> <a href="installation.html" class="wikilink1" title="installation">Installation</a></div></li><li class="level1"><div class="li"> <a href="development.html" class="wikilink1" title="development">Development</a></div><ul><li class="level2"><div class="li"> <a href="source.html" class="wikilink1" title="source">Source Code</a></div></li><li class="level2"><div class="li"> <a href="history.html" class="wikilink1" title="history">History</a></div></li><li class="level2"><div class="li"> <a href="compiling.html" class="wikilink1" title="compiling">Compiling</a></div></li></ul></li><li class="level1"><div class="li"> <a href="howto_garmin_connect.html" class="wikilink1" title="howto_garmin_connect">Using the Plugin</a> </div><ul><li class="level2"><div class="li"> <a href="configuration.html" class="wikilink1" title="configuration">Configuration</a></div></li><li class="level2"><div class="li"> <a href="faq.html" class="wikilink1" title="faq">FAQ</a></div></li></ul></li><li class="level1"><div class="li"> <a href="donation.html" class="wikilink1" title="donation">Donation</a></div></li></ul><ul><li class="level1"><div class="li"> <a href="fit2tcx.html" class="wikilink1" title="fit2tcx">Fit2Tcx</a></div></li></ul>								</div>
+								</div>
+							</td></tr>
+							</tbody></table>
+							</div>
+						  </div>
+						</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+		</tbody></table><br>
+
+	</div> 
+
+      </div>
+		      <div class="mainright">
+	        <div class="page">
+        	  <!-- wikipage start -->
+	          <!-- TOC START -->
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header" style="cursor: pointer;"><span id="toc__toggle" class="toc_close"><span>−</span></span>Table of Contents</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#devices" class="toc">Devices</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#devices_in_development" class="toc">Devices in development</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#device_specific_settings" class="toc">Device specific settings</a></span></div>
+<ul class="toc">
+<li class="level3"><div class="li"><span class="li"><a href="#gpsmap_60csx" class="toc">GPSmap 60CSx</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#etrex_legend_hcx" class="toc">eTrex LEGEND HCx</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#etrex_serial" class="toc">eTrex (Serial)</a></span></div></li>
+<li class="level3"><div class="li"><span class="li"><a href="#any_file_based_device" class="toc">Any file based device</a></span></div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<!-- TOC END -->
+
+<h2 class="sectionedit1"><a name="devices" id="devices">Devices</a></h2>
+<div class="level2">
+<div class="table sectionedit2"><table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0 leftalign">Device  </td><th class="col1"> Supported </th><th class="col2"> Autodetect </th><th class="col3 leftalign"> Send GPX             </th><th class="col4 leftalign"> Read Fitnessdata   </th><th class="col5"> Read GPX </th><th class="col6"> Write Fitnessdata </th>
+	</tr>
+	<tr class="row1">
+		<th class="col0 leftalign"> Dakota            </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row2">
+		<th class="col0 leftalign"> Oregon            </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row3">
+		<th class="col0 leftalign"> Edge 200          </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES</td>
+	</tr>
+	<tr class="row4">
+		<th class="col0 leftalign"> Edge 305          </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> NO           </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row5">
+		<th class="col0 leftalign"> Edge 500          </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES </td>
+	</tr>
+	<tr class="row6">
+		<th class="col0 leftalign"> Edge 705          </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES?<sup><a href="#fn__1" name="fnt__1" id="fnt__1" class="fn_top">1)</a></sup> </td>
+	</tr>
+	<tr class="row7">
+		<th class="col0 leftalign"> Edge 800          </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES</td>
+	</tr>
+	<tr class="row8">
+		<th class="col0"> Edge Touring Plus </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES</td>
+	</tr>
+	<tr class="row9">
+		<th class="col0 leftalign"> Forerunner 10<sup><a href="#fn__2" name="fnt__2" id="fnt__2" class="fn_top">2)</a></sup>    </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3"> NO <sup><a href="#fn__3" name="fnt__3" id="fnt__3" class="fn_top">3)</a></sup> </td><td class="col4 leftalign"> YES        </td><td class="col5"> NO <sup><a href="#fn__4" name="fnt__4" id="fnt__4" class="fn_top">4)</a></sup> </td><td class="col6"> YES </td>
+	</tr>
+	<tr class="row10">
+		<th class="col0 leftalign"> Forerunner 110    </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3"> NO <sup><a href="#fn__5" name="fnt__5" id="fnt__5" class="fn_top">5)</a></sup> </td><td class="col4 leftalign"> YES        </td><td class="col5"> NO <sup><a href="#fn__6" name="fnt__6" id="fnt__6" class="fn_top">6)</a></sup> </td><td class="col6"> YES </td>
+	</tr>
+	<tr class="row11">
+		<th class="col0 leftalign"> Forerunner 210<sup><a href="#fn__7" name="fnt__7" id="fnt__7" class="fn_top">7)</a></sup>    </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES           </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES </td>
+	</tr>
+	<tr class="row12">
+		<th class="col0 leftalign"> Forerunner 220<sup><a href="#fn__8" name="fnt__8" id="fnt__8" class="fn_top">8)</a></sup>    </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> YES           </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> YES </td>
+	</tr>
+	<tr class="row13">
+		<th class="col0 leftalign"> Forerunner 305    </th><td class="col1"> YES </td><td class="col2"> YES </td><td class="col3 leftalign"> NO           </td><td class="col4 leftalign"> YES        </td><td class="col5"> YES </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row14">
+		<th class="col0 leftalign"> Forerunner 310XT  </th><td class="col1 leftalign"> NO  </td><td class="col2 leftalign"> NO  </td><td class="col3 leftalign"> NO           </td><td class="col4 leftalign"> NO         </td><td class="col5 leftalign"> NO  </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row15">
+		<th class="col0 leftalign"> GPSmap 60CSx <sup><a href="#fn__9" name="fnt__9" id="fnt__9" class="fn_top">9)</a></sup>     </th><td class="col1"> YES </td><td class="col2 leftalign"> NO  </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> NO         </td><td class="col5 leftalign"> NO  </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row16">
+		<th class="col0 leftalign"> eTrex  / eTrex Legend HCx <sup><a href="#fn__10" name="fnt__10" id="fnt__10" class="fn_top">10)</a></sup>     </th><td class="col1"> YES </td><td class="col2 leftalign"> NO  </td><td class="col3 leftalign"> YES          </td><td class="col4 leftalign"> NO         </td><td class="col5 leftalign"> NO  </td><td class="col6"> NO </td>
+	</tr>
+	<tr class="row17">
+		<th class="col0" colspan="7"> </th>
+	</tr>
+	<tr class="row18">
+		<th class="col0"> Any file based device with the file GarminDevice.xml<sup><a href="#fn__11" name="fnt__11" id="fnt__11" class="fn_top">11)</a></sup> </th><td class="col1"> YES </td><td class="col2 leftalign"> YES  </td><td class="col3"> YES <sup><a href="#fn__12" name="fnt__12" id="fnt__12" class="fn_top">12)</a></sup> </td><td class="col4"> YES<sup><a href="#fn__13" name="fnt__13" id="fnt__13" class="fn_top">13)</a></sup> </td><td class="col5"> YES<sup><a href="#fn__14" name="fnt__14" id="fnt__14" class="fn_top">14)</a></sup></td><td class="col6"> YES<sup><a href="#fn__15" name="fnt__15" id="fnt__15" class="fn_top">15)</a></sup> </td>
+	</tr>
+</tbody></table></div>
+
+</div>
+
+<h2 class="sectionedit3"><a name="devices_in_development" id="devices_in_development">Devices in development</a></h2>
+<div class="level2">
+<div class="table sectionedit4"><table class="inline">
+	<tbody><tr class="row0">
+		<td class="col0 leftalign">Device  </td><th class="col1"> Supported </th><th class="col2"> Autodetect </th><th class="col3 leftalign"> Send GPX             </th><th class="col4 leftalign"> Read Fitnessdata   </th><th class="col5"> Read GPX </th><th class="col6"> Write Fitnessdata </th><th class="col7"> Status </th>
+	</tr>
+	<tr class="row1">
+		<th class="col0 leftalign"> Forerunner 405           </th><td class="col1"> ? </td><td class="col2"> ? </td><td class="col3 leftalign"> ?          </td><td class="col4 leftalign"> ?        </td><td class="col5"> ? </td><td class="col6"> ? </td><td class="col7"> Not yet started </td>
+	</tr>
+</tbody></table></div>
+
+</div>
+
+<h2 class="sectionedit5"><a name="device_specific_settings" id="device_specific_settings">Device specific settings</a></h2>
+<div class="level2">
+
+<p>
+Some devices need some adjustment in the <a href="configuration.html" class="wikilink1" title="configuration">configuration</a>. The configuration is a xml file that is stored in your home directory as a hidden file at either of these two places:
+</p>
+<pre class="code">~/.config/garminplugin/garminplugin.xml
+~/.garminplugin.xml </pre>
+
+</div>
+
+<h3 class="sectionedit6"><a name="gpsmap_60csx" id="gpsmap_60csx">GPSmap 60CSx</a></h3>
+<div class="level3">
+
+<p>
+You need to disable the autodetection of Edge/Forerunner, otherwise the device switches itself of. You also need to install gpsbabel and configure the plugin as in the following example:
+</p>
+<dl class="file">
+<dt><a href="index.html?do=export_code&amp;id=devices&amp;codeblock=1" title="Download Snippet" class="mediafile mf_xml">garminplugin.xml</a></dt>
+<dd><pre class="code file xml"><span class="sc3"><span class="re1">&lt;?xml</span> <span class="re0">version</span>=<span class="st0">"1.0"</span> <span class="re0">encoding</span>=<span class="st0">"UTF-8"</span> <span class="re0">standalone</span>=<span class="st0">"no"</span> <span class="re2">?&gt;</span></span>
+<span class="sc3"><span class="re1">&lt;GarminPlugin</span> <span class="re0">logfile</span>=<span class="st0">""</span> <span class="re0">level</span>=<span class="st0">"ERROR"</span><span class="re2">&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;Devices<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;Device<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;Name<span class="re2">&gt;</span></span></span>GPSmap 60CSx<span class="sc3"><span class="re1">&lt;/Name<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StoragePath<span class="re2">&gt;</span></span></span>/tmp<span class="sc3"><span class="re1">&lt;/StoragePath<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StorageCommand<span class="re2">&gt;</span></span></span>gpsbabel -i gpx -f %1 -o garmin,snlen=14 -F usb:<span class="sc3"><span class="re1">&lt;/StorageCommand<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;FitnessDataPath<span class="re2">&gt;</span></span><span class="re1">&lt;/FitnessDataPath<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;/Device<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;/Devices<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;Settings<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;ForerunnerTools</span> <span class="re0">enabled</span>=<span class="st0">"false"</span> <span class="re2">/&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;/Settings<span class="re2">&gt;</span></span></span>
+<span class="sc3"><span class="re1">&lt;/GarminPlugin<span class="re2">&gt;</span></span></span></pre>
+</dd></dl>
+
+</div>
+
+<h3 class="sectionedit7"><a name="etrex_legend_hcx" id="etrex_legend_hcx">eTrex LEGEND HCx</a></h3>
+<div class="level3">
+
+<p>
+You need to disable the autodetection of Edge/Forerunner, otherwise the device switches itself of. You also need to install gpsbabel and configure the plugin as in the following example:
+</p>
+<dl class="file">
+<dt><a href="index.html?do=export_code&amp;id=devices&amp;codeblock=2" title="Download Snippet" class="mediafile mf_xml">garminplugin.xml</a></dt>
+<dd><pre class="code file xml"><span class="sc3"><span class="re1">&lt;?xml</span> <span class="re0">version</span>=<span class="st0">"1.0"</span> <span class="re0">encoding</span>=<span class="st0">"UTF-8"</span> <span class="re0">standalone</span>=<span class="st0">"no"</span> <span class="re2">?&gt;</span></span>
+<span class="sc3"><span class="re1">&lt;GarminPlugin</span> <span class="re0">logfile</span>=<span class="st0">""</span> <span class="re0">level</span>=<span class="st0">"ERROR"</span><span class="re2">&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;Devices<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;Device<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;Name<span class="re2">&gt;</span></span></span>eTrex Legend HCx<span class="sc3"><span class="re1">&lt;/Name<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StoragePath<span class="re2">&gt;</span></span></span>/tmp<span class="sc3"><span class="re1">&lt;/StoragePath<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StorageCommand<span class="re2">&gt;</span></span></span>gpsbabel -i gpx -f %1 -o garmin -F usb:<span class="sc3"><span class="re1">&lt;/StorageCommand<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;FitnessDataPath<span class="re2">&gt;</span></span><span class="re1">&lt;/FitnessDataPath<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;/Device<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;/Devices<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;Settings<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;ForerunnerTools</span> <span class="re0">enabled</span>=<span class="st0">"false"</span> <span class="re2">/&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;/Settings<span class="re2">&gt;</span></span></span>
+<span class="sc3"><span class="re1">&lt;/GarminPlugin<span class="re2">&gt;</span></span></span></pre>
+</dd></dl>
+
+</div>
+
+<h3 class="sectionedit8"><a name="etrex_serial" id="etrex_serial">eTrex (Serial)</a></h3>
+<div class="level3">
+
+<p>
+You can use this configuration if your eTrex is attached using a serial cable (not over USB). You also need to install gpsbabel and configure the plugin as in the following example:
+</p>
+<dl class="file">
+<dt><a href="index.html?do=export_code&amp;id=devices&amp;codeblock=3" title="Download Snippet" class="mediafile mf_xml">garminplugin.xml</a></dt>
+<dd><pre class="code file xml"><span class="sc3"><span class="re1">&lt;?xml</span> <span class="re0">version</span>=<span class="st0">"1.0"</span> <span class="re0">encoding</span>=<span class="st0">"UTF-8"</span> <span class="re0">standalone</span>=<span class="st0">"no"</span> <span class="re2">?&gt;</span></span>
+<span class="sc3"><span class="re1">&lt;GarminPlugin</span> <span class="re0">logfile</span>=<span class="st0">""</span> <span class="re0">level</span>=<span class="st0">"ERROR"</span><span class="re2">&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;Devices<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;Device<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;Name<span class="re2">&gt;</span></span></span>eTrex<span class="sc3"><span class="re1">&lt;/Name<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StoragePath<span class="re2">&gt;</span></span></span>/tmp<span class="sc3"><span class="re1">&lt;/StoragePath<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StorageCommand<span class="re2">&gt;</span></span></span>gpsbabel -i gpx -f %1 -o garmin -F /dev/ttyS0<span class="sc3"><span class="re1">&lt;/StorageCommand<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;FitnessDataPath<span class="re2">&gt;</span></span><span class="re1">&lt;/FitnessDataPath<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;/Device<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;/Devices<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;Settings<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;ForerunnerTools</span> <span class="re0">enabled</span>=<span class="st0">"false"</span> <span class="re2">/&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;/Settings<span class="re2">&gt;</span></span></span>
+<span class="sc3"><span class="re1">&lt;/GarminPlugin<span class="re2">&gt;</span></span></span></pre>
+</dd></dl>
+
+<p>
+<strong>Please note that older eTrex devices have only 6 digits for waypoints.</strong> Gpsbabel shortens these waypoints at the beginning. Which means your waypoint might change from GC2B1X8 to C2B1X8 during transfer to the device.
+</p>
+
+</div>
+
+<h3 class="sectionedit9"><a name="any_file_based_device" id="any_file_based_device">Any file based device</a></h3>
+<div class="level3">
+
+<p>
+If you do have a device (manufacturer does not matter) which offers access to the file system of the device (Ubuntu automatically mounts the device, so you can access it using the file manager) - you can easily transfer GPX files to the device using the plugin.
+</p>
+<ul>
+<li class="level1"><div class="li"> Set the name of your device in the configuration file in the section <strong>&lt;Name&gt; … &lt;/Name&gt;</strong></div>
+</li>
+<li class="level1"><div class="li"> Set the path where you want your gpx files to be written to <strong>&lt;StoragePath&gt; … &lt;/StoragePath&gt;</strong></div>
+</li>
+<li class="level1"><div class="li"> Optional: Set a command that gets executed after writing the file to the device (Use %1 for the file name) <strong>&lt;StorageCommand&gt; … &lt;/StorageCommand&gt;</strong></div>
+</li>
+</ul>
+
+<p>
+If the path set under <strong>StoragePath</strong> does not exist (usually unplugged device), the plugin will not find/show the device.
+</p>
+<dl class="file">
+<dt><a href="index.html?do=export_code&amp;id=devices&amp;codeblock=4" title="Download Snippet" class="mediafile mf_xml">garminplugin.xml</a></dt>
+<dd><pre class="code file xml"><span class="sc3"><span class="re1">&lt;?xml</span> <span class="re0">version</span>=<span class="st0">"1.0"</span> <span class="re0">encoding</span>=<span class="st0">"UTF-8"</span> <span class="re0">standalone</span>=<span class="st0">"no"</span> <span class="re2">?&gt;</span></span>
+<span class="sc3"><span class="re1">&lt;GarminPlugin</span> <span class="re0">logfile</span>=<span class="st0">""</span> <span class="re0">level</span>=<span class="st0">"ERROR"</span><span class="re2">&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;Devices<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;Device<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;Name<span class="re2">&gt;</span></span></span>YOUR_DEVICE_NAME<span class="sc3"><span class="re1">&lt;/Name<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StoragePath<span class="re2">&gt;</span></span></span>/media/YOUR_GPS_MOUNT_PATH/PLACE_YOU_PUT_GPX_FILES_TO<span class="sc3"><span class="re1">&lt;/StoragePath<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;StorageCommand<span class="re2">&gt;</span></span><span class="re1">&lt;/StorageCommand<span class="re2">&gt;</span></span></span>
+            <span class="sc3"><span class="re1">&lt;FitnessDataPath<span class="re2">&gt;</span></span><span class="re1">&lt;/FitnessDataPath<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;/Device<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;/Devices<span class="re2">&gt;</span></span></span>
+    <span class="sc3"><span class="re1">&lt;Settings<span class="re2">&gt;</span></span></span>
+        <span class="sc3"><span class="re1">&lt;ForerunnerTools</span> <span class="re0">enabled</span>=<span class="st0">"true"</span> <span class="re2">/&gt;</span></span>
+    <span class="sc3"><span class="re1">&lt;/Settings<span class="re2">&gt;</span></span></span>
+<span class="sc3"><span class="re1">&lt;/GarminPlugin<span class="re2">&gt;</span></span></span></pre>
+</dd></dl>
+
+</div>
+<div class="footnotes">
+<div class="fn"><sup><a href="#fnt__1" id="fn__1" name="fn__1" class="fn_bot">1)</a></sup> 
+not yet tested</div>
+<div class="fn"><sup><a href="#fnt__2" id="fn__2" name="fn__2" class="fn_bot">2)</a></sup> 
+needs plugin version 0.3.17</div>
+<div class="fn"><sup><a href="#fnt__3" id="fn__3" name="fn__3" class="fn_bot">3)</a></sup> 
+, <sup><a href="#fnt__4" id="fn__4" name="fn__4" class="fn_bot">4)</a></sup> 
+, <sup><a href="#fnt__5" id="fn__5" name="fn__5" class="fn_bot">5)</a></sup> 
+, <sup><a href="#fnt__6" id="fn__6" name="fn__6" class="fn_bot">6)</a></sup> 
+not supported by device</div>
+<div class="fn"><sup><a href="#fnt__7" id="fn__7" name="fn__7" class="fn_bot">7)</a></sup> 
+, <sup><a href="#fnt__8" id="fn__8" name="fn__8" class="fn_bot">8)</a></sup> 
+was reported working by users</div>
+<div class="fn"><sup><a href="#fnt__9" id="fn__9" name="fn__9" class="fn_bot">9)</a></sup> 
+, <sup><a href="#fnt__10" id="fn__10" name="fn__10" class="fn_bot">10)</a></sup> 
+using gpsbabel</div>
+<div class="fn"><sup><a href="#fnt__11" id="fn__11" name="fn__11" class="fn_bot">11)</a></sup> 
+since version 0.3.0</div>
+<div class="fn"><sup><a href="#fnt__12" id="fn__12" name="fn__12" class="fn_bot">12)</a></sup> 
+, <sup><a href="#fnt__13" id="fn__13" name="fn__13" class="fn_bot">13)</a></sup> 
+, <sup><a href="#fnt__14" id="fn__14" name="fn__14" class="fn_bot">14)</a></sup> 
+, <sup><a href="#fnt__15" id="fn__15" name="fn__15" class="fn_bot">15)</a></sup> 
+if supported by device</div>
+</div>
+
+	          <!-- wikipage stop -->
+        	</div>
+	     </div>
+	 
+      <div class="clearer">&nbsp;</div>
+</div>
+
+ 
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <div class="doc">
+        devices.txt · Last modified: 2017/08/13 18:45 (external edit) &nbsp;
+		<span class="doclink">
+			&nbsp;
+	        <a href="#dokuwiki__top" class="action top" accesskey="x" rel="nofollow" title="Back to top [X]">Back to top</a>		</span>
+      </div>
+    </div>
+
+   
+    <div class="bar" id="bar__bottom">
+       <div class="footerinc">
+  
+
+  <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/" rel="license" title="Creative Commons License"><img src="button-cc.gif" alt="Creative Commons License" width="80" height="15"></a>
+  <a href="https://www.paypal.com/xclick/business=andreas.diesner%40gmx.de" title="Donate"><img src="button-donate.gif" alt="Donate" width="80" height="15"></a>
+<a href="http://flattr.com/thing/127221/Garmin-Communicator-Plugin-for-Linux" target="_top">
+<img src="flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+<a href="https://www.google.com/+AndreasDiesner?rel=author"><img src="icon-google-plus.png" alt="Google+" width="20" height="20"></a>
+<a href="https://scan.coverity.com/projects/1843">
+  <img alt="Coverity Scan Build Status" src="badge.svg">
+</a>
+
+<!--
+
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="">
+   <dc:type rdf:resource="http://purl.org/dc/dcmitype/Text" />
+   <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.0/" />
+</Work>
+
+<License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.0/">
+   <permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+   <permits rdf:resource="http://web.resource.org/cc/Distribution" />
+   <requires rdf:resource="http://web.resource.org/cc/Notice" />
+   <requires rdf:resource="http://web.resource.org/cc/Attribution" />
+   <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse" />
+   <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+   <requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+</License>
+
+</rdf:RDF>
+
+-->
+
+
+</div>
+<!-- Piwik --> 
+
+<!-- End Piwik Tracking Code -->
+       <img style="float: right;" class="footer_border" src="footer_image_right.png" alt=""> 
+     <div class="clearer"></div>
+    </div>
+    
+  </div>
+
+</div>
+
+<div class="no"><img src="indexer.php" alt="" width="2" height="1"></div>
+
+
+<div style="display: none; z-index: 1000; outline: 0px none;" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable" tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-media__popup_content"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-media__popup_content">Link settings</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="media__popup_content" class="ui-dialog-content ui-widget-content"><p id="media__link"><label>Link target</label><button class="button" id="media__linkbtn1" title="Link to detail page"><img src="media_link_lnk.png"></button><button class="button" id="media__linkbtn2" title="Direct link to original"><img src="media_link_direct.png"></button><button class="button" id="media__linkbtn3" title="No link"><img src="media_link_nolnk.png"></button><button class="button" id="media__linkbtn4" title="Show only the link."><img src="media_link_displaylnk.png"></button></p><p id="media__align"><label>Alignment</label><button class="button" id="media__alignbtn1" title="Use no align."><img src="media_align_noalign.png"></button><button class="button" id="media__alignbtn2" title="Align the image on the left."><img src="media_align_left.png"></button><button class="button" id="media__alignbtn3" title="Align the image in the middle."><img src="media_align_center.png"></button><button class="button" id="media__alignbtn4" title="Align the image on the right."><img src="media_align_right.png"></button></p><p id="media__size"><label>Image size</label><button class="button" id="media__sizebtn1" title="Small version"><img src="media_size_small.png"></button><button class="button" id="media__sizebtn2" title="Medium version"><img src="media_size_medium.png"></button><button class="button" id="media__sizebtn3" title="Large version"><img src="media_size_large.png"></button><button class="button" id="media__sizebtn4" title="Original version"><img src="media_size_original.png"></button></p><p><input id="media__sendbtn" class="button" value="Insert" type="button"></p></div></div></body>
+</html>

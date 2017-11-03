@@ -1,0 +1,250 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+  
+  <title>
+    installation    [Linux Garmin Communicator Plugin]
+  </title>
+
+  <meta name="generator" content="DokuWiki">
+<meta name="robots" content="index,follow">
+<meta name="date" content="2017-08-13T18:45:35+0000">
+<meta name="keywords" content="installation">
+<link rel="canonical" href="installation.html">
+
+
+
+
+
+
+  <link rel="shortcut icon" href="favicon.ico">
+
+  
+	
+	
+
+
+
+
+<link media="all" href="index.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="header">
+<!--      <div class="pagename">
+        [[<a href="installation.html&amp;do=backlink" >installation</a>]]
+      </div> -->
+      <div class="logo">
+        <a href="index.html" name="dokuwiki__top" id="dokuwiki__top" accesskey="h" title="[ALT+H]">Linux Garmin Communicator Plugin</a>      </div>
+
+      <div class="clearer"></div>
+    </div>
+    <div class="menu-top">
+    	<!--<div id="tpl_simple_navi">-->
+		    	<!--</div>-->
+    </div>
+
+    
+    
+    
+  </div>
+  
+  
+<div class="sideandpage">
+	
+			<div class="sideleft">
+		<div class="userbarandshadows">
+				<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tbody><tr>
+				<td>
+					<table width="100%" cellspacing="0" cellpadding="0" border="0">
+						<tbody><tr>
+						<td valign="top">
+						  <div class="userbar">
+							<div id="sidebarActionTableId">
+							<table width="100%" cellspacing="0" cellpadding="2" border="0">
+							<tbody><tr><td>
+								<div class="smallpadding">
+								<div id="sidebar">
+								<ul class="primary">
+<li class="level1"><div class="li"> <a href="index.html" class="wikilink1" title="start">GarminPlugin</a></div></li><li class="level1"><div class="li"> <a href="news.html" class="wikilink1" title="news">News</a></div></li><li class="level1"><div class="li"> <a href="devices.html" class="wikilink1" title="devices">Supported Devices</a></div></li><li class="level1"><div class="li"> <a href="installation.html" class="wikilink1" title="installation">Installation</a></div></li><li class="level1"><div class="li"> <a href="development.html" class="wikilink1" title="development">Development</a></div><ul><li class="level2"><div class="li"> <a href="source.html" class="wikilink1" title="source">Source Code</a></div></li><li class="level2"><div class="li"> <a href="history.html" class="wikilink1" title="history">History</a></div></li><li class="level2"><div class="li"> <a href="compiling.html" class="wikilink1" title="compiling">Compiling</a></div></li></ul></li><li class="level1"><div class="li"> <a href="howto_garmin_connect.html" class="wikilink1" title="howto_garmin_connect">Using the Plugin</a> </div><ul><li class="level2"><div class="li"> <a href="configuration.html" class="wikilink1" title="configuration">Configuration</a></div></li><li class="level2"><div class="li"> <a href="faq.html" class="wikilink1" title="faq">FAQ</a></div></li></ul></li><li class="level1"><div class="li"> <a href="donation.html" class="wikilink1" title="donation">Donation</a></div></li></ul><ul><li class="level1"><div class="li"> <a href="fit2tcx.html" class="wikilink1" title="fit2tcx">Fit2Tcx</a></div></li></ul>								</div>
+								</div>
+							</td></tr>
+							</tbody></table>
+							</div>
+						  </div>
+						</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+		</tbody></table><br>
+
+	</div> 
+
+      </div>
+		      <div class="mainright">
+	        <div class="page">
+        	  <!-- wikipage start -->
+	          <!-- TOC START -->
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header" style="cursor: pointer;"><span id="toc__toggle" class="toc_close"><span>−</span></span>Table of Contents</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#installation_on_ubuntu" class="toc">Installation on Ubuntu</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#debian" class="toc">Debian</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#fedora_opensuse_mandriva_centos_rpm" class="toc">Fedora, OpenSUSE, Mandriva &amp; CentOS (rpm)</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#arch_linux" class="toc">Arch Linux</a></span></div></li>
+</ul>
+</div>
+</div>
+<!-- TOC END -->
+
+<h2 class="sectionedit1"><a name="installation_on_ubuntu" id="installation_on_ubuntu">Installation on Ubuntu</a></h2>
+<div class="level2">
+
+<p>
+Ubuntu users can simply follow these instructions:
+</p>
+<pre class="code"> 
+sudo add-apt-repository ppa:andreas-diesner/garminplugin
+sudo apt-get update
+sudo apt-get install garminplugin </pre>
+
+<p>
+<a href="https://help.launchpad.net/Packaging/PPA/InstallingSoftware" class="urlextern" title="https://help.launchpad.net/Packaging/PPA/InstallingSoftware" rel="nofollow">Official instructions</a> on how to add <strong>ppa:andreas-diesner/garminplugin</strong> to the system.
+</p>
+
+</div>
+
+<h2 class="sectionedit2"><a name="debian" id="debian">Debian</a></h2>
+<div class="level2">
+
+<p>
+Since November 2012 there is an <a href="http://packages.debian.org/sid/garmin-plugin" class="urlextern" title="http://packages.debian.org/sid/garmin-plugin" rel="nofollow">official debian sid package</a> with the name “garmin-plugin”. Simply install it.
+</p>
+
+<p>
+Old instructions:
+Debian users can download the deb files from the following url and manually install it<br>
+
+<a href="http://ppa.launchpad.net/andreas-diesner/garminplugin/ubuntu/pool/main/g/garminplugin/" class="urlextern" title="http://ppa.launchpad.net/andreas-diesner/garminplugin/ubuntu/pool/main/g/garminplugin/" rel="nofollow">http://ppa.launchpad.net/andreas-diesner/garminplugin/ubuntu/pool/main/g/garminplugin/</a>
+</p>
+
+<p>
+The plugin will not get detected by Iceweasel since it will be installed into the wrong directory. You can correct this by creating a link in your home directory:
+</p>
+<pre class="code">mkdir -p ~/.mozilla/plugins
+ln -s /usr/lib/mozilla/plugins/npGarminPlugin.so ~/.mozilla/plugins/npGarminPlugin.so</pre>
+
+</div>
+
+<h2 class="sectionedit3"><a name="fedora_opensuse_mandriva_centos_rpm" id="fedora_opensuse_mandriva_centos_rpm">Fedora, OpenSUSE, Mandriva &amp; CentOS (rpm)</a></h2>
+<div class="level2">
+
+<p>
+There is a repository for Fedora, OpenSUSE, Mandriva and CentOS Users. Go to the following website and follow the instructions:
+</p>
+
+<p>
+<a href="http://software.opensuse.org/download/package?project=home:garminplugin&amp;package=GarminPlugin" class="urlextern" title="http://software.opensuse.org/download/package?project=home:garminplugin&amp;package=GarminPlugin" rel="nofollow">http://software.opensuse.org/download/package?project=home:garminplugin&amp;package=GarminPlugin</a>
+</p>
+
+<p>
+Thanks goes to Robert Walker who introduced me into the mysteries of RPM building and Axel Braun who helped me using the openSUSE build system.
+</p>
+
+</div>
+
+<h2 class="sectionedit4"><a name="arch_linux" id="arch_linux">Arch Linux</a></h2>
+<div class="level2">
+
+<p>
+José San Juan has created an <a href="https://aur.archlinux.org/packages/garminplugin/" class="urlextern" title="https://aur.archlinux.org/packages/garminplugin/" rel="nofollow">arch package</a>
+</p>
+
+</div>
+
+	          <!-- wikipage stop -->
+        	</div>
+	     </div>
+	 
+      <div class="clearer">&nbsp;</div>
+</div>
+
+ 
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <div class="doc">
+        installation.txt · Last modified: 2017/08/13 18:45 (external edit) &nbsp;
+		<span class="doclink">
+			&nbsp;
+	        <a href="#dokuwiki__top" class="action top" accesskey="x" rel="nofollow" title="Back to top [X]">Back to top</a>		</span>
+      </div>
+    </div>
+
+   
+    <div class="bar" id="bar__bottom">
+       <div class="footerinc">
+  
+
+  <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/" rel="license" title="Creative Commons License"><img src="button-cc.gif" alt="Creative Commons License" width="80" height="15"></a>
+  <a href="https://www.paypal.com/xclick/business=andreas.diesner%40gmx.de" title="Donate"><img src="button-donate.gif" alt="Donate" width="80" height="15"></a>
+<a href="http://flattr.com/thing/127221/Garmin-Communicator-Plugin-for-Linux" target="_top">
+<img src="flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+<a href="https://www.google.com/+AndreasDiesner?rel=author"><img src="icon-google-plus.png" alt="Google+" width="20" height="20"></a>
+<a href="https://scan.coverity.com/projects/1843">
+  <img alt="Coverity Scan Build Status" src="badge.svg">
+</a>
+
+<!--
+
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="">
+   <dc:type rdf:resource="http://purl.org/dc/dcmitype/Text" />
+   <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.0/" />
+</Work>
+
+<License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.0/">
+   <permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+   <permits rdf:resource="http://web.resource.org/cc/Distribution" />
+   <requires rdf:resource="http://web.resource.org/cc/Notice" />
+   <requires rdf:resource="http://web.resource.org/cc/Attribution" />
+   <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse" />
+   <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+   <requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+</License>
+
+</rdf:RDF>
+
+-->
+
+
+</div>
+<!-- Piwik --> 
+
+<!-- End Piwik Tracking Code -->
+       <img style="float: right;" class="footer_border" src="footer_image_right.png" alt=""> 
+     <div class="clearer"></div>
+    </div>
+    
+  </div>
+
+</div>
+
+<div class="no"><img src="indexer.php" alt="" width="2" height="1"></div>
+
+
+<div style="display: none; z-index: 1000; outline: 0px none;" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable" tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-media__popup_content"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-media__popup_content">Link settings</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="media__popup_content" class="ui-dialog-content ui-widget-content"><p id="media__link"><label>Link target</label><button class="button" id="media__linkbtn1" title="Link to detail page"><img src="media_link_lnk.png"></button><button class="button" id="media__linkbtn2" title="Direct link to original"><img src="media_link_direct.png"></button><button class="button" id="media__linkbtn3" title="No link"><img src="media_link_nolnk.png"></button><button class="button" id="media__linkbtn4" title="Show only the link."><img src="media_link_displaylnk.png"></button></p><p id="media__align"><label>Alignment</label><button class="button" id="media__alignbtn1" title="Use no align."><img src="media_align_noalign.png"></button><button class="button" id="media__alignbtn2" title="Align the image on the left."><img src="media_align_left.png"></button><button class="button" id="media__alignbtn3" title="Align the image in the middle."><img src="media_align_center.png"></button><button class="button" id="media__alignbtn4" title="Align the image on the right."><img src="media_align_right.png"></button></p><p id="media__size"><label>Image size</label><button class="button" id="media__sizebtn1" title="Small version"><img src="media_size_small.png"></button><button class="button" id="media__sizebtn2" title="Medium version"><img src="media_size_medium.png"></button><button class="button" id="media__sizebtn3" title="Large version"><img src="media_size_large.png"></button><button class="button" id="media__sizebtn4" title="Original version"><img src="media_size_original.png"></button></p><p><input id="media__sendbtn" class="button" value="Insert" type="button"></p></div></div></body>
+</html>

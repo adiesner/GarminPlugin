@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" dir="ltr" lang="en">
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+
+  
+  <title>
+    start    [Linux Garmin Communicator Plugin]
+  </title>
+
+  <meta name="generator" content="DokuWiki">
+<meta name="robots" content="index,follow">
+<meta name="date" content="2017-08-13T18:45:35+0000">
+<meta name="keywords" content="start">
+<link rel="canonical" href="index.html">
+
+
+
+
+
+
+  <link rel="shortcut icon" href="favicon.ico">
+
+  
+	
+	
+
+
+
+
+<link media="all" href="index.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<div class="dokuwiki">
+  
+  <div class="stylehead">
+
+    <div class="header">
+<!--      <div class="pagename">
+        [[<a href="index.html&amp;do=backlink" >start</a>]]
+      </div> -->
+      <div class="logo">
+        <a href="index.html" name="dokuwiki__top" id="dokuwiki__top" accesskey="h" title="[ALT+H]">Linux Garmin Communicator Plugin</a>      </div>
+
+      <div class="clearer"></div>
+    </div>
+    <div class="menu-top">
+    	<!--<div id="tpl_simple_navi">-->
+		    	<!--</div>-->
+    </div>
+
+       
+    
+  </div>
+  
+  
+<div class="sideandpage">
+	
+			<div class="sideleft">
+		<div class="userbarandshadows">
+				<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tbody><tr>
+				<td>
+					<table width="100%" cellspacing="0" cellpadding="0" border="0">
+						<tbody><tr>
+						<td valign="top">
+						  <div class="userbar">
+							<div id="sidebarActionTableId">
+							<table width="100%" cellspacing="0" cellpadding="2" border="0">
+							<tbody><tr><td>
+								<div class="smallpadding">
+								<div id="sidebar">
+								<ul class="primary">
+<li class="level1"><div class="li"> <a href="index.html" class="wikilink1" title="start">GarminPlugin</a></div></li><li class="level1"><div class="li"> <a href="news.html" class="wikilink1" title="news">News</a></div></li><li class="level1"><div class="li"> <a href="devices.html" class="wikilink1" title="devices">Supported Devices</a></div></li><li class="level1"><div class="li"> <a href="installation.html" class="wikilink1" title="installation">Installation</a></div></li><li class="level1"><div class="li"> <a href="development.html" class="wikilink1" title="development">Development</a></div><ul><li class="level2"><div class="li"> <a href="source.html" class="wikilink1" title="source">Source Code</a></div></li><li class="level2"><div class="li"> <a href="history.html" class="wikilink1" title="history">History</a></div></li><li class="level2"><div class="li"> <a href="compiling.html" class="wikilink1" title="compiling">Compiling</a></div></li></ul></li><li class="level1"><div class="li"> <a href="howto_garmin_connect.html" class="wikilink1" title="howto_garmin_connect">Using the Plugin</a> </div><ul><li class="level2"><div class="li"> <a href="configuration.html" class="wikilink1" title="configuration">Configuration</a></div></li><li class="level2"><div class="li"> <a href="faq.html" class="wikilink1" title="faq">FAQ</a></div></li></ul></li><li class="level1"><div class="li"> <a href="donation.html" class="wikilink1" title="donation">Donation</a></div></li></ul><ul><li class="level1"><div class="li"> <a href="fit2tcx.html" class="wikilink1" title="fit2tcx">Fit2Tcx</a></div></li></ul>								</div>
+								</div>
+							</td></tr>
+							</tbody></table>
+							</div>
+						  </div>
+						</td>
+						</tr>
+					</tbody></table>
+				</td>
+			</tr>
+		</tbody></table><br>
+
+	</div> 
+
+      </div>
+		      <div class="mainright">
+	        <div class="page">
+        	  <!-- wikipage start -->
+	          <!-- TOC START -->
+<div class="toc">
+<div class="tocheader toctoggle" id="toc__header" style="cursor: pointer;"><span id="toc__toggle" class="toc_close"><span>−</span></span>Table of Contents</div>
+<div id="toc__inside">
+
+<ul class="toc">
+<li class="level1"><div class="li"><span class="li"><a href="#garmin_communicator_plugin_for_linux_ubuntu" class="toc">Garmin Communicator Plugin for Linux / Ubuntu</a></span></div>
+<ul class="toc">
+<li class="level2"><div class="li"><span class="li"><a href="#howto_use_the_plugin" class="toc">Howto use the plugin</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#supported_devices" class="toc">Supported devices</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#installation" class="toc">Installation</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#the_future" class="toc">The future...</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#feedback" class="toc">Feedback</a></span></div></li>
+<li class="level2"><div class="li"><span class="li"><a href="#other_links" class="toc">Other links</a></span></div></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<!-- TOC END -->
+
+<h1 class="sectionedit1"><a name="garmin_communicator_plugin_for_linux_ubuntu" id="garmin_communicator_plugin_for_linux_ubuntu">Garmin Communicator Plugin for Linux / Ubuntu</a></h1>
+<div class="level1">
+
+<p>
+Officially <a href="http://www.garmin.com/" class="urlextern" title="http://www.garmin.com" rel="nofollow">Garmin</a> does not offer any support for Linux. To be able to use my two Garmin devices under linux I started the development of a browser plugin that behaves just like the original Garmin Communicator Plugin. The plugin allows you to send gpx files to the device (eg. “Send to gps” from geocaching.com) or to upload your fitness data to a website (eg. connect.garmin.com). 
+</p>
+
+<p>
+If you like the plugin you can <a href="donation.html" class="wikilink1" title="donation">support the development</a> of new devices by donating money (to buy new devices - and hopefully implement them)
+</p>
+
+<p>
+
+</p><form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<input name="cmd" value="_s-xclick" type="hidden">
+<input name="hosted_button_id" value="WXF89NFGG8E5E" type="hidden">
+<input src="btn_donatecc_lg.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" type="image" border="0">
+<img alt="" src="pixel.gif" width="1" height="1" border="0">
+</form>
+
+<p></p>
+
+</div>
+
+<h2 class="sectionedit2"><a name="howto_use_the_plugin" id="howto_use_the_plugin">Howto use the plugin</a></h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a href="howto_garmin_connect.html" class="wikilink1" title="howto_garmin_connect">Howto use the plugin on connect.garmin.com</a></div>
+</li>
+</ul>
+
+</div>
+
+<h2 class="sectionedit3"><a name="supported_devices" id="supported_devices">Supported devices</a></h2>
+<div class="level2">
+
+<p>
+Not all Garmin devices are supported yet. If you have a file based device or a device that can be accessed with garmintools your chances are good that it is already supported. Have a look into the list of <a href="devices.html" class="wikilink1" title="devices">supported devices</a> and <a href="websites.html" class="wikilink1" title="websites">tested websites</a>. If your device is not yet supported you can always try to contact me!
+</p>
+
+</div>
+
+<h2 class="sectionedit4"><a name="installation" id="installation">Installation</a></h2>
+<div class="level2">
+
+<p>
+For Ubuntu there is a public Launchpad Repository available under ppa:andreas-diesner/garminplugin. For further information read the <a href="installation.html" class="wikilink1" title="installation">installation instructions</a>
+</p>
+
+<p>
+Changing the <a href="user_agent_switcher.html" class="wikilink1" title="user_agent_switcher">User Agent</a> is <strong>no longer necessary</strong> (since version 0.2.7).
+</p>
+
+</div>
+
+<h2 class="sectionedit5"><a name="the_future" id="the_future">The future...</a></h2>
+<div class="level2">
+
+<p>
+… is very uncertain. The plugin stopped working in Chrome 35+, and Firefox will follow sometime in the future. The support for the plugin interface NPAPI has been dropped, and <a href="https://forums.garmin.com/showthread.php?76009-Announcement-Concerning-Garmin-Connect" class="urlextern" title="https://forums.garmin.com/showthread.php?76009-Announcement-Concerning-Garmin-Connect" rel="nofollow">Garmin has no plans to put any more work into the plugin</a>. So they are going to let the plugin die <img src="icon_sad.gif" class="middle" alt=":-(">. Suggestions on how to continue from here on are welcome…
+</p>
+
+</div>
+
+<h2 class="sectionedit6"><a name="feedback" id="feedback">Feedback</a></h2>
+<div class="level2">
+
+<p>
+For bugs or feature requests send me an email: <a href="mailto:garminplugin@andreas-diesner.de" class="mail" title="garminplugin@andreas-diesner.de">garminplugin@andreas-diesner.de</a><br>
+
+Preferred language is German or English.
+</p>
+
+</div>
+
+<h2 class="sectionedit7"><a name="other_links" id="other_links">Other links</a></h2>
+<div class="level2">
+<ul>
+<li class="level1"><div class="li"> <a href="configuration.html" class="wikilink1" title="configuration">Configuration</a></div>
+</li>
+<li class="level1"><div class="li"> <a href="faq.html" class="wikilink1" title="faq">FAQ</a></div>
+</li>
+<li class="level1"><div class="li"> <a href="history.html" class="wikilink1" title="history">History</a></div>
+</li>
+<li class="level1"><div class="li"> <a href="donation.html" class="wikilink1" title="donation">Donation</a></div>
+</li>
+<li class="level1"><div class="li"> <a href="source.html" class="wikilink1" title="source">Source</a></div>
+</li>
+</ul>
+
+</div>
+
+	          <!-- wikipage stop -->
+        	</div>
+	     </div>
+	 
+      <div class="clearer">&nbsp;</div>
+</div>
+
+ 
+  <div class="stylefoot">
+
+    <div class="meta">
+      <div class="user">
+              </div>
+      <div class="doc">
+        start.txt · Last modified: 2017/08/13 18:45 (external edit) &nbsp;
+		<span class="doclink">
+			&nbsp;
+	        <a href="#dokuwiki__top" class="action top" accesskey="x" rel="nofollow" title="Back to top [X]">Back to top</a>		</span>
+      </div>
+    </div>
+
+   
+    <div class="bar" id="bar__bottom">
+       <div class="footerinc">
+  
+
+  <a href="http://creativecommons.org/licenses/by-nc-sa/2.0/" rel="license" title="Creative Commons License"><img src="button-cc.gif" alt="Creative Commons License" width="80" height="15"></a>
+  <a href="https://www.paypal.com/xclick/business=andreas.diesner%40gmx.de" title="Donate"><img src="button-donate.gif" alt="Donate" width="80" height="15"></a>
+<a href="http://flattr.com/thing/127221/Garmin-Communicator-Plugin-for-Linux" target="_top">
+<img src="flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0"></a>
+<a href="https://www.google.com/+AndreasDiesner?rel=author"><img src="icon-google-plus.png" alt="Google+" width="20" height="20"></a>
+<a href="https://scan.coverity.com/projects/1843">
+  <img alt="Coverity Scan Build Status" src="badge.svg">
+</a>
+
+<!--
+
+<rdf:RDF xmlns="http://web.resource.org/cc/"
+    xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+<Work rdf:about="">
+   <dc:type rdf:resource="http://purl.org/dc/dcmitype/Text" />
+   <license rdf:resource="http://creativecommons.org/licenses/by-nc-sa/2.0/" />
+</Work>
+
+<License rdf:about="http://creativecommons.org/licenses/by-nc-sa/2.0/">
+   <permits rdf:resource="http://web.resource.org/cc/Reproduction" />
+   <permits rdf:resource="http://web.resource.org/cc/Distribution" />
+   <requires rdf:resource="http://web.resource.org/cc/Notice" />
+   <requires rdf:resource="http://web.resource.org/cc/Attribution" />
+   <prohibits rdf:resource="http://web.resource.org/cc/CommercialUse" />
+   <permits rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+   <requires rdf:resource="http://web.resource.org/cc/ShareAlike" />
+</License>
+
+</rdf:RDF>
+
+-->
+
+
+</div>
+<!-- Piwik --> 
+
+<!-- End Piwik Tracking Code -->
+       <img style="float: right;" class="footer_border" src="footer_image_right.png" alt=""> 
+     <div class="clearer"></div>
+    </div>
+    
+  </div>
+
+</div>
+
+<div class="no"><img src="indexer.php" alt="" width="2" height="1"></div>
+
+
+<div style="display: none; z-index: 1000; outline: 0px none;" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-draggable" tabindex="-1" role="dialog" aria-labelledby="ui-dialog-title-media__popup_content"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span class="ui-dialog-title" id="ui-dialog-title-media__popup_content">Link settings</span><a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"><span class="ui-icon ui-icon-closethick">close</span></a></div><div id="media__popup_content" class="ui-dialog-content ui-widget-content"><p id="media__link"><label>Link target</label><button class="button" id="media__linkbtn1" title="Link to detail page"><img src="media_link_lnk.png"></button><button class="button" id="media__linkbtn2" title="Direct link to original"><img src="media_link_direct.png"></button><button class="button" id="media__linkbtn3" title="No link"><img src="media_link_nolnk.png"></button><button class="button" id="media__linkbtn4" title="Show only the link."><img src="media_link_displaylnk.png"></button></p><p id="media__align"><label>Alignment</label><button class="button" id="media__alignbtn1" title="Use no align."><img src="media_align_noalign.png"></button><button class="button" id="media__alignbtn2" title="Align the image on the left."><img src="media_align_left.png"></button><button class="button" id="media__alignbtn3" title="Align the image in the middle."><img src="media_align_center.png"></button><button class="button" id="media__alignbtn4" title="Align the image on the right."><img src="media_align_right.png"></button></p><p id="media__size"><label>Image size</label><button class="button" id="media__sizebtn1" title="Small version"><img src="media_size_small.png"></button><button class="button" id="media__sizebtn2" title="Medium version"><img src="media_size_medium.png"></button><button class="button" id="media__sizebtn3" title="Large version"><img src="media_size_large.png"></button><button class="button" id="media__sizebtn4" title="Original version"><img src="media_size_original.png"></button></p><p><input id="media__sendbtn" class="button" value="Insert" type="button"></p></div></div></body>
+</html>
